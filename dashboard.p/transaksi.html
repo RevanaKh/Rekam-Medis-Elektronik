@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi Klinik - Transaksi Pasien</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Variabel CSS (dari dashboard_pasien.html untuk konsistensi) */
         :root {
@@ -31,52 +32,47 @@
             display: flex;
             min-height: 100vh;
             background-color: var(--light-color);
-            overflow-x: hidden; /* Mencegah scroll horizontal */
+            overflow-x: hidden; /* Mencegah scroll horizontal di seluruh body */
         }
 
-        /* Mobile Toggle outside sidebar (dari dashboard_pasien.html) */
+        /* Mobile Toggle di luar sidebar untuk akses mudah */
         .mobile-toggle {
-            display: none; /* Hidden by default, shown on mobile */
+            display: none; /* Tersembunyi secara default, akan ditampilkan di mobile */
             position: fixed;
             top: 15px;
             left: 15px;
             font-size: 2rem;
-            color: var(--secondary-color);
+            color: var(--white);
             cursor: pointer;
-            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            z-index: 1100;
             padding: 5px 10px;
             background-color: var(--primary-dark);
             border-radius: 5px;
             box-shadow: var(--shadow);
-            line-height: 1; /* Align text vertically */
-            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none; /* Prevent interaction when hidden */
-        }
-
-        /* Sidebar/Navigasi Utama (dari dashboard_pasien.html) */
+        /* Sidebar/Navigasi Utama */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
             color: var(--secondary-color);
             transition: all 0.3s ease;
             flex-shrink: 0;
-            position: fixed; /* Sidebar tetap di posisi */
-            height: 100%; /* Tinggi penuh */
-            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
-            overflow-x: hidden; /* Penting: Mencegah scroll horizontal di dalam sidebar */
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            z-index: 1000;
             display: flex;
             flex-direction: column;
+            left: 0;
         }
 
         .sidebar.minimized {
-            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
+            width: var(--sidebar-minimized-width);
         }
 
         .sidebar-header {
@@ -86,34 +82,38 @@
             background-color: var(--primary-dark);
             color: var(--white);
             font-size: 1.5rem;
-            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+            overflow: hidden;
             position: relative;
-            justify-content: flex-start; /* Ensure items start from left */
+            justify-content: flex-start;
             gap: 10px;
         }
 
         .sidebar.minimized .sidebar-header {
-            justify-content: center; /* Center menu icon when minimized */
-            padding: 20px 0; /* Adjust padding for minimized state */
+            justify-content: center;
+            padding: 20px 0;
         }
 
         .menu-icon {
             font-size: 2rem;
             cursor: pointer;
-            line-height: 1; /* Ensure proper alignment */
-            padding: 0 5px; /* Add some padding around the icon */
+            line-height: 1;
+            padding: 0 5px;
             color: var(--secondary-color);
         }
 
         .sidebar.minimized .menu-icon {
-            font-size: 1.5rem; /* Smaller icon when minimized */
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            display: none;
         }
 
         .nav-list {
             list-style: none;
             padding: 0;
             margin-top: 20px;
-            flex-grow: 1; /* Allow nav list to grow */
+            flex-grow: 1;
         }
 
         .nav-item {
@@ -127,39 +127,32 @@
             color: var(--secondary-color);
             text-decoration: none;
             transition: background-color 0.2s ease, color 0.2s ease;
-            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+            overflow: hidden;
         }
 
         .nav-icon {
             margin-right: 10px;
-            width: 24px; /* Fixed width for SVG icon */
-            height: 24px; /* Fixed height for SVG icon */
+            width: 24px;
+            height: 24px;
             flex-shrink: 0;
         }
 
         .nav-icon svg {
             width: 100%;
             height: 100%;
-            stroke: currentColor; /* Inherit color from parent */
-        }
-
-        .sidebar.minimized .nav-icon {
-            margin-right: 0; /* No margin when minimized */
-            justify-content: center;
-            display: flex;
-            width: 100%; /* Take full width of minimized item */
+            stroke: currentColor;
         }
 
         .nav-text {
             opacity: 1;
             transition: opacity 0.2s ease;
-            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+            white-space: nowrap;
         }
 
         .sidebar.minimized .nav-text {
-            opacity: 0; /* Hide text when minimized */
+            opacity: 0;
             width: 0;
-            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            overflow: hidden;
             visibility: hidden;
         }
 
@@ -168,7 +161,7 @@
             color: var(--white);
         }
 
-        /* Logout Section (dari dashboard_pasien.html) */
+        /* Bagian Logout */
         .logout-section {
             padding: 0;
             text-align: center;
@@ -193,7 +186,7 @@
             border-top: 1px solid var(--secondary-color);
             border-bottom: 1px solid var(--secondary-color);
             box-sizing: border-box;
-            overflow: hidden; /* Penting: Mencegah scrollbar horizontal pada link logout */
+            overflow: hidden;
         }
 
         .logout-link:hover {
@@ -215,7 +208,7 @@
         .logout-text {
             opacity: 1;
             transition: opacity 0.2s ease;
-            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+            white-space: nowrap;
         }
 
         .sidebar.minimized .logout-link {
@@ -229,18 +222,18 @@
         .sidebar.minimized .logout-text {
             opacity: 0;
             width: 0;
-            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            overflow: hidden;
             visibility: hidden;
         }
         .sidebar.minimized .logout-icon {
             margin-right: 0;
         }
 
-        /* Tombol Toggle untuk Desktop (dari dashboard_pasien.html) */
+        /* Tombol Toggle untuk Desktop */
         .toggle-btn {
             position: absolute;
             top: 20px;
-            right: -20px; /* Posisikan di luar sidebar */
+            right: -20px; /* Di luar sidebar agar bisa dijangkau */
             background-color: var(--primary-dark);
             color: var(--white);
             border: none;
@@ -252,7 +245,7 @@
             align-items: center;
             cursor: pointer;
             box-shadow: var(--shadow);
-            z-index: 1001; /* Di atas sidebar */
+            z-index: 1001;
             transition: transform 0.3s ease;
         }
 
@@ -261,210 +254,356 @@
         }
 
         .sidebar.minimized .toggle-btn {
-            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+            transform: translateX(-190px) rotate(180deg); /* Pindahkan saat sidebar diminimalisir */
         }
 
-        /* Area Konten Utama (dari dashboard_pasien.html) */
+        /* Konten Utama */
         .main-content {
             flex-grow: 1;
             padding: 20px;
             transition: margin-left 0.3s ease;
-            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
-            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
-            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
             z-index: 1;
         }
 
-        /* Responsive adjustments (dari dashboard_pasien.html) */
+        /* Penyesuaian Responsif untuk Mobile */
         @media (max-width: 768px) {
             .mobile-toggle {
-                display: block; /* Show on mobile */
-                z-index: 10000; /* Ensure it's always on top */
+                display: block; /* Tampilkan mobile toggle */
+                z-index: 10000; /* Pastikan di atas elemen lain */
             }
 
             .sidebar {
-                left: -250px; /* Hide sidebar off-screen */
-                position: fixed; /* Ensure it stays off-screen */
+                left: -250px; /* Sembunyikan sidebar di luar layar */
+                position: fixed;
                 height: 100%;
-                z-index: 2000; /* Higher than main content */
-                background-color: var(--primary-color); /* Ensure background for visual separation */
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
             }
 
             .sidebar.active {
-                left: 0; /* Slide in when active */
+                left: 0; /* Geser masuk saat aktif */
             }
 
             .main-content {
-                margin-left: 0; /* No margin on mobile */
-                width: 100%; /* Full width */
-                position: relative; /* Crucial for z-index to work against sidebar */
-                z-index: 1; /* Main content below active sidebar */
-            }
-
-            .sidebar.minimized + .main-content {
-                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
             }
 
             .toggle-btn {
-                display: none; /* Hide desktop toggle on mobile */
+                display: none; /* Sembunyikan toggle desktop di mobile */
             }
 
             body {
-                flex-direction: column; /* Stack elements vertically */
+                flex-direction: column;
+            }
+
+            .navbar {
+                padding: 10px 15px;
+                margin-top: 50px;
+            }
+
+            .navbar h2 {
+                font-size: 20px;
+            }
+
+            .card {
+                padding: 15px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* Filter & Search section for mobile */
+            .filter-search-section {
+                flex-direction: column;
+                gap: 10px; /* Adjust gap for mobile */
+                align-items: stretch; /* Stretch items to fill width */
+            }
+
+            .filter-search-section input,
+            .filter-search-section select {
+                width: 100%; /* Full width for inputs/selects */
+            }
+
+            .filter-search-section .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-responsive-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .transaction-table {
+                width: 100%;
+                min-width: 600px; /* Minimum width to enable horizontal scroll */
+            }
+
+            .transaction-table th, .transaction-table td {
+                font-size: 0.8em;
+                padding: 8px;
+                white-space: nowrap; /* Prevent text wrapping in cells by default */
+            }
+
+            /* Allow specific columns to wrap if content is long */
+            .transaction-table td:nth-child(3) { /* Service */
+                white-space: normal;
+                max-width: 150px;
+                overflow-wrap: break-word;
+                word-break: break-word;
             }
         }
 
-        /* Original transaksi.html styles for content */
-        .page-title {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--text-color); /* Changed from --dark-color */
-            font-size: 28px;
-            font-weight: bold;
+        /* Gaya CSS asli dari transaksi.html untuk konten (dipertahankan dan disesuaikan) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
         }
 
-        .transaction-container {
-            background-color: var(--white); /* Changed from #fff */
-            border-radius: 8px;
+        .navbar .left-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 24px;
+        }
+
+        .navbar .user-profile {
+            display: none;
+        }
+
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 10px;
             box-shadow: var(--shadow);
             overflow: hidden;
+        }
+
+        .filter-search-section {
+            display: flex;
+            flex-wrap: wrap; /* Allows items to wrap onto the next line */
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            gap: 15px; /* Spacing between items */
+        }
+
+        .filter-search-section .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap; /* Allows group items to wrap too */
+        }
+
+        .filter-search-section label {
+            font-weight: bold;
+            color: var(--text-color);
+            white-space: nowrap;
+        }
+
+        .filter-search-section input[type="text"],
+        .filter-search-section input[type="date"],
+        .filter-search-section select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            box-sizing: border-box; /* Include padding in element's total width/height */
+        }
+
+        .filter-search-section button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-search-section button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
         }
 
         .transaction-table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
+            min-width: 700px; /* Adjust as needed for desktop */
         }
 
         .transaction-table th, .transaction-table td {
-            padding: 12px 15px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
         }
 
         .transaction-table th {
             background-color: var(--primary-color);
-            color: var(--secondary-color); /* Changed from #000 */
-            font-weight: 600;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .transaction-table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
 
         .transaction-table tbody tr:hover {
-            background-color: var(--light-color);
+            background-color: #ddd;
         }
 
-        .status-paid {
-            background-color: #d1fae5;
-            color: #047857;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .status-cancelled {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .search-filter {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            background-color: var(--white); /* Changed from #fff */
-            border-radius: 5px;
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
             padding: 5px 10px;
-            box-shadow: var(--shadow);
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .search-box input {
-            border: none;
-            outline: none;
-            padding: 8px;
-            width: 100%;
-            font-size: 14px;
-        }
-
-        .search-box i {
-            color: #888;
-            margin-right: 5px;
-        }
-
-        .filter-box {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-box select {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
             border-radius: 5px;
-            outline: none;
-            font-size: 14px;
-            background-color: var(--white); /* Changed from #fff */
+            font-weight: bold;
+            font-size: 0.8em;
+            color: white;
+            text-align: center;
         }
 
+        .status-badge.pending {
+            background-color: #ff9800; /* Orange */
+        }
+
+        .status-badge.completed {
+            background-color: #4CAF50; /* Green */
+        }
+
+        .status-badge.cancelled {
+            background-color: #f44336; /* Red */
+        }
+
+        .status-badge.in-progress {
+            background-color: #2196F3; /* Blue */
+        }
+
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
+            align-items: center;
             margin-top: 20px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .pagination button {
-            background-color: var(--white); /* Changed from #fff */
-            border: 1px solid #ddd;
             padding: 8px 12px;
-            margin: 0 5px;
+            border: 1px solid var(--primary-color);
+            background-color: var(--white);
+            color: var(--primary-color);
             border-radius: 5px;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .pagination button:hover {
-            background-color: var(--light-color);
+            transition: all 0.3s ease;
+            font-size: 0.9em;
         }
 
         .pagination button.active {
             background-color: var(--primary-color);
-            color: var(--secondary-color); /* Changed from #000 */
-            border-color: var(--primary-color);
+            color: var(--white);
         }
 
-        .empty-state {
+        .pagination button:hover:not(.active) {
+            background-color: #e0e0e0;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .empty-transactions-message {
             text-align: center;
-            padding: 40px 20px;
-            color: #888;
+            color: #777;
+            padding: 30px;
+            font-style: italic;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin-top: 20px;
         }
 
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 10px;
-            color: #ccc;
+        /* Modal for Detail (Optional - if needed for more complex detail view) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001; /* Above most content, below mobile toggle */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #555;
         }
     </style>
 </head>
@@ -570,420 +709,404 @@
     </div>
 
     <div class="main-content" id="main-content">
-        <h1 class="page-title">Transaksi Pasien</h1>
-        
-        <div class="search-filter">
-            <div class="search-box">
-                <i>&#x1F50D;</i>
-                <input type="text" id="searchInput" placeholder="Cari transaksi...">
+        <div class="navbar">
+            <div class="left-section">
+                <h2>Transaksi Pasien</h2>
             </div>
-            <div class="filter-box">
-                <select id="statusFilter">
-                    <option value="">Semua Status</option>
-                    <option value="paid">Lunas</option>
-                    <option value="pending">Menunggu Pembayaran</option>
-                </select>
-                <select id="dateFilter">
-                    <option value="">Semua Tanggal</option>
-                    <option value="7">7 Hari Terakhir</option>
-                    <option value="30">30 Hari Terakhir</option>
-                    <option value="90">3 Bulan Terakhir</option>
-                </select>
+            </div>
+
+        <div class="dashboard-content">
+            <div class="card transaction-history-card">
+                <h3>Daftar Transaksi</h3>
+                <div class="filter-search-section">
+                    <div class="filter-group">
+                        <input type="text" id="searchInput" placeholder="Cari transaksi...">
+                        <label for="statusFilter">Status:</label>
+                        <select id="statusFilter">
+                            <option value="">Semua</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Selesai</option>
+                            <option value="cancelled">Dibatalkan</option>
+                            <option value="in-progress">Diproses</option>
+                        </select>
+                        <label for="dateFilter">Tanggal:</label>
+                        <input type="date" id="dateFilter">
+                        <button id="applyFilterBtn">Terapkan Filter</button>
+                        <button id="clearFilterBtn">Clear Filter</button>
+                    </div>
+                </div>
+
+                <div class="empty-transactions-message hidden" id="emptyTransactionsMessage">
+                    Tidak ada transaksi ditemukan untuk filter ini.
+                </div>
+
+                <div class="table-responsive-wrapper">
+                    <table class="transaction-table" id="transactionTable">
+                        <thead>
+                            <tr>
+                                <th>ID Transaksi</th>
+                                <th>Tanggal</th>
+                                <th>Layanan</th>
+                                <th>Jumlah</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionTableBody">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination">
+                    <button id="prevPageBtn" disabled>&laquo; Sebelumnya</button>
+                    <button id="nextPageBtn">Berikutnya &raquo;</button>
+                </div>
             </div>
         </div>
-        
-        <div class="transaction-container">
-            <table class="transaction-table">
-                <thead>
-                    <tr>
-                        <th>No. Transaksi</th>
-                        <th>Tanggal</th>
-                        <th>Layanan</th>
-                        <th>Total Biaya</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="transactionTableBody">
-                    </tbody>
-            </table>
-            
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <i>&#x1F4C4;</i>
-                <p>Tidak ada data transaksi yang tersedia</p>
-            </div>
-        </div>
-        
-        <div class="pagination" id="pagination">
-            </div>
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
 
+            const transactionTableBody = document.getElementById('transactionTableBody');
+            const emptyTransactionsMessage = document.getElementById('emptyTransactionsMessage');
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const dateFilter = document.getElementById('dateFilter');
+            const applyFilterBtn = document.getElementById('applyFilterBtn');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
 
-          // Fungsi untuk memeriksa akses berdasarkan peran
-        function checkAccess(allowedRoles) {
-            const user = sessionStorage.getItem('loggedInUser');
-            if (user) {
-                const loggedInUser = JSON.parse(user);
-                if (!allowedRoles.includes(loggedInUser.role)) {
-                    alert('Anda tidak memiliki akses ke halaman ini.');
-                    sessionStorage.clear();
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+            const pagination = document.getElementById('pagination');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            const rowsPerPage = 5; // Number of transactions per page
+            let currentPage = 1;
+
+            // Dummy transaction data
+            const transactions = [
+                { id: 'TRX001', patientEmail: "pasien1@example.com", date: '2023-01-05', service: 'Pemeriksaan Umum', amount: 150000, status: 'completed' },
+                { id: 'TRX002', patientEmail: "pasien1@example.com", date: '2023-01-10', service: 'Ganti Perban', amount: 50000, status: 'pending' },
+                { id: 'TRX003', patientEmail: "pasien2@example.com", date: '2023-01-15', service: 'Vaksinasi Flu', amount: 200000, status: 'completed' },
+                { id: 'TRX004', patientEmail: "pasien1@example.com", date: '2023-02-01', service: 'Tes Darah Lengkap', amount: 300000, status: 'in-progress' },
+                { id: 'TRX005', patientEmail: "pasien1@example.com", date: '2023-02-05', service: 'Konsultasi Gizi', amount: 100000, status: 'completed' },
+                { id: 'TRX006', patientEmail: "pasien1@example.com", date: '2023-02-10', service: 'Fisioterapi (Sesi 1)', amount: 250000, status: 'pending' },
+                { id: 'TRX007', patientEmail: "pasien1@example.com", date: '2023-02-15', service: 'Pembersihan Karang Gigi', amount: 180000, status: 'completed' },
+                { id: 'TRX008', patientEmail: "pasien1@example.com", date: '2023-03-01', service: 'Cek Kesehatan Rutin', amount: 400000, status: 'in-progress' },
+                { id: 'TRX009', patientEmail: "pasien1@example.com", date: '2023-03-05', service: 'Imunisasi Anak', amount: 120000, status: 'completed' },
+                { id: 'TRX010', patientEmail: "pasien1@example.com", date: '2023-03-10', service: 'USG Kandungan', amount: 350000, status: 'pending' },
+                { id: 'TRX011', patientEmail: "pasien1@example.com", date: '2023-03-15', service: 'Pemeriksaan Mata', amount: 160000, status: 'cancelled' },
+                { id: 'TRX012', patientEmail: "pasien1@example.com", date: '2023-03-20', service: 'Cek Kolesterol', amount: 80000, status: 'completed' },
+                { id: 'TRX013', patientEmail: "pasien1@example.com", date: '2023-04-01', service: 'Terapi Akupunktur', amount: 220000, status: 'in-progress' },
+                { id: 'TRX014', patientEmail: "pasien1@example.com", date: '2023-04-05', service: 'Medical Check-up Pranikah', amount: 600000, status: 'completed' },
+                { id: 'TRX015', patientEmail: "pasien1@example.com", date: '2023-04-10', service: 'Pemasangan KB Implan', amount: 450000, status: 'pending' }
+            ];
+
+            // --- Check Login Status and Redirect ---
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedInUser || loggedInUser.role !== 'pasien') {
+                alert('Anda harus login sebagai pasien untuk mengakses halaman ini.');
+                window.location.href = 'index.html'; // Redirect to login page
+                return; // Stop execution if not logged in or not a patient
+            }
+
+            // Filter transactions for the logged-in user
+            window.userTransactions = transactions.filter(tx => tx.patientEmail === loggedInUser.email);
+            window.filteredTransactions = window.userTransactions; // Initial filtered transactions
+
+            // --- Helper Functions ---
+            const formatDate = (dateString) => {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            };
+
+            const formatCurrency = (amount) => {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(amount);
+            };
+
+            const getStatusDisplay = (status) => {
+                let badgeClass = '';
+                let statusText = '';
+                switch (status) {
+                    case 'pending':
+                        badgeClass = 'pending';
+                        statusText = 'Pending';
+                        break;
+                    case 'completed':
+                        badgeClass = 'completed';
+                        statusText = 'Selesai';
+                        break;
+                    case 'cancelled':
+                        badgeClass = 'cancelled';
+                        statusText = 'Dibatalkan';
+                        break;
+                    case 'in-progress':
+                        badgeClass = 'in-progress';
+                        statusText = 'Diproses';
+                        break;
+                    default:
+                        badgeClass = '';
+                        statusText = status;
                 }
-            } else {
-                window.location.href = '/Rekam-Medis-Elektronik/index.html';
-            }
-        }
- // Jalankan pemeriksaan akses terlebih dahulu
-        checkAccess(['pasien']);
-        
-        // Pagination logic
-        const itemsPerPage = 5;
-        let currentPage = 1;
+                return `<span class="status-badge ${badgeClass}">${statusText}</span>`;
+            };
 
-        const displayTransactions = (page) => {
-            const startIndex = (page - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedTransactions = transactions.slice(startIndex, endIndex);
-            
-            transactionTableBody.innerHTML = '';
-            
-            if (paginatedTransactions.length === 0) {
-                emptyState.style.display = 'block';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            
-            paginatedTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${formatDate(transaction.date)}</td>
-                    <td>${transaction.service}</td>
-                    <td>${formatCurrency(transaction.amount)}</td>
-                    <td>${getStatusDisplay(transaction.status)}</td>
-                `;
-                transactionTableBody.appendChild(row);
-            });
-        };
+            // --- Display Transactions ---
+            const displayTransactions = (page) => {
+                transactionTableBody.innerHTML = '';
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const paginatedItems = window.filteredTransactions.slice(start, end);
 
-        const setupPagination = () => {
-            const pageCount = Math.ceil(transactions.length / itemsPerPage);
-            pagination.innerHTML = '';
-            
-            // Previous button
-            const prevButton = document.createElement('button');
-            prevButton.innerHTML = '&laquo;';
-            prevButton.addEventListener('click', () => {
+                if (paginatedItems.length === 0) {
+                    emptyTransactionsMessage.classList.remove('hidden');
+                    pagination.classList.add('hidden');
+                } else {
+                    emptyTransactionsMessage.classList.add('hidden');
+                    pagination.classList.remove('hidden');
+                    paginatedItems.forEach(transaction => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${transaction.id}</td>
+                            <td>${formatDate(transaction.date)}</td>
+                            <td>${transaction.service}</td>
+                            <td>${formatCurrency(transaction.amount)}</td>
+                            <td>${getStatusDisplay(transaction.status)}</td>
+                        `;
+                        transactionTableBody.appendChild(row);
+                    });
+                }
+                updatePaginationButtons();
+            };
+
+            // --- Pagination Setup ---
+            const setupPagination = () => {
+                pagination.innerHTML = ''; // Clear existing buttons
+                const pageCount = Math.ceil(window.filteredTransactions.length / rowsPerPage);
+
+                prevPageBtn.removeEventListener('click', handlePrevPage);
+                nextPageBtn.removeEventListener('click', handleNextPage);
+
+                const prevButton = document.createElement('button');
+                prevButton.id = 'prevPageBtn';
+                prevButton.textContent = '« Sebelumnya';
+                prevButton.disabled = currentPage === 1;
+                prevButton.addEventListener('click', handlePrevPage);
+                pagination.appendChild(prevButton);
+
+                for (let i = 1; i <= pageCount; i++) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.classList.add('page-number');
+                    if (i === currentPage) {
+                        btn.classList.add('active');
+                    }
+                    btn.addEventListener('click', () => {
+                        currentPage = i;
+                        displayTransactions(currentPage);
+                    });
+                    pagination.appendChild(btn);
+                }
+
+                const nextButton = document.createElement('button');
+                nextButton.id = 'nextPageBtn';
+                nextButton.textContent = 'Berikutnya »';
+                nextButton.disabled = currentPage === pageCount || pageCount === 0;
+                nextButton.addEventListener('click', handleNextPage);
+                pagination.appendChild(nextButton);
+            };
+
+            const updatePaginationButtons = () => {
+                const pageCount = Math.ceil(window.filteredTransactions.length / rowsPerPage);
+                const pageNumberButtons = pagination.querySelectorAll('.page-number');
+
+                pageNumberButtons.forEach((button, index) => {
+                    if (index + 1 === currentPage) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+
+                pagination.querySelector('#prevPageBtn').disabled = currentPage === 1;
+                pagination.querySelector('#nextPageBtn').disabled = currentPage === pageCount || pageCount === 0;
+            };
+
+            const handlePrevPage = () => {
                 if (currentPage > 1) {
                     currentPage--;
                     displayTransactions(currentPage);
-                    updatePaginationButtons();
                 }
-            });
-            pagination.appendChild(prevButton);
-            
-            // Page buttons
-            for (let i = 1; i <= pageCount; i++) {
-                const button = document.createElement('button');
-                button.innerText = i;
-                
-                if (i === currentPage) {
-                    button.classList.add('active');
-                }
-                
-                button.addEventListener('click', () => {
-                    currentPage = i;
-                    displayTransactions(currentPage);
-                    updatePaginationButtons();
-                });
-                
-                pagination.appendChild(button);
-            }
-            
-            // Next button
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = '&raquo;';
-            nextButton.addEventListener('click', () => {
+            };
+
+            const handleNextPage = () => {
+                const pageCount = Math.ceil(window.filteredTransactions.length / rowsPerPage);
                 if (currentPage < pageCount) {
                     currentPage++;
                     displayTransactions(currentPage);
-                    updatePaginationButtons();
                 }
-            });
-            pagination.appendChild(nextButton);
-        };
+            };
 
-        const updatePaginationButtons = () => {
-            const buttons = pagination.querySelectorAll('button');
-            buttons.forEach((button, index) => {
-                // Skip first and last buttons (prev/next)
-                if (index === 0 || index === buttons.length - 1) return;
-                
-                const pageNumber = index;
-                if (pageNumber === currentPage) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            });
-        };
+            // --- Filter Transactions ---
+            const filterTransactions = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedStatus = statusFilter.value;
+                const selectedDate = dateFilter.value;
 
-        // Sidebar and Mobile Menu Toggle (Copied from dashboard_pasien.html)
-        // Toggle sidebar for desktop
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('minimized');
-                // Adjust main content margin based on sidebar state
-                if (sidebar.classList.contains('minimized')) {
-                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                }
-            });
-        }
+                window.filteredTransactions = window.userTransactions.filter(transaction => {
+                    const matchesSearch = Object.values(transaction).some(value =>
+                        String(value).toLowerCase().includes(searchTerm)
+                    );
+                    const matchesStatus = !selectedStatus || transaction.status === selectedStatus;
+                    const matchesDate = !selectedDate || transaction.date === selectedDate;
 
-        // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
-        if (mobileToggle) {
-            mobileToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
-                sidebar.classList.toggle('active');
-            });
-        }
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
 
-        // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
-        if (menuIcon) {
-            menuIcon.addEventListener('click', () => {
-                // For mobile, this should close the sidebar if open
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                }
-                // For desktop, this toggles minimization
-                else {
+                currentPage = 1; // Reset to first page after filtering
+                setupPagination(); // Re-setup pagination based on new filtered data
+                displayTransactions(currentPage); // Display first page of filtered data
+            };
+
+            // --- Sidebar and Mobile Menu Toggle ---
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    console.log('Desktop sidebar toggle clicked!');
                     sidebar.classList.toggle('minimized');
                     if (sidebar.classList.contains('minimized')) {
                         mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
                     } else {
                         mainContent.style.marginLeft = 'var(--sidebar-width)';
                     }
-                }
-            });
-        }
-
-        // Close sidebar when clicking outside on mobile
-        mainContent.addEventListener('click', () => {
-            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
-            }
-        });
-
-        // Prevent sidebar clicks from propagating to mainContent to close it
-        sidebar.addEventListener('click', (event) => {
-            event.stopPropagation();
-        });
-
-
-        // Initialize the app (from dashboard_pasien.html)
-        function init() {
-            // Check screen width on load and apply initial sidebar state
-            if (window.innerWidth <= 768) {
-                sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
-                sidebar.classList.remove('active'); // Ensure hidden by default
-                mainContent.style.marginLeft = '0';
-            } else {
-                sidebar.classList.remove('active'); // Ensure not active on desktop
-                mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
-            }
-        }
-
-        // Run initialization
-        init();
-
-        // Adjust main content margin on window resize for desktop view (from dashboard_pasien.html)
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                if (sidebar.classList.contains('minimized')) {
-                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                }
-                sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
-            } else {
-                mainContent.style.marginLeft = '0';
-            }
-        });
-
-
-        // Search and Filter Functionality
-        const searchInput = document.getElementById('searchInput');
-        const statusFilter = document.getElementById('statusFilter');
-        const dateFilter = document.getElementById('dateFilter');
-        
-        const filterTransactions = () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const statusValue = statusFilter.value;
-            const dateValue = parseInt(dateFilter.value) || 0;
-            
-            // Filter based on search term, status, and date
-            const filteredTransactions = transactions.filter(transaction => {
-                // Search term filter
-                const matchesSearch = searchTerm === '' || 
-                    transaction.id.toLowerCase().includes(searchTerm) ||
-                    transaction.service.toLowerCase().includes(searchTerm);
-                
-                // Status filter
-                const matchesStatus = statusValue === '' || transaction.status === statusValue;
-                
-                // Date filter
-                let matchesDate = true;
-                if (dateValue > 0) {
-                    const currentDate = new Date();
-                    const transactionDate = new Date(transaction.date);
-                    const daysDifference = Math.floor((currentDate - transactionDate) / (1000 * 60 * 60 * 24));
-                    matchesDate = daysDifference <= dateValue;
-                }
-                
-                return matchesSearch && matchesStatus && matchesDate;
-            });
-            
-            // Update display with filtered transactions
-            currentPage = 1;
-            
-            // Store filtered transactions for pagination
-            window.filteredTransactions = filteredTransactions;
-            
-            // Update pagination
-            const pageCount = Math.ceil(filteredTransactions.length / itemsPerPage);
-            pagination.innerHTML = '';
-            
-            if (filteredTransactions.length === 0) {
-                emptyState.style.display = 'block';
-                transactionTableBody.innerHTML = '';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            
-            // Display first page of filtered results
-            const startIndex = 0;
-            const endIndex = Math.min(itemsPerPage, filteredTransactions.length);
-            const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
-            
-            transactionTableBody.innerHTML = '';
-            
-            paginatedTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${formatDate(transaction.date)}</td>
-                    <td>${transaction.service}</td>
-                    <td>${formatCurrency(transaction.amount)}</td>
-                    <td>${getStatusDisplay(transaction.status)}</td>
-                `;
-                transactionTableBody.appendChild(row);
-            });
-            
-            setupPaginationForFiltered(filteredTransactions);
-        };
-        
-        const setupPaginationForFiltered = (filteredData) => {
-            const pageCount = Math.ceil(filteredData.length / itemsPerPage);
-            pagination.innerHTML = '';
-            
-            if (pageCount <= 1) {
-                return;
-            }
-            
-            // Previous button
-            const prevButton = document.createElement('button');
-            prevButton.innerHTML = '&laquo;';
-            prevButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayFilteredPage(currentPage, filteredData);
-                    updatePaginationButtonsFiltered(pageCount);
-                }
-            });
-            pagination.appendChild(prevButton);
-            
-            // Page buttons
-            for (let i = 1; i <= pageCount; i++) {
-                const button = document.createElement('button');
-                button.innerText = i;
-                
-                if (i === currentPage) {
-                    button.classList.add('active');
-                }
-                
-                button.addEventListener('click', () => {
-                    currentPage = i;
-                    displayFilteredPage(currentPage, filteredData);
-                    updatePaginationButtonsFiltered(pageCount);
                 });
-                
-                pagination.appendChild(button);
             }
-            
-            // Next button
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = '&raquo;';
-            nextButton.addEventListener('click', () => {
-                if (currentPage < pageCount) {
-                    currentPage++;
-                    displayFilteredPage(currentPage, filteredData);
-                    updatePaginationButtonsFiltered(pageCount);
-                }
-            });
-            pagination.appendChild(nextButton);
-        };
-        
-        const displayFilteredPage = (page, filteredData) => {
-            const startIndex = (page - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
-            const paginatedTransactions = filteredData.slice(startIndex, endIndex);
-            
-            transactionTableBody.innerHTML = '';
-            
-            paginatedTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${formatDate(transaction.date)}</td>
-                    <td>${transaction.service}</td>
-                    <td>${formatCurrency(transaction.amount)}</td>
-                    <td>${getStatusDisplay(transaction.status)}</td>
-                `;
-                transactionTableBody.appendChild(row);
-            });
-        };
-        
-        const updatePaginationButtonsFiltered = (pageCount) => {
-            const buttons = pagination.querySelectorAll('button');
-            buttons.forEach((button, index) => {
-                // Skip first and last buttons (prev/next)
-                if (index === 0 || index === buttons.length - 1) return;
-                
-                const pageNumber = index;
-                if (pageNumber === currentPage) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            });
-        };
-        
-        // Event Listeners
-        searchInput.addEventListener('input', filterTransactions);
-        statusFilter.addEventListener('change', filterTransactions);
-        dateFilter.addEventListener('change', filterTransactions);
 
-        // Initialize
-        displayTransactions(currentPage);
-        setupPagination();
-        
-        // Set initial filtered transactions
-        window.filteredTransactions = transactions;
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', (event) => {
+                    console.log('Mobile toggle clicked!');
+                    event.stopPropagation();
+                    sidebar.classList.toggle('active');
+
+                    // --- TEMPORARY DIAGNOSTIC CHANGE ---
+                    // Menghapus logika untuk menyembunyikan mobile-toggle saat sidebar aktif.
+                    // Ini untuk menguji apakah mobile-toggle menjadi bisa diklik.
+                    // Jika ini memperbaiki klik, maka masalahnya ada pada logika hiding ini.
+                    /*
+                    if (sidebar.classList.contains('active')) {
+                        mobileToggle.style.opacity = '0';
+                        mobileToggle.style.visibility = 'hidden';
+                        mobileToggle.style.pointerEvents = 'none';
+                    } else {
+                        mobileToggle.style.opacity = '1';
+                        mobileToggle.style.visibility = 'visible';
+                        mobileToggle.style.pointerEvents = 'auto';
+                    }
+                    */
+                    // --- END TEMPORARY DIAGNOSTIC CHANGE ---
+                });
+            }
+
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    console.log('Menu icon (inside sidebar) clicked!');
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                        // --- TEMPORARY DIAGNOSTIC CHANGE ---
+                        // Menghapus logika untuk menampilkan mobile-toggle saat sidebar ditutup.
+                        /*
+                        mobileToggle.style.opacity = '1';
+                        mobileToggle.style.visibility = 'visible';
+                        mobileToggle.style.pointerEvents = 'auto';
+                        */
+                        // --- END TEMPORARY DIAGNOSTIC CHANGE ---
+                    } else {
+                        sidebar.classList.toggle('minimized');
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        } else {
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
+                        }
+                    }
+                });
+            }
+
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    console.log('Main content clicked, closing mobile sidebar');
+                    sidebar.classList.remove('active');
+                    // --- TEMPORARY DIAGNOSTIC CHANGE ---
+                    // Menghapus logika untuk menampilkan mobile-toggle saat sidebar ditutup.
+                    /*
+                    mobileToggle.style.opacity = '1';
+                    mobileToggle.style.visibility = 'visible';
+                    mobileToggle.style.pointerEvents = 'auto';
+                    */
+                    // --- END TEMPORARY DIAGNOSTIC CHANGE ---
+                }
+            });
+
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            function initLayout() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    sidebar.classList.remove('minimized');
+                    mainContent.style.marginLeft = '0';
+                    mainContent.style.width = '100%';
+                    // --- TEMPORARY DIAGNOSTIC CHANGE ---
+                    // Menghapus inisialisasi visibilitas/clickability untuk mobile-toggle.
+                    /*
+                    mobileToggle.style.opacity = '1';
+                    mobileToggle.style.visibility = 'visible';
+                    mobileToggle.style.pointerEvents = 'auto';
+                    */
+                    // --- END TEMPORARY DIAGNOSTIC CHANGE ---
+                } else {
+                    sidebar.style.left = '0';
+                    sidebar.classList.remove('active');
+                    sidebar.classList.remove('minimized');
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    mainContent.style.width = 'calc(100% - var(--sidebar-width))';
+                }
+            }
+
+            // --- Event Listeners for Filters ---
+            searchInput.addEventListener('input', filterTransactions);
+            statusFilter.addEventListener('change', filterTransactions);
+            dateFilter.addEventListener('change', filterTransactions);
+            applyFilterBtn.addEventListener('click', filterTransactions);
+            clearFilterBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                statusFilter.value = '';
+                dateFilter.value = '';
+                filterTransactions();
+            });
+
+            // --- Logout Function ---
+            window.logout = function() {
+                if (confirm('Apakah Anda yakin ingin logout?')) {
+                    sessionStorage.clear();
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
+            };
+
+            // Initialize layout and display transactions
+            initLayout();
+            displayTransactions(currentPage);
+            setupPagination();
+
+            window.addEventListener('resize', initLayout);
+        });
     </script>
 </body>
 </html>
