@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Klinik - Transaksi Pasien</title>
+    <title>Transaksi Pasien</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Variabel CSS (dari dashboard_pasien.html untuk konsistensi) */
@@ -29,844 +29,576 @@
         }
 
         body {
-            display: flex;
+            display: flex; /* Penting untuk layout sidebar dan konten */
             min-height: 100vh;
             background-color: var(--light-color);
-            overflow-x: hidden; /* Mencegah scroll horizontal */
+            overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan */
         }
 
-        /* Mobile Toggle outside sidebar (dari dashboard_pasien.html) */
-        .mobile-toggle {
-            display: none; /* Hidden by default, shown on mobile */
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            font-size: 2rem;
-            color: var(--secondary-color);
-            cursor: pointer;
-            z-index: 1100; /* Higher than sidebar for mobile visibility */
-            padding: 5px 10px;
-            background-color: var(--primary-dark);
-            border-radius: 5px;
-            box-shadow: var(--shadow);
-            line-height: 1; /* Align text vertically */
-            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
-        }
-
-        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none; /* Prevent interaction when hidden */
-        }
-
-        /* Sidebar/Navigasi Utama (dari dashboard_pasien.html) */
+        /* NEW/MODIFIED CSS FOR SIDEBAR AND MAIN CONTENT TOGGLE */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
-            color: var(--secondary-color);
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-            position: fixed; /* Sidebar tetap di posisi */
-            height: 100%; /* Tinggi penuh */
-            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
-            overflow-x: hidden; /* Penting: Mencegah scroll horizontal di dalam sidebar */
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            color: var(--white);
+            padding: 20px;
             display: flex;
             flex-direction: column;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: var(--shadow);
+            position: fixed; /* Menjaga sidebar tetap di tempatnya */
+            height: 100vh; /* Memastikan sidebar mengambil tinggi penuh */
+            z-index: 1000;
         }
 
         .sidebar.minimized {
-            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
+            width: var(--sidebar-minimized-width);
         }
 
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background-color: var(--primary-dark);
-            color: var(--white);
-            font-size: 1.5rem;
-            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
-            position: relative;
-            justify-content: flex-start; /* Ensure items start from left */
-            gap: 10px;
-        }
-
-        .sidebar.minimized .sidebar-header {
-            justify-content: center; /* Center menu icon when minimized */
-            padding: 20px 0; /* Adjust padding for minimized state */
-        }
-
-        .menu-icon {
-            font-size: 2rem;
-            cursor: pointer;
-            line-height: 1; /* Ensure proper alignment */
-            padding: 0 5px; /* Add some padding around the icon */
-            color: var(--secondary-color);
-        }
-
-        .sidebar.minimized .menu-icon {
-            font-size: 1.5rem; /* Smaller icon when minimized */
-        }
-
-        .nav-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-            flex-grow: 1; /* Allow nav list to grow */
-        }
-
-        .nav-item {
-            position: relative;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: var(--secondary-color);
-            text-decoration: none;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
-        }
-
-        .nav-icon {
-            margin-right: 10px;
-            width: 24px; /* Fixed width for SVG icon */
-            height: 24px; /* Fixed height for SVG icon */
-            flex-shrink: 0;
-        }
-
-        .nav-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: currentColor; /* Inherit color from parent */
-        }
-
-        .sidebar.minimized .nav-icon {
-            margin-right: 0; /* No margin when minimized */
-            justify-content: center;
-            display: flex;
-            width: 100%; /* Take full width of minimized item */
-        }
-
-        .nav-text {
-            opacity: 1;
-            transition: opacity 0.2s ease;
-            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
-        }
-
-        .sidebar.minimized .nav-text {
-            opacity: 0; /* Hide text when minimized */
-            width: 0;
-            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
-            visibility: hidden;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: var(--primary-dark);
-            color: var(--white);
-        }
-
-        /* Logout Section (dari dashboard_pasien.html) */
-        .logout-section {
-            padding: 0;
+        .sidebar .logo {
             text-align: center;
-            width: 100%;
-            flex-shrink: 0;
-            margin-top: auto;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--white);
+            transition: opacity 0.3s ease;
         }
 
-        .logout-link {
+        .sidebar.minimized .logo {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar nav ul li a {
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, padding 0.3s ease;
+        }
+
+        .sidebar nav ul li a:hover,
+        .sidebar nav ul li a.active {
+            background-color: var(--primary-dark);
+        }
+
+        .sidebar nav ul li a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar nav ul li a span {
+            transition: opacity 0.3s ease, max-width 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .sidebar.minimized nav ul li a span {
+            opacity: 0;
+            max-width: 0;
+        }
+
+        .sidebar .logout-btn {
             background-color: var(--secondary-color);
             color: var(--white);
+            padding: 10px 15px;
+            border-radius: 5px;
             text-align: center;
-            border-radius: 0;
+            margin-top: auto;
+            text-decoration: none;
+            transition: background-color 0.3s ease, opacity 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px 0;
-            text-decoration: none;
-            transition: background-color 0.2s ease;
-            gap: 8px;
-            width: 100%;
-            border-top: 1px solid var(--secondary-color);
-            border-bottom: 1px solid var(--secondary-color);
-            box-sizing: border-box;
-            overflow: hidden; /* Penting: Mencegah scrollbar horizontal pada link logout */
         }
 
-        .logout-link:hover {
-            background-color: #222;
+        .sidebar .logout-btn i {
+            margin-right: 10px;
         }
 
-        .logout-icon {
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-
-        .logout-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: currentColor;
-        }
-
-        .logout-text {
-            opacity: 1;
-            transition: opacity 0.2s ease;
-            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
-        }
-
-        .sidebar.minimized .logout-link {
-            padding: 15px 0;
-            width: 100%;
-            height: auto;
-            border-radius: 0;
-            justify-content: center;
-        }
-
-        .sidebar.minimized .logout-text {
+        .sidebar.minimized .logout-btn {
             opacity: 0;
-            width: 0;
-            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
-            visibility: hidden;
+            pointer-events: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            margin-left: auto;
+            margin-right: auto;
+            overflow: hidden;
         }
-        .sidebar.minimized .logout-icon {
+
+        .sidebar.minimized .logout-btn i {
             margin-right: 0;
         }
 
-        /* Tombol Toggle untuk Desktop (dari dashboard_pasien.html) */
-        .toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: -20px; /* Posisikan di luar sidebar */
-            background-color: var(--primary-dark);
-            color: var(--white);
+        .sidebar.minimized .logout-btn span {
+            display: none;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .main-content.sidebar-minimized {
+            margin-left: var(--sidebar-minimized-width);
+            width: calc(100% - var(--sidebar-minimized-width));
+        }
+
+        .header {
+            background-color: var(--white);
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .header .left-section {
+            display: flex;
+            align-items: center;
+        }
+
+        /* MENU TOGGLE BUTTON STYLES */
+        .header .menu-toggle {
+            background: none;
             border: none;
-            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+            margin-right: 20px;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .header .menu-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .header .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .header .user-profile .username {
+            margin-right: 10px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .header .user-profile .profile-pic {
             width: 40px;
             height: 40px;
+            border-radius: 50%;
+            background-color: #ccc;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 18px;
+            color: var(--text-color);
             cursor: pointer;
-            box-shadow: var(--shadow);
-            z-index: 1001; /* Di atas sidebar */
-            transition: transform 0.3s ease;
         }
 
-        .toggle-btn i {
-            font-size: 1.2rem;
-        }
-
-        .sidebar.minimized .toggle-btn {
-            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
-        }
-
-        /* Area Konten Utama (dari dashboard_pasien.html) */
-        .main-content {
-            flex-grow: 1;
+        /* Main Content Area */
+        main {
             padding: 20px;
-            transition: margin-left 0.3s ease;
-            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
-            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
-            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
-            position: relative;
-            z-index: 1;
+            flex-grow: 1;
+            background-color: var(--light-color);
         }
 
-        /* Responsive adjustments (dari dashboard_pasien.html) */
-        @media (max-width: 768px) {
-            .mobile-toggle {
-                display: block; /* Show on mobile */
-                z-index: 10000; /* Ensure it's always on top */
-            }
-
-            .sidebar {
-                left: -250px; /* Hide sidebar off-screen */
-                position: fixed; /* Ensure it stays off-screen */
-                height: 100%;
-                z-index: 2000; /* Higher than main content */
-                background-color: var(--primary-color); /* Ensure background for visual separation */
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
-            }
-
-            .sidebar.active {
-                left: 0; /* Slide in when active */
-            }
-
-            .main-content {
-                margin-left: 0; /* No margin on mobile */
-                width: 100%; /* Full width */
-                position: relative; /* Crucial for z-index to work against sidebar */
-                z-index: 1; /* Main content below active sidebar */
-            }
-
-            .sidebar.minimized + .main-content {
-                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
-            }
-
-            .toggle-btn {
-                display: none; /* Hide desktop toggle on mobile */
-            }
-
-            body {
-                flex-direction: column; /* Stack elements vertically */
-            }
-        }
-
-        /* Original transaksi.html styles for content */
         .page-title {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--text-color); /* Changed from --dark-color */
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .transaction-container {
-            background-color: var(--white); /* Changed from #fff */
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
+            color: var(--text-color);
             margin-bottom: 20px;
         }
 
-        .transaction-table {
-            width: 100%;
-            border-collapse: collapse;
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            align-items: center;
         }
 
-        .transaction-table th, .transaction-table td {
+        .controls-container label {
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .controls-container input[type="text"],
+        .controls-container select,
+        .controls-container input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            min-width: 150px;
+            flex: 1;
+        }
+
+        .table-container {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table thead th {
+            background-color: var(--primary-color);
+            color: var(--white);
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
-        .transaction-table th {
-            background-color: var(--primary-color);
-            color: var(--secondary-color); /* Changed from #000 */
-            font-weight: 600;
+        table tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            color: var(--text-color);
         }
 
-        .transaction-table tbody tr:hover {
-            background-color: var(--light-color);
+        table tbody tr:hover {
+            background-color: #f9f9f9;
         }
 
-        .status-paid {
-            background-color: #d1fae5;
-            color: #047857;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .status-cancelled {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-
-        .search-filter {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            background-color: var(--white); /* Changed from #fff */
-            border-radius: 5px;
+        .status-badge {
             padding: 5px 10px;
-            box-shadow: var(--shadow);
-            flex: 1;
-            min-width: 200px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--white);
         }
 
-        .search-box input {
-            border: none;
-            outline: none;
-            padding: 8px;
-            width: 100%;
-            font-size: 14px;
-        }
+        .status-badge.pending { background-color: #ff9800; } /* Orange */
+        .status-badge.completed { background-color: var(--success-color); }
+        .status-badge.cancelled { background-color: var(--danger-color); }
 
-        .search-box i {
-            color: #888;
-            margin-right: 5px;
-        }
-
-        .filter-box {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-box select {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            outline: none;
-            font-size: 14px;
-            background-color: var(--white); /* Changed from #fff */
-        }
         .pagination {
             display: flex;
             justify-content: center;
+            align-items: center;
             margin-top: 20px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .pagination button {
-            background-color: var(--white); /* Changed from #fff */
-            border: 1px solid #ddd;
+            background-color: var(--white);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
             padding: 8px 12px;
-            margin: 0 5px;
             border-radius: 5px;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .pagination button:hover {
-            background-color: var(--light-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .pagination button.active {
             background-color: var(--primary-color);
-            color: var(--secondary-color); /* Changed from #000 */
-            border-color: var(--primary-color);
+            color: var(--white);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 10px;
-            color: #ccc;
+        .pagination button:hover:not(.active) {
+            background-color: #e0f2f1; /* Light hover effect */
         }
     </style>
 </head>
 <body>
-    <div class="mobile-toggle" id="mobile-toggle"> ≡ </div>
-    <div class="sidebar" id="sidebar">
-        <button class="toggle-btn" id="sidebar-toggle">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="sidebar-header">
-            <div class="menu-icon">≡</div>
-        </div>
-        <ul class="nav-list">
-            <li class="nav-item">
-                <a href="dashboard_pasien.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Home</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="pendaftaran_pasien.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Pendaftaran Pasien</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="jadwal_d.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Jadwal Dokter</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="riwayat.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                            <polyline points="22 6 12 13 2 6"></polyline>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Riwayat</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="transaksi.html" class="nav-link active">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="1" x2="12" y2="23"></line>
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Transaksi</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="pengaturan.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82-.33H9A1.65 1.65 0 0 0 10 3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09z"></path>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Pengaturan</div>
-                </a>
-            </li>
-        </ul>
-        <div class="logout-section">
-            <a href="#" class="logout-link">
-                <div class="logout-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="17 16 22 12 17 8"></polyline>
-                        <line x1="22" y1="12" x2="10" y2="12"></line>
-                    </svg>
-                </div>
-                <div class="logout-text">Logout</div>
-            </a>
-        </div>
+    <div class="sidebar">
+        <div class="logo">Klinik</div>
+        <nav>
+            <ul>
+                <li><a href="#"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                <li><a href="#" class="active"><i class="fas fa-exchange-alt"></i> <span>Transaksi</span></a></li>
+                <li><a href="riwayat.html"><i class="fas fa-history"></i> <span>Riwayat</span></a></li>
+            </ul>
+        </nav>
+        <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
     </div>
 
-    <div class="main-content" id="main-content">
-        <h1 class="page-title">Riwayat Transaksi Pasien</h1>
-
-        <div class="search-filter">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari transaksi...">
+    <div class="main-content">
+        <div class="header">
+            <div class="left-section">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Transaksi Pasien</h1>
             </div>
-            <div class="filter-box">
+            <div class="user-profile">
+                <span class="username">Dr. Budi</span>
+                <div class="profile-pic"><i class="fas fa-user-md"></i></div>
+            </div>
+        </div>
+
+        <main>
+            <div class="controls-container">
+                <label for="search">Cari Transaksi:</label>
+                <input type="text" id="search" placeholder="Cari berdasarkan ID, layanan...">
+
+                <label for="statusFilter">Status:</label>
                 <select id="statusFilter">
                     <option value="">Semua Status</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Selesai</option>
+                    <option value="cancelled">Dibatalkan</option>
                 </select>
+
+                <label for="dateFilter">Tanggal:</label>
                 <input type="date" id="dateFilter">
             </div>
-        </div>
 
-        <div class="transaction-container">
-            <table class="transaction-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tanggal</th>
-                        <th>Layanan</th>
-                        <th>Jumlah</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="transactionTableBody">
-                    </tbody>
-            </table>
-        </div>
-
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="fas fa-exclamation-circle"></i>
-            <p>Tidak ada riwayat transaksi yang ditemukan.</p>
-        </div>
-
-        <div class="pagination" id="pagination">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Transaksi</th>
+                            <th>Tanggal</th>
+                            <th>Layanan</th>
+                            <th>Jumlah</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        </tbody>
+                </table>
             </div>
+
+            <div class="pagination" id="pagination">
+                <button id="prevPage">Sebelumnya</button>
+                <button class="page-number active">1</button>
+                <button class="page-number">2</button>
+                <button class="page-number">3</button>
+                <button id="nextPage">Berikutnya</button>
+            </div>
+        </main>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggleBtn = document.getElementById('sidebar-toggle');
-            const mobileToggleBtn = document.getElementById('mobile-toggle');
-            const mainContent = document.getElementById('main-content');
-            const minimizedSidebarWidth = 'var(--sidebar-minimized-width)';
-            const fullSidebarWidth = 'var(--sidebar-width)';
+        // MENU TOGGLE JAVASCRIPT (NEW)
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
 
-            // Function to set main content margin
-            const setMainContentMargin = () => {
-                if (window.innerWidth <= 768) {
-                    mainContent.style.marginLeft = '0';
-                } else {
-                    if (sidebar.classList.contains('minimized')) {
-                        mainContent.style.marginLeft = minimizedSidebarWidth;
-                    } else {
-                        mainContent.style.marginLeft = fullSidebarWidth;
-                    }
-                }
-            };
-
-            // Toggle sidebar for desktop
-            if (sidebarToggleBtn) {
-                sidebarToggleBtn.addEventListener('click', () => {
+            if (menuToggle && sidebar && mainContent) {
+                menuToggle.addEventListener('click', function() {
                     sidebar.classList.toggle('minimized');
-                    setMainContentMargin();
+                    mainContent.classList.toggle('sidebar-minimized');
                 });
+            } else {
+                console.error("DEBUG: One or more required elements for menu toggle not found:");
+                if (!menuToggle) console.error("  - Element with class 'menu-toggle' is missing.");
+                if (!sidebar) console.error("  - Element with class 'sidebar' is missing.");
+                if (!mainContent) console.error("  - Element with class 'main-content' is missing.");
             }
-
-            // Toggle sidebar for mobile
-            if (mobileToggleBtn) {
-                mobileToggleBtn.addEventListener('click', () => {
-                    sidebar.classList.add('active');
-                    // No margin change for main content on mobile, sidebar overlays
-                });
-            }
-
-            // Close sidebar when clicking outside on mobile
-            mainContent.addEventListener('click', () => {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
-                    sidebar.classList.remove('active');
-                }
-            });
-
-            // Prevent sidebar click from closing it on mobile
-            sidebar.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-
-            // Initialize on load
-            const init = () => {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('minimized');
-                    sidebar.classList.remove('active');
-                    mainContent.style.marginLeft = '0';
-                } else {
-                    sidebar.classList.remove('active');
-                    sidebar.classList.remove('minimized'); // Ensure it starts expanded on desktop
-                    setMainContentMargin();
-                }
-            };
-            init();
-
-            // Adjust main content margin on window resize
-            window.addEventListener('resize', () => {
-                init(); // Re-initialize sidebar state based on new window size
-            });
-
-
-            // Original transaksi.html JavaScript (kept below the sidebar logic)
-
-            // Dummy Data Transaksi
-            const transactions = [
-                { id: 'TRX001', date: '2023-01-15', service: 'Pemeriksaan Umum', amount: 150000, status: 'Paid' },
-                { id: 'TRX002', date: '2023-01-20', service: 'Cabut Gigi', amount: 300000, status: 'Pending' },
-                { id: 'TRX003', date: '2023-02-01', service: 'Scaling Gigi', amount: 200000, status: 'Paid' },
-                { id: 'TRX004', date: '2023-02-10', service: 'Vaksinasi Flu', amount: 100000, status: 'Paid' },
-                { id: 'TRX005', date: '2023-02-15', service: 'Konsultasi Gizi', amount: 80000, status: 'Cancelled' },
-                { id: 'TRX006', date: '2023-03-01', service: 'Pemeriksaan Mata', amount: 180000, status: 'Paid' },
-                { id: 'TRX007', date: '2023-03-05', service: 'Fisioterapi', amount: 250000, status: 'Pending' },
-                { id: 'TRX008', date: '2023-03-10', service: 'Rapid Test', amount: 75000, status: 'Paid' },
-                { id: 'TRX009', date: '2023-03-12', service: 'Tes Darah Lengkap', amount: 120000, status: 'Paid' },
-                { id: 'TRX010', date: '2023-03-18', service: 'Pembersihan Karang Gigi', amount: 220000, status: 'Pending' },
-                { id: 'TRX011', date: '2024-01-05', service: 'Checkup Tahunan', amount: 250000, status: 'Paid' },
-                { id: 'TRX012', date: '2024-01-10', service: 'Konsultasi Online', amount: 90000, status: 'Pending' },
-                { id: 'TRX013', date: '2024-01-15', service: 'Terapi Fisik', amount: 180000, status: 'Paid' },
-                { id: 'TRX014', date: '2024-02-01', service: 'Suntik Vitamin', amount: 70000, status: 'Paid' },
-                { id: 'TRX015', date: '2024-02-05', service: 'USG Kandungan', amount: 350000, status: 'Paid' },
-            ];
-
-            const transactionTableBody = document.getElementById('transactionTableBody');
-            const searchInput = document.getElementById('searchInput');
-            const statusFilter = document.getElementById('statusFilter');
-            const dateFilter = document.getElementById('dateFilter');
-            const pagination = document.getElementById('pagination');
-            const emptyState = document.getElementById('emptyState');
-
-            let currentPage = 1;
-            const rowsPerPage = 5;
-            window.filteredTransactions = []; // Define as global for filtering functions
-
-            const formatDate = (dateString) => {
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                return new Date(dateString).toLocaleDateString('id-ID', options);
-            };
-
-            const formatCurrency = (amount) => {
-                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
-            };
-
-            const getStatusDisplay = (status) => {
-                switch (status) {
-                    case 'Paid':
-                        return `<span class="status-paid">${status}</span>`;
-                    case 'Pending':
-                        return `<span class="status-pending">${status}</span>`;
-                    case 'Cancelled':
-                        return `<span class="status-cancelled">${status}</span>`;
-                    default:
-                        return status;
-                }
-            };
-
-            const filterTransactions = () => {
-                const searchTerm = searchInput.value.toLowerCase();
-                const selectedStatus = statusFilter.value;
-                const selectedDate = dateFilter.value;
-
-                window.filteredTransactions = transactions.filter(transaction => {
-                    const matchesSearch = Object.values(transaction).some(value =>
-                        String(value).toLowerCase().includes(searchTerm)
-                    );
-                    const matchesStatus = selectedStatus === '' || transaction.status === selectedStatus;
-                    const matchesDate = selectedDate === '' || transaction.date === selectedDate;
-
-                    return matchesSearch && matchesStatus && matchesDate;
-                });
-
-                currentPage = 1; // Reset to first page on filter
-                displayTransactions(currentPage);
-                setupPagination();
-            };
-
-            const displayTransactions = (page) => {
-                transactionTableBody.innerHTML = '';
-                const start = (page - 1) * rowsPerPage;
-                const end = start + rowsPerPage;
-                const paginatedItems = window.filteredTransactions.slice(start, end);
-
-                if (paginatedItems.length === 0) {
-                    emptyState.style.display = 'block';
-                    pagination.style.display = 'none';
-                } else {
-                    emptyState.style.display = 'none';
-                    pagination.style.display = 'flex'; // Show pagination when data exists
-                    paginatedItems.forEach(transaction => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${transaction.id}</td>
-                            <td>${formatDate(transaction.date)}</td>
-                            <td>${transaction.service}</td>
-                            <td>${formatCurrency(transaction.amount)}</td>
-                            <td>${getStatusDisplay(transaction.status)}</td>
-                        `;
-                        transactionTableBody.appendChild(row);
-                    });
-                }
-            };
-
-            const setupPagination = () => {
-                pagination.innerHTML = '';
-                const pageCount = Math.ceil(window.filteredTransactions.length / rowsPerPage);
-
-                if (pageCount <= 1 && window.filteredTransactions.length > 0) {
-                    // If only one page and data exists, still show one active button for clarity
-                    const button = document.createElement('button');
-                    button.innerText = '1';
-                    button.classList.add('active');
-                    button.addEventListener('click', () => {
-                        currentPage = 1;
-                        displayTransactions(currentPage);
-                        updatePaginationButtonsFiltered(pageCount);
-                    });
-                    pagination.appendChild(button);
-                    return; // Exit if only one page needed
-                } else if (pageCount <= 1 && window.filteredTransactions.length === 0) {
-                     pagination.style.display = 'none'; // Hide pagination if no results
-                     return;
-                }
-
-
-                const prevButton = document.createElement('button');
-                prevButton.innerText = 'Sebelumnya';
-                prevButton.addEventListener('click', () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        displayTransactions(currentPage);
-                        updatePaginationButtonsFiltered(pageCount);
-                    }
-                });
-                pagination.appendChild(prevButton);
-
-                for (let i = 1; i <= pageCount; i++) {
-                    const button = document.createElement('button');
-                    button.innerText = i;
-                    if (i === currentPage) {
-                        button.classList.add('active');
-                    }
-                    button.addEventListener('click', () => {
-                        currentPage = i;
-                        displayTransactions(currentPage);
-                        updatePaginationButtonsFiltered(pageCount);
-                    });
-                    pagination.appendChild(button);
-                }
-
-                const nextButton = document.createElement('button');
-                nextButton.innerText = 'Berikutnya';
-                nextButton.addEventListener('click', () => {
-                    if (currentPage < pageCount) {
-                        currentPage++;
-                        displayTransactions(currentPage);
-                        updatePaginationButtonsFiltered(pageCount);
-                    }
-                });
-                pagination.appendChild(nextButton);
-            };
-            
-            const updatePaginationButtonsFiltered = (pageCount) => {
-                const buttons = pagination.querySelectorAll('button');
-                buttons.forEach((button, index) => {
-                    // Skip first and last buttons (prev/next)
-                    if (index === 0 || index === buttons.length - 1) {
-                         if (button.innerText === 'Sebelumnya') {
-                            button.disabled = currentPage === 1;
-                        } else if (button.innerText === 'Berikutnya') {
-                            button.disabled = currentPage === pageCount;
-                        }
-                        return;
-                    }
-                    
-                    const pageNumber = parseInt(button.innerText);
-                    if (pageNumber === currentPage) {
-                        button.classList.add('active');
-                    } else {
-                        button.classList.remove('active');
-                    }
-                });
-            };
-            
-            // Event Listeners for original content
-            searchInput.addEventListener('input', filterTransactions);
-            statusFilter.addEventListener('change', filterTransactions);
-            dateFilter.addEventListener('change', filterTransactions);
-
-            // Initialize original content
-            filterTransactions(); // Call filter once to load initial data and set up pagination
         });
+
+        // Existing JavaScript for Transaksi Page
+        const transactions = [
+            { id: 'TRX001', date: '2023-01-15', service: 'Pemeriksaan Umum', amount: 150000, status: 'completed' },
+            { id: 'TRX002', date: '2023-01-15', service: 'Cabut Gigi', amount: 300000, status: 'pending' },
+            { id: 'TRX003', date: '2023-01-16', service: 'Scaling Gigi', amount: 200000, status: 'completed' },
+            { id: 'TRX004', date: '2023-01-16', service: 'Konsultasi Gizi', amount: 100000, status: 'cancelled' },
+            { id: 'TRX005', date: '2023-01-17', service: 'Vaksinasi Flu', amount: 250000, status: 'completed' },
+            { id: 'TRX006', date: '2023-01-17', service: 'Check Up Lengkap', amount: 500000, status: 'pending' },
+            { id: 'TRX007', date: '2023-01-18', service: 'Fisioterapi', amount: 180000, status: 'completed' },
+            { id: 'TRX008', date: '2023-01-18', service: 'Pemeriksaan Darah', amount: 120000, status: 'pending' },
+            { id: 'TRX009', date: '2023-01-19', service: 'Pengobatan Jerawat', amount: 175000, status: 'completed' },
+            { id: 'TRX010', date: '2023-01-19', service: 'Tes COVID-19', amount: 90000, status: 'completed' },
+            { id: 'TRX011', date: '2023-01-20', service: 'Ganti Perban', amount: 50000, status: 'pending' },
+            { id: 'TRX012', date: '2023-01-20', service: 'Imunisasi Anak', amount: 220000, status: 'completed' },
+            { id: 'TRX013', date: '2023-01-21', service: 'Konsultasi Psikologi', amount: 250000, status: 'cancelled' },
+            { id: 'TRX014', date: '2023-01-21', service: 'Suntik Vitamin C', amount: 150000, status: 'completed' },
+            { id: 'TRX015', date: '2023-01-22', service: 'Pembersihan Telinga', amount: 80000, status: 'pending' }
+        ];
+
+        const transactionsPerPage = 5;
+        let currentPage = 1;
+        let filteredTransactions = [];
+
+        const transactionTableBody = document.getElementById('transactionTableBody');
+        const searchInput = document.getElementById('search');
+        const statusFilter = document.getElementById('statusFilter');
+        const dateFilter = document.getElementById('dateFilter');
+        const pagination = document.getElementById('pagination');
+
+        const formatDate = (dateString) => {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        };
+
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        };
+
+        const getStatusDisplay = (status) => {
+            let className = '';
+            let text = '';
+            switch (status) {
+                case 'pending':
+                    className = 'pending';
+                    text = 'Pending';
+                    break;
+                case 'completed':
+                    className = 'completed';
+                    text = 'Selesai';
+                    break;
+                case 'cancelled':
+                    className = 'cancelled';
+                    text = 'Dibatalkan';
+                    break;
+                default:
+                    className = '';
+                    text = status;
+            }
+            return `<span class="status-badge ${className}">${text}</span>`;
+        };
+
+        const displayTransactions = (page) => {
+            transactionTableBody.innerHTML = '';
+            const start = (page - 1) * transactionsPerPage;
+            const end = start + transactionsPerPage;
+            const paginatedTransactions = filteredTransactions.slice(start, end);
+
+            paginatedTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.id}</td>
+                    <td>${formatDate(transaction.date)}</td>
+                    <td>${transaction.service}</td>
+                    <td>${formatCurrency(transaction.amount)}</td>
+                    <td>${getStatusDisplay(transaction.status)}</td>
+                `;
+                transactionTableBody.appendChild(row);
+            });
+        };
+
+        const setupPagination = () => {
+            pagination.innerHTML = '';
+            const pageCount = Math.ceil(filteredTransactions.length / transactionsPerPage);
+
+            const prevButton = document.createElement('button');
+            prevButton.id = 'prevPage';
+            prevButton.textContent = 'Sebelumnya';
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayTransactions(currentPage);
+                    updatePaginationButtons();
+                }
+            });
+            pagination.appendChild(prevButton);
+
+            for (let i = 1; i <= pageCount; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.classList.add('page-number');
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    displayTransactions(currentPage);
+                    updatePaginationButtons();
+                });
+                pagination.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.id = 'nextPage';
+            nextButton.textContent = 'Berikutnya';
+            nextButton.addEventListener('click', () => {
+                if (currentPage < pageCount) {
+                    currentPage++;
+                    displayTransactions(currentPage);
+                    updatePaginationButtons();
+                }
+            });
+            pagination.appendChild(nextButton);
+
+            updatePaginationButtons(); // Set initial active state
+        };
+
+        const updatePaginationButtons = () => {
+            const buttons = pagination.querySelectorAll('.page-number');
+            buttons.forEach(button => {
+                if (parseInt(button.textContent) === currentPage) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === Math.ceil(filteredTransactions.length / transactionsPerPage);
+        };
+
+        const filterTransactions = () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedStatus = statusFilter.value;
+            const selectedDate = dateFilter.value;
+
+            filteredTransactions = transactions.filter(transaction => {
+                const matchesSearch = transaction.id.toLowerCase().includes(searchTerm) ||
+                                      transaction.service.toLowerCase().includes(searchTerm);
+                const matchesStatus = selectedStatus === '' || transaction.status === selectedStatus;
+                const matchesDate = selectedDate === '' || transaction.date === selectedDate;
+                return matchesSearch && matchesStatus && matchesDate;
+            });
+
+            currentPage = 1; // Reset to first page after filtering
+            displayTransactions(currentPage);
+            setupPagination(); // Re-setup pagination for filtered data
+        };
+
+        // Event Listeners
+        searchInput.addEventListener('input', filterTransactions);
+        statusFilter.addEventListener('change', filterTransactions);
+        dateFilter.addEventListener('change', filterTransactions);
+
+        // Initialize
+        filteredTransactions = transactions; // Initialize filteredTransactions with all data
+        displayTransactions(currentPage);
+        setupPagination();
     </script>
 </body>
 </html>
