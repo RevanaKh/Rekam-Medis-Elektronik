@@ -25,806 +25,1283 @@
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Penting: Pastikan padding dan border termasuk dalam lebar/tinggi elemen */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            display: flex; /* Penting untuk layout sidebar dan konten */
+            display: flex;
             min-height: 100vh;
             background-color: var(--light-color);
-            overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan */
+            overflow-x: hidden; /* Mencegah scroll horizontal di seluruh body */
         }
 
-        /* NEW/MODIFIED CSS FOR SIDEBAR AND MAIN CONTENT TOGGLE */
+        /* Mobile Toggle di luar sidebar untuk akses mudah */
+        .mobile-toggle {
+            display: none; /* Tersembunyi secara default, akan ditampilkan di mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--white);
+            cursor: pointer;
+            z-index: 1100;
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Sembunyikan toggle mobile saat sidebar aktif (terbuka) */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Sidebar/Navigasi Utama */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
-            color: var(--white);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
+            color: var(--secondary-color);
             transition: all 0.3s ease;
             flex-shrink: 0;
-            box-shadow: var(--shadow);
-            position: fixed; /* Menjaga sidebar tetap di tempatnya */
-            height: 100vh; /* Memastikan sidebar mengambil tinggi penuh */
+            position: fixed; /* Penting untuk sidebar agar tidak terpengaruh scroll konten utama */
+            height: 100%;
+            overflow-y: auto; /* Memungkinkan scroll vertikal jika konten sidebar panjang */
+            overflow-x: hidden; /* Mencegah scroll horizontal di sidebar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            left: 0; /* Default: sidebar terlihat untuk desktop */
         }
 
         .sidebar.minimized {
             width: var(--sidebar-minimized-width);
         }
 
-        .sidebar .logo {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--white);
-            transition: opacity 0.3s ease;
-        }
-
-        .sidebar.minimized .logo {
-            opacity: 0;
-            height: 0;
-            overflow: hidden;
-        }
-
-        .sidebar nav ul {
-            list-style: none;
-        }
-
-        .sidebar nav ul li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar nav ul li a {
-            color: var(--white);
-            text-decoration: none;
-            padding: 10px 15px;
+        .sidebar-header {
             display: flex;
             align-items: center;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, padding 0.3s ease;
-        }
-
-        .sidebar nav ul li a:hover,
-        .sidebar nav ul li a.active {
+            padding: 20px;
             background-color: var(--primary-dark);
-        }
-
-        .sidebar nav ul li a i {
-            margin-right: 10px;
-            font-size: 18px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar nav ul li a span {
-            transition: opacity 0.3s ease, max-width 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            max-width: 100%;
-        }
-
-        .sidebar.minimized nav ul li a span {
-            opacity: 0;
-            max-width: 0;
-        }
-
-        .sidebar .logout-btn {
-            background-color: var(--secondary-color);
             color: var(--white);
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-align: center;
-            margin-top: auto;
-            text-decoration: none;
-            transition: background-color 0.3s ease, opacity 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar .logout-btn i {
-            margin-right: 10px;
-        }
-
-        .sidebar.minimized .logout-btn {
-            opacity: 0;
-            pointer-events: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            justify-content: center;
-            align-items: center;
-            margin-left: auto;
-            margin-right: auto;
+            font-size: 1.5rem;
             overflow: hidden;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
         }
 
-        .sidebar.minimized .logout-btn i {
-            margin-right: 0;
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
         }
 
-        .sidebar.minimized .logout-btn span {
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .user-info { /* Jika ada info user di sidebar, di sini tempatnya */
             display: none;
         }
 
-        .main-content {
-            flex-grow: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            width: calc(100% - var(--sidebar-width));
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1; /* Memastikan daftar navigasi mengambil sisa ruang */
         }
 
-        .main-content.sidebar-minimized {
-            margin-left: var(--sidebar-minimized-width);
-            width: calc(100% - var(--sidebar-minimized-width));
-        }
-
-        .header {
-            background-color: var(--white);
-            padding: 15px 20px;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        .header .left-section {
-            display: flex;
-            align-items: center;
-        }
-
-        /* MENU TOGGLE BUTTON STYLES */
-        .header .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-color);
-            margin-right: 20px;
-            padding: 5px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .header .menu-toggle:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .header h1 {
-            font-size: 24px;
-            color: var(--text-color);
-            margin: 0;
-        }
-
-        .header .user-profile {
-            display: flex;
-            align-items: center;
-        }
-
-        .header .user-profile .username {
-            margin-right: 10px;
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .header .user-profile .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #ccc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            color: var(--text-color);
-            cursor: pointer;
-        }
-
-        /* Main Content Styling */
-        main {
-            padding: 20px;
-            flex-grow: 1;
-            background-color: var(--light-color);
-        }
-
-        .filter-container {
-            background-color: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .filter-container label {
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .filter-container input[type="date"],
-        .filter-container input[type="text"],
-        .filter-container select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            min-width: 150px;
-            flex: 1;
-        }
-
-        .filter-container button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .filter-container button.primary {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .filter-container button.primary:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .filter-container button.secondary {
-            background-color: var(--secondary-color);
-            color: var(--white);
-        }
-
-        .filter-container button.secondary:hover {
-            background-color: #555;
-        }
-
-        .table-container {
-            background-color: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        table thead th {
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        table tbody td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            color: var(--text-color);
-        }
-
-        table tbody tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        .action-buttons button {
-            padding: 8px 12px;
-            margin-right: 5px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-
-        .action-buttons .edit-btn {
-            background-color: #2196F3; /* Blue */
-            color: white;
-        }
-
-        .action-buttons .edit-btn:hover {
-            background-color: #0b7dda;
-        }
-
-        .action-buttons .delete-btn {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .action-buttons .delete-btn:hover {
-            background-color: #da190b;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 2000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: var(--white);
-            margin: auto;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            max-width: 600px;
-            width: 100%;
+        .nav-item {
             position: relative;
         }
 
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            cursor: pointer;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: #000;
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
             text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0; /* Mencegah ikon menyusut */
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0;
+            justify-content: center;
+            display: flex;
+            width: 100%;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Mencegah teks melipat baris */
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Bagian Logout */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0; /* Mencegah bagian ini menyusut */
+            margin-top: auto; /* Mendorong ke bagian bawah sidebar */
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px; /* Di luar sidebar agar bisa dijangkau */
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
         }
 
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--text-color);
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg); /* Pindahkan saat sidebar diminimalisir */
+        }
+
+        /* Konten Utama */
+        .main-content {
+            flex-grow: 1; /* Mengambil sisa lebar yang tersedia */
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width); /* Margin default untuk desktop */
+            width: calc(100% - var(--sidebar-width)); /* Lebar default untuk desktop */
+            overflow-y: auto; /* Scroll vertikal jika konten panjang */
+            overflow-x: hidden; /* Mencegah scroll horizontal di main-content */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Penyesuaian Responsif untuk Mobile */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block; /* Tampilkan mobile toggle */
+                z-index: 10000; /* Pastikan di atas elemen lain */
+            }
+
+            .sidebar {
+                left: -250px; /* Sembunyikan sidebar di luar layar */
+                position: fixed; /* Penting untuk mobile agar tidak terpengaruh scroll */
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                left: 0; /* Geser masuk saat aktif */
+            }
+
+            .main-content {
+                margin-left: 0; /* Tidak ada margin di mobile */
+                width: 100%; /* Lebar penuh */
+                padding: 15px; /* Sedikit padding untuk konten utama di mobile */
+            }
+
+            .toggle-btn {
+                display: none; /* Sembunyikan toggle desktop di mobile */
+            }
+
+            body {
+                flex-direction: column; /* Susun elemen secara vertikal */
+            }
+
+            /* Penyesuaian Navbar untuk Mobile */
+            .navbar {
+                padding: 10px 15px; /* Padding lebih kecil */
+                margin-top: 50px; /* Beri ruang untuk mobile toggle */
+            }
+
+            .navbar h2 {
+                font-size: 20px; /* Ukuran font lebih kecil untuk judul */
+            }
+
+            /* Penyesuaian Umum Card untuk Mobile */
+            .card {
+                padding: 15px; /* Kurangi padding umum card untuk mobile */
+                width: 100%; /* Pastikan card mengambil lebar penuh */
+                box-sizing: border-box; /* Pastikan padding dihitung dalam width */
+                overflow: hidden; /* Penting: mencegah konten di dalam card meluap */
+            }
+
+            /* Card Profil Pasien - Penyesuaian Mobile */
+            .patient-profile-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .patient-details {
+                max-width: 100%; /* Izinkan detail mengambil lebar penuh */
+                padding: 0 5px; /* Kurangi padding horizontal di sini */
+                text-align: left;
+                width: 100%; /* Pastikan patient-details mengisi parent-nya */
+            }
+
+            .patient-details p {
+                word-wrap: break-word; /* Pastikan teks panjang melipat baris */
+                overflow-wrap: break-word; /* Alternatif untuk word-wrap */
+                margin-bottom: 5px;
+                font-size: 0.9em; /* Sedikit kecilkan font */
+                line-height: 1.3;
+            }
+
+            .patient-details strong {
+                display: inline-block;
+                min-width: 60px; /* Kurangi sedikit min-width untuk label agar tidak terlalu memakan tempat */
+                white-space: normal; /* Izinkan label untuk wrap jika sangat panjang */
+            }
+
+            /* Card Tabel Riwayat - Penyesuaian Mobile */
+            .history-table-card {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .filter-section input[type="date"],
+            .filter-section button {
+                width: 100%;
+            }
+
+            .table-responsive-wrapper {
+                overflow-x: auto; /* Hanya wrapper tabel yang bisa di-scroll horizontal */
+                -webkit-overflow-scrolling: touch; /* Mengaktifkan smooth scrolling di iOS */
+            }
+
+            .history-table {
+                width: 100%; /* Pastikan tabel mengisi lebar wrapper */
+                min-width: 500px; /* Pertahankan lebar minimum untuk tabel agar ada scroll jika konten panjang */
+                /* Nilai min-width ini yang akan menentukan seberapa jauh tabel bisa di-scroll */
+            }
+
+            .history-table th, .history-table td {
+                padding: 8px;
+                font-size: 0.8em; /* Sedikit kecilkan font lagi untuk kepadatan */
+                white-space: nowrap; /* Penting: mencegah konten sel melipat baris */
+            }
+            .history-table td:nth-child(3), /* Diagnosis */
+            .history-table td:nth-child(4), /* Tindakan */
+            .history-table td:nth-child(5) { /* Obat */
+                white-space: normal; /* Izinkan sel ini melipat baris untuk konten panjang */
+                max-width: 150px; /* Batasi lebar untuk sel ini */
+                overflow-wrap: break-word; /* Pastikan teks panjang melipat */
+                word-break: break-word; /* Untuk kompatibilitas lebih baik */
+            }
+            .history-table th:nth-child(3),
+            .history-table th:nth-child(4),
+            .history-table th:nth-child(5) {
+                white-space: nowrap; /* Jaga header agar tidak melipat */
+            }
+
+
+            /* Modal untuk Edit Profil - Penyesuaian Mobile */
+            .modal-content {
+                padding: 20px;
+                width: 95%; /* Lebar modal di mobile */
+                max-width: 400px; /* Batasi max-width juga di mobile agar tidak terlalu besar di tablet */
+            }
+
+            .modal-content h3 {
+                font-size: 1.4em; /* Lebih kecil */
+            }
+
+            .modal-content label {
+                font-size: 0.9em; /* Lebih kecil */
+            }
+
+            .modal-content input[type="text"],
+            .modal-content input[type="date"],
+            .modal-content input[type="email"],
+            .modal-content .password-container input {
+                width: calc(100% - 16px); /* Sesuaikan lebar input agar pas dengan padding */
+                padding: 8px;
+                font-size: 0.9em; /* Lebih kecil */
+            }
+
+            .modal-content .password-container .toggle-password {
+                right: 8px; /* Sesuaikan posisi ikon */
+                font-size: 0.9em; /* Lebih kecil */
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-buttons button {
+                width: 100%;
+                padding: 10px; /* Sesuaikan padding tombol */
+                font-size: 0.9em; /* Sesuaikan font size tombol */
+            }
+
+            .close-modal {
+                font-size: 22px; /* Lebih kecil */
+                top: 8px;
+                right: 12px;
+            }
+        }
+
+        /* Gaya CSS asli dari riwayat.html untuk konten (dipertahankan dan disesuaikan) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+            padding: 15px 20px;
+            border-radius: 10px;
             margin-bottom: 20px;
+            box-shadow: var(--shadow);
         }
 
-        .modal-form label {
+        .navbar .left-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .sidebar-toggle { /* Ini akan dihapus/disembunyikan karena strategi mobile toggle baru */
+            display: none !important;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 24px;
+        }
+
+        .navbar .user-profile { /* Menyembunyikan bagian user-profile jika tidak digunakan */
+            display: none;
+        }
+
+        /* Konten Dashboard */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr; /* Pastikan hanya 1 kolom untuk tata letak responsif */
+            gap: 20px;
+        }
+
+        /* Card (umum) - untuk desktop */
+        .card {
+            background-color: var(--white);
+            padding: 25px; /* Default padding untuk desktop */
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden; /* Mencegah overflow dari konten di dalam card */
+        }
+
+        /* Card Profil Pasien */
+        .patient-profile-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-avatar { /* Ini akan disembunyikan/dihapus demi ikon Font Awesome */
+            display: none;
+        }
+        .patient-profile-card .fas.fa-user-circle { /* Gaya untuk ikon user Font Awesome di card profil */
+            width: 100px;
+            height: 100px;
+            font-size: 100px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .patient-profile-card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+
+        .patient-details {
+            width: 100%;
+            max-width: 400px; /* Batasi lebar untuk desktop agar tidak terlalu lebar */
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .patient-details p {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .patient-details strong {
+            display: inline-block;
+            width: 120px; /* Lebar tetap untuk label di desktop */
+            color: var(--secondary-color);
+        }
+
+        .edit-profile-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Tabel Riwayat */
+        .history-table-card {
+            /* overflow-x sudah dipindahkan ke .table-responsive-wrapper */
+        }
+
+        .table-responsive-wrapper {
+            overflow-x: auto; /* Menerapkan scroll hanya pada wrapper tabel */
+            -webkit-overflow-scrolling: touch; /* Mengaktifkan smooth scrolling di iOS */
+            width: 100%; /* Pastikan wrapper mengambil lebar penuh card */
+        }
+
+        .history-table {
+            width: 100%; /* Tabel akan mengisi lebar wrapper */
+            border-collapse: collapse;
+            margin-top: 20px;
+            min-width: 600px; /* Pastikan tabel memiliki lebar minimum untuk memicu scroll jika diperlukan di desktop */
+        }
+
+        .history-table th, .history-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .history-table th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .history-table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .history-table tbody tr:hover {
+            background-color: #ddd;
+        }
+
+        /* Bagian Filter */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap; /* Memungkinkan item filter melipat ke baris baru */
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-section input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .filter-section button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            display: flex; /* Untuk penyelarasan ikon */
+            align-items: center; /* Untuk penyelarasan ikon */
+            gap: 8px; /* Jarak antara ikon dan teks */
+        }
+
+        .filter-section button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Gaya Khusus untuk Tombol PDF dan Print */
+        #printPdfBtn {
+            background-color: #2196f3; /* Biru untuk Print PDF */
+        }
+        #printPdfBtn:hover {
+            background-color: #1976d2; /* Biru lebih gelap saat hover */
+        }
+
+        /* Modal untuk Edit Profil */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Memungkinkan scroll jika konten modal terlalu tinggi */
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex; /* Menampilkan modal */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; /* Memastikan modal di tengah */
+            padding: 30px; /* Padding default desktop */
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%; /* Lebar modal */
+            max-width: 500px; /* Lebar maksimum modal di desktop */
+            position: relative;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        .modal-content label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
             color: var(--text-color);
         }
 
-        .modal-form input[type="text"],
-        .modal-form input[type="password"],
-        .modal-form input[type="date"],
-        .modal-form input[type="email"],
-        .modal-form input[type="number"],
-        .modal-form select,
-        .modal-form textarea {
-            width: 100%;
+        .modal-content input[type="text"],
+        .modal-content input[type="date"],
+        .modal-content input[type="email"] {
+            width: calc(100% - 22px); /* Default desktop input width (kurangi padding) */
             padding: 10px;
             margin-bottom: 15px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 1em;
         }
 
-        .modal-form .form-group {
+        /* Gaya untuk toggle password di dalam modal */
+        .modal-content .password-container {
+            position: relative;
+            width: 100%;
             margin-bottom: 15px;
         }
 
-        .modal-form .form-actions {
+        .modal-content .password-container input[type="password"],
+        .modal-content .password-container input[type="text"] {
+            width: 100%; /* Lebar penuh container */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            padding-right: 40px; /* Ruang untuk ikon toggle */
+        }
+
+        .modal-content .password-container .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 1em;
+        }
+
+        .modal-content .password-container .toggle-password:hover {
+            color: #555;
+        }
+
+        .modal-content .gender-options label {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: normal;
+        }
+
+        .modal-content .gender-options {
+            margin-bottom: 15px;
+        }
+
+        .modal-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
             margin-top: 20px;
         }
 
-        .modal-form button {
+        .modal-buttons button {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            width: auto;
         }
 
-        .modal-form button.save-btn {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
 
-        .modal-form button.save-btn:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .modal-form button.cancel-btn {
+        .modal-buttons .cancel-btn {
             background-color: #ccc;
             color: var(--text-color);
         }
 
-        .modal-form button.cancel-btn:hover {
+        .modal-buttons .cancel-btn:hover {
             background-color: #bbb;
         }
 
-        .modal-form .input-group {
-            position: relative;
-        }
-
-        .modal-form .toggle-password {
+        .close-modal {
             position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
+            top: 15px;
+            right: 25px;
+            font-size: 30px;
+            font-weight: bold;
             color: #888;
-        }
-
-        .print-pdf-btn {
-            background-color: var(--danger-color); /* Red for PDF */
-            color: var(--white);
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: none;
             cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 20px;
-            display: block; /* Make it a block element to take full width */
-            width: fit-content; /* Adjust width to content */
-        }
-        .print-pdf-btn:hover {
-            background-color: #da190b;
         }
 
-        /* Print Specific Styles */
+        .close-modal:hover {
+            color: #555;
+        }
+
+        /* Pesan saat riwayat kosong */
+        .empty-history-message {
+            text-align: center;
+            color: #777;
+            padding: 30px;
+            font-style: italic;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        /* Gaya Khusus untuk Cetak (Print) */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            .table-container, .table-container * {
-                visibility: visible;
-            }
-            .table-container {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                box-shadow: none;
-                padding: 0;
-            }
-            .filter-container, .header, .sidebar, .modal, .pagination, .print-pdf-btn, .action-buttons {
+            /* Sembunyikan sidebar dan mobile toggle, yang adalah direct children dari body */
+            body > *:not(.main-content) { /* Sembunyikan semua kecuali main-content */
                 display: none !important;
             }
-            table {
-                width: 100%;
-                border-collapse: collapse;
+            .main-content {
+                margin-left: 0 !important; /* Hapus margin sidebar */
+                width: 100% !important; /* Lebar penuh */
+                padding: 0 !important; /* Hapus padding */
             }
-            table thead th, table tbody td {
-                border: 1px solid #ccc !important;
+            /* HANYA sembunyikan elemen yang TIDAK ingin Anda cetak */
+            .filter-section,
+            .empty-history-message,
+            .modal,
+            .toggle-btn,
+            .mobile-toggle,
+            .edit-profile-btn { /* Menyembunyikan tombol edit profil saat mencetak */
+                display: none !important;
+            }
+            /* Pastikan navbar tetap terlihat */
+            .navbar {
+                display: flex !important; /* Sesuaikan dengan display aslinya, atau 'block' */
+                justify-content: space-between !important;
+                align-items: center !important;
+                background-color: var(--white) !important;
+                padding: 15px 20px !important;
+                border-radius: 0 !important; /* Hapus border-radius jika tidak diinginkan */
+                margin-bottom: 20px !important;
+                box-shadow: none !important; /* Hapus shadow */
+            }
+            /* Jika ada patient-profile-card di dalam main-content dan Anda ingin mencetaknya,
+               pastikan tidak ada display: none; yang berlaku untuknya di sini.
+               Jika tidak ada di riwayat.html atau Anda tidak ingin mencetaknya, biarkan saja. */
+            .patient-profile-card { /* Jika card ini ada dan Anda tidak ingin mencetaknya */
+                display: none !important;
+            }
+            .card.history-table-card {
+                box-shadow: none !important; /* Hapus bayangan untuk cetak */
+                padding: 0 !important; /* Hapus padding */
+                margin: 0 !important; /* Hapus margin */
+                width: 100% !important;
+            }
+            .history-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin-top: 0 !important;
+            }
+            .history-table th, .history-table td {
+                border: 1px solid #000 !important; /* Border lebih gelap untuk cetak */
                 padding: 8px !important;
-                background-color: #fff !important;
+                font-size: 0.8em !important;
+            }
+            .history-table th {
+                background-color: #e0e0e0 !important; /* Background lebih terang untuk header cetak */
                 color: #000 !important;
             }
-            table thead th {
-                background-color: #e0e0e0 !important;
+            .history-table tbody tr:nth-child(even) {
+                background-color: #f8f8f8 !important; /* Background lebih terang untuk baris genap */
             }
         }
-
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">Klinik</div>
-        <nav>
-            <ul>
-                <li><a href="#"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-                <li><a href="transaksi.html"><i class="fas fa-exchange-alt"></i> <span>Transaksi</span></a></li>
-                <li><a href="#" class="active"><i class="fas fa-history"></i> <span>Riwayat</span></a></li>
-            </ul>
-        </nav>
-        <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
     </div>
 
-    <div class="main-content">
-        <div class="header">
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="pendaftaran_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Pendaftaran Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_d.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="antrian.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Antrian Pemeriksaan</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="transaksi.html" class="nav-link"> <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="transaksi.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Riwayat Pasien</div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="logout-section">
+            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="navbar">
             <div class="left-section">
-                <button class="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1>Riwayat Pasien</h1>
-            </div>
-            <div class="user-profile">
-                <span class="username">Dr. Budi</span>
-                <div class="profile-pic"><i class="fas fa-user-md"></i></div>
+                <h2>Riwayat Pasien</h2>
             </div>
         </div>
 
-        <main>
-            <div class="filter-container">
-                <label for="filterDate">Filter Tanggal:</label>
-                <input type="date" id="filterDate">
-
-                <label for="filterPatientName">Nama Pasien:</label>
-                <input type="text" id="filterPatientName" placeholder="Cari nama pasien">
-
-                <label for="filterService">Layanan:</label>
-                <select id="filterService">
-                    <option value="">Semua Layanan</option>
-                    <option value="Pemeriksaan Umum">Pemeriksaan Umum</option>
-                    <option value="Cabut Gigi">Cabut Gigi</option>
-                    <option value="Scaling Gigi">Scaling Gigi</option>
-                    <option value="Konsultasi Gizi">Konsultasi Gizi</option>
-                    <option value="Vaksinasi Flu">Vaksinasi Flu</option>
-                </select>
-
-                <button class="primary" id="applyFilterBtn">Terapkan Filter</button>
-                <button class="secondary" id="clearFilterBtn">Bersihkan Filter</button>
-            </div>
-
-            <button class="print-pdf-btn" id="printPdfBtn"><i class="fas fa-print"></i> Cetak PDF</button>
-
-            <div class="table-container">
-                <table id="patientHistoryTable">
-                    <thead>
-                        <tr>
-                            <th>ID Riwayat</th>
-                            <th>Tanggal</th>
-                            <th>Nama Pasien</th>
-                            <th>Layanan</th>
-                            <th>Diagnosa</th>
-                            <th>Obat</th>
-                            <th>Catatan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
+            <div class="card history-table-card">
+                <h3>Riwayat Kunjungan</h3>
+                <div class="filter-section">
+                    <input type="date" id="dateFilter">
+                    <button id="applyFilterBtn">Terapkan Filter</button>
+                    <button id="clearFilterBtn">Clear Filter</button>
+                    <button id="printPdfBtn"><i class="fas fa-print"></i> Print PDF</button>
+                </div>
+                <div class="empty-history-message hidden" id="emptyHistoryMessage">
+                    Tidak ada riwayat medis ditemukan untuk filter ini.
+                </div>
+                <div class="table-responsive-wrapper">
+                    <table class="history-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>Tanggal Kunjungan</th>
+                                <th>Dokter</th>
+                                <th>Diagnosis</th>
+                                <th>Tindakan</th>
+                                <th>Obat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
                         </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
-        </main>
-    </div>
-
-    <div id="patientHistoryModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Detail Riwayat Pasien</h2>
-            <form id="patientHistoryForm" class="modal-form">
-                <input type="hidden" id="historyId">
-                <div class="form-group">
-                    <label for="patientName">Nama Pasien:</label>
-                    <input type="text" id="patientName" required>
-                </div>
-                <div class="form-group">
-                    <label for="service">Layanan:</label>
-                    <input type="text" id="service" required>
-                </div>
-                <div class="form-group">
-                    <label for="diagnosis">Diagnosa:</label>
-                    <textarea id="diagnosis" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="medication">Obat:</label>
-                    <textarea id="medication" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="notes">Catatan:</label>
-                    <textarea id="notes" rows="3"></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="save-btn">Simpan</button>
-                    <button type="button" class="cancel-btn">Batal</button>
-                </div>
-            </form>
         </div>
     </div>
+
 
     <script>
-        // MENU TOGGLE JAVASCRIPT (NEW)
         document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
 
-            if (menuToggle && sidebar && mainContent) {
-                menuToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('minimized');
-                    mainContent.classList.toggle('sidebar-minimized');
+            const patientProfileName = document.getElementById('patientProfileName');
+            const patientNik = document.getElementById('patientNik');
+            const patientEmail = document.getElementById('patientEmail');
+            const patientGender = document.getElementById('patientGender');
+            const patientAddress = document.getElementById('patientAddress');
+            const patientPlaceOfBirth = document.getElementById('patientPlaceOfBirth');
+            const patientDob = document.getElementById('patientDob');
+
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const editProfileModal = document.getElementById('editProfileModal');
+            const closeEditProfileModal = document.getElementById('closeEditProfileModal');
+            const cancelEditProfile = document.getElementById('cancelEditProfile');
+            const editProfileForm = document.getElementById('editProfileForm');
+
+            const editPatientName = document.getElementById('editPatientName');
+            const editPatientNik = document.getElementById('editPatientNik');
+            const editPatientEmail = document.getElementById('editPatientEmail');
+            const editGenderMale = document.getElementById('editGenderMale');
+            const editGenderFemale = document.getElementById('editGenderFemale');
+            const editPatientAddress = document.getElementById('editPatientAddress');
+            const editPatientPlaceOfBirth = document.getElementById('editPatientPlaceOfBirth');
+            const editPatientDob = document.getElementById('editPatientDob');
+            const editNewPassword = document.getElementById('editNewPassword');
+            const editConfirmPassword = document.getElementById('editConfirmPassword');
+
+            const historyTableBody = document.getElementById('historyTableBody');
+            const emptyHistoryMessage = document.getElementById('emptyHistoryMessage');
+            const dateFilter = document.getElementById('dateFilter');
+            const applyFilterBtn = document.getElementById('applyFilterBtn');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+            const printPdfBtn = document.getElementById('printPdfBtn');
+
+            
+
+            // --- Check Login Status and Redirect ---
+            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+            if (!loggedInUser || loggedInUser.role !== 'pasien') {
+                alert('Anda harus login sebagai pasien untuk mengakses halaman ini.');
+                window.location.href = 'index.html'; // Redirect to login page
+                return; // Stop execution if not logged in or not a patient
+            }
+
+            // --- Load Patient Data ---
+            function loadPatientData() {
+                if (loggedInUser) {
+                    // These elements are not in riwayat.html, so commenting them out to avoid errors.
+                    // patientProfileName.textContent = loggedInUser.name || 'Nama Pasien';
+                    // patientNik.textContent = loggedInUser.nik || 'Tidak Diketahui';
+                    // patientEmail.textContent = loggedInUser.email || 'Tidak Diketahui';
+                    // patientGender.textContent = loggedInUser.gender || 'Tidak Diketahui';
+                    // patientAddress.textContent = loggedInUser.address || 'Tidak Diketahui';
+                    // patientPlaceOfBirth.textContent = loggedInUser.placeOfBirth || 'Tidak Diketahui';
+                    // patientDob.textContent = loggedInUser.dateOfBirth || 'Tidak Diketahui';
+
+                    // Populate edit form fields
+                    // These elements are for the modal, which is not actively used on this page for display.
+                    // editPatientName.value = loggedInUser.name || '';
+                    // editPatientNik.value = loggedInUser.nik || '';
+                    // editPatientEmail.value = loggedInUser.email || '';
+                    // if (loggedInUser.gender === 'Laki-laki') {
+                    //     editGenderMale.checked = true;
+                    // } else if (loggedInUser.gender === 'Perempuan') {
+                    //     editGenderFemale.checked = true;
+                    // }
+                    // editPatientAddress.value = loggedInUser.address || '';
+                    // editPatientPlaceOfBirth.value = loggedInUser.placeOfBirth || '';
+                    // editPatientDob.value = loggedInUser.dateOfBirth || '';
+
+                    // Clear password fields in modal when opened
+                    // editNewPassword.value = '';
+                    // editConfirmPassword.value = '';
+                }
+            }
+
+
+            // --- Filter Medical History ---
+            function filterData() {
+                const selectedDate = dateFilter.value; // Get the single date value
+
+                const filteredHistory = medicalHistoryData.filter(record => {
+                    const isForLoggedInUser = record.patientEmail === loggedInUser.email;
+
+                    // If a date is selected, filter by that specific date
+                    const dateMatches = !selectedDate || record.date === selectedDate;
+
+                    return isForLoggedInUser && dateMatches;
                 });
-            } else {
-                console.error("DEBUG: One or more required elements for menu toggle not found:");
-                if (!menuToggle) console.error("  - Element with class 'menu-toggle' is missing.");
-                if (!sidebar) console.error("  - Element with class 'sidebar' is missing.");
-                if (!mainContent) console.error("  - Element with class 'main-content' is missing.");
+
+                displayHistory(filteredHistory);
             }
-        });
 
-        // Existing JavaScript for Riwayat Page
-        let patientHistoryData = [
-            { id: 'R001', date: '2023-01-15', patientName: 'Budi Santoso', service: 'Pemeriksaan Umum', diagnosis: 'Flu ringan', medication: 'Paracetamol', notes: 'Istirahat cukup.' },
-            { id: 'R002', date: '2023-01-15', patientName: 'Citra Dewi', service: 'Cabut Gigi', diagnosis: 'Karies gigi', medication: 'Amoxicillin', notes: 'Hindari makanan keras.' },
-            { id: 'R003', date: '2023-01-16', patientName: 'Dewi Lestari', service: 'Scaling Gigi', diagnosis: 'Tartar', medication: '-', notes: 'Jaga kebersihan gigi.' },
-            { id: 'R004', date: '2023-01-16', patientName: 'Eka Putra', service: 'Konsultasi Gizi', diagnosis: 'Kurang gizi', medication: 'Multivitamin', notes: 'Perbanyak sayur dan buah.' },
-            { id: 'R005', date: '2023-01-17', patientName: 'Fajar Indah', service: 'Vaksinasi Flu', diagnosis: '-', medication: 'Vaksin Flu', notes: 'Efek samping ringan wajar.' },
-            { id: 'R006', date: '2023-01-17', patientName: 'Gilang Ramadhan', service: 'Pemeriksaan Umum', diagnosis: 'Demam', medication: 'Obat demam', notes: 'Kompres hangat.' },
-            { id: 'R007', date: '2023-01-18', patientName: 'Hana Permata', service: 'Fisioterapi', diagnosis: 'Keseleo', medication: 'Topical analgesic', notes: 'Latihan ringan.' },
-            { id: 'R008', date: '2023-01-18', patientName: 'Indra Wijaya', service: 'Pemeriksaan Darah', diagnosis: 'Anemia', medication: 'Suplemen zat besi', notes: 'Makan makanan kaya zat besi.' },
-            { id: 'R009', date: '2023-01-19', patientName: 'Joko Susanto', service: 'Pengobatan Jerawat', diagnosis: 'Acne vulgaris', medication: 'Topical cream', notes: 'Bersihkan wajah teratur.' },
-            { id: 'R010', date: '2023-01-19', patientName: 'Kartika Sari', service: 'Tes COVID-19', diagnosis: 'Negatif', medication: '-', notes: 'Tetap jaga protokol kesehatan.' }
-        ];
-
-        const historyTableBody = document.getElementById('historyTableBody');
-        const patientHistoryModal = document.getElementById('patientHistoryModal');
-        const closeButton = patientHistoryModal.querySelector('.close-button');
-        const cancelButton = patientHistoryModal.querySelector('.cancel-btn');
-        const patientHistoryForm = document.getElementById('patientHistoryForm');
-        const historyIdInput = document.getElementById('historyId');
-        const patientNameInput = document.getElementById('patientName');
-        const serviceInput = document.getElementById('service');
-        const diagnosisInput = document.getElementById('diagnosis');
-        const medicationInput = document.getElementById('medication');
-        const notesInput = document.getElementById('notes');
-
-        const filterDateInput = document.getElementById('filterDate');
-        const filterPatientNameInput = document.getElementById('filterPatientName');
-        const filterServiceSelect = document.getElementById('filterService');
-        const applyFilterBtn = document.getElementById('applyFilterBtn');
-        const clearFilterBtn = document.getElementById('clearFilterBtn');
-        const printPdfBtn = document.getElementById('printPdfBtn');
-
-        const formatDate = (dateString) => {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
-        };
-
-        const loadPatientData = () => {
-            historyTableBody.innerHTML = '';
-            const filteredData = patientHistoryData.filter(data => {
-                const matchesDate = !filterDateInput.value || data.date === filterDateInput.value;
-                const matchesPatientName = !filterPatientNameInput.value || data.patientName.toLowerCase().includes(filterPatientNameInput.value.toLowerCase());
-                const matchesService = !filterServiceSelect.value || data.service === filterServiceSelect.value;
-                return matchesDate && matchesPatientName && matchesService;
-            });
-
-            filteredData.forEach(data => {
-                const row = historyTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${data.id}</td>
-                    <td>${formatDate(data.date)}</td>
-                    <td>${data.patientName}</td>
-                    <td>${data.service}</td>
-                    <td>${data.diagnosis}</td>
-                    <td>${data.medication}</td>
-                    <td>${data.notes}</td>
-                    <td class="action-buttons">
-                        <button class="edit-btn" data-id="${data.id}"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="delete-btn" data-id="${data.id}"><i class="fas fa-trash"></i> Hapus</button>
-                    </td>
-                `;
-            });
-
-            // Add event listeners for edit and delete buttons after rendering
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', (event) => openEditModal(event.target.dataset.id));
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', (event) => deletePatientHistory(event.target.dataset.id));
-            });
-        };
-
-        const openEditModal = (id) => {
-            const data = patientHistoryData.find(d => d.id === id);
-            if (data) {
-                historyIdInput.value = data.id;
-                patientNameInput.value = data.patientName;
-                serviceInput.value = data.service;
-                diagnosisInput.value = data.diagnosis;
-                medicationInput.value = data.medication;
-                notesInput.value = data.notes;
-                patientHistoryModal.classList.add('active');
+            // --- Display Medical History ---
+            function displayHistory(data) {
+                historyTableBody.innerHTML = '';
+                if (data.length === 0) {
+                    emptyHistoryMessage.classList.remove('hidden');
+                } else {
+                    emptyHistoryMessage.classList.add('hidden');
+                    data.forEach(record => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${record.date}</td>
+                            <td>${record.doctor}</td>
+                            <td>${record.diagnosis}</td>
+                            <td>${record.action}</td>
+                            <td>${record.medicines}</td>
+                        `;
+                        historyTableBody.appendChild(row);
+                    });
+                }
             }
-        };
 
-        const closePatientHistoryModal = () => {
-            patientHistoryModal.classList.remove('active');
-            patientHistoryForm.reset();
-        };
-
-        const savePatientHistory = (event) => {
-            event.preventDefault();
-            const id = historyIdInput.value;
-            const updatedData = {
-                id: id,
-                date: patientHistoryData.find(d => d.id === id)?.date || new Date().toISOString().slice(0, 10), // Keep original date or set current
-                patientName: patientNameInput.value,
-                service: serviceInput.value,
-                diagnosis: diagnosisInput.value,
-                medication: medicationInput.value,
-                notes: notesInput.value
+            // --- Logout Function ---
+            window.logout = function() {
+                if (confirm('Apakah Anda yakin ingin logout?')) {
+                    sessionStorage.clear();
+                    localStorage.removeItem('loggedInUser');
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
             };
 
-            const index = patientHistoryData.findIndex(d => d.id === id);
-            if (index !== -1) {
-                patientHistoryData[index] = updatedData;
-            } else {
-                // For a new entry, generate a unique ID
-                const newId = 'R' + String(patientHistoryData.length + 1).padStart(3, '0');
-                updatedData.id = newId;
-                patientHistoryData.push(updatedData);
+            // --- Sidebar and Mobile Menu Toggle ---
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                });
             }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    } else {
+                        sidebar.classList.toggle('minimized');
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        } else {
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
+                        }
+                    }
+                });
+            }
+
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            function initLayout() {
+                if (window.innerWidth <= 768) {
+                    sidebar.style.left = '-250px'; /* Sembunyikan sidebar di mobile */
+                    sidebar.classList.remove('active');
+                    sidebar.classList.remove('minimized');
+                    mainContent.style.marginLeft = '0';
+                    mainContent.style.width = '100%';
+                } else {
+                    sidebar.style.left = '0'; /* Tampilkan sidebar di desktop */
+                    sidebar.classList.remove('active');
+                    // Periksa apakah sidebar harus diminimized dari awal jika ada preferensi
+                    // Misalnya: if (localStorage.getItem('sidebarState') === 'minimized') { sidebar.classList.add('minimized'); }
+                    sidebar.classList.remove('minimized'); // Hapus ini jika ingin mempertahankan state
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    mainContent.style.width = 'calc(100% - var(--sidebar-width))';
+                }
+            }
+
+            initLayout(); // Panggil saat DOMContentLoaded
+
+            window.addEventListener('resize', () => {
+                initLayout(); // Panggil saat window di-resize
+            });
+
+
+            // --- Edit Profile Modal Logic ---
+            // editProfileBtn.addEventListener('click', () => {
+            //     loadPatientData();
+            //     editProfileModal.classList.add('active');
+            // });
+
+            // closeEditProfileModal.addEventListener('click', () => {
+            //     editProfileModal.classList.remove('active');
+            // });
+
+            // cancelEditProfile.addEventListener('click', () => {
+            //     editProfileModal.classList.remove('active');
+            // });
+
+            // editProfileModal.addEventListener('click', (e) => {
+            //     if (e.target === editProfileModal) {
+            //         editProfileModal.classList.remove('active');
+            //     }
+            // });
+
+            // editProfileForm.addEventListener('submit', (e) => {
+            //     e.preventDefault();
+
+            //     const newName = editPatientName.value;
+            //     const newNik = editPatientNik.value;
+            //     const newEmail = editPatientEmail.value;
+            //     const newGender = document.querySelector('input[name="editGender"]:checked') ? document.querySelector('input[name="editGender"]:checked').value : '';
+            //     const newAddress = editPatientAddress.value;
+            //     const newPlaceOfBirth = editPatientPlaceOfBirth.value;
+            //     const newDob = editPatientDob.value;
+            //     const newPassword = editNewPassword.value;
+            //     const confirmPassword = editConfirmPassword.value;
+
+            //     if (newPassword) {
+            //         if (newPassword !== confirmPassword) {
+            //             alert('Password baru dan konfirmasi password tidak cocok!');
+            //             return;
+            //         }
+            //         const passwordValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(newPassword);
+            //         if (!passwordValid) {
+            //             alert("Password harus minimal 8 karakter dan mengandung huruf dan angka.");
+            //             return;
+            //         }
+            //         loggedInUser.password = newPassword;
+            //     }
+
+            //     loggedInUser.name = newName;
+            //     loggedInUser.gender = newGender;
+            //     loggedInUser.address = newAddress;
+            //     loggedInUser.placeOfBirth = newPlaceOfBirth;
+            //     loggedInUser.dateOfBirth = newDob;
+
+            //     sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
+            //     let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+            //     const userIndex = registeredUsers.findIndex(user => user.email === loggedInUser.email);
+            //     if (userIndex !== -1) {
+            //         registeredUsers[userIndex] = loggedInUser;
+            //         localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+            //     }
+
+            //     loadPatientData();
+            //     filterData();
+            //     editProfileModal.classList.remove('active');
+            //     alert('Profil berhasil diperbarui!');
+            // });
+
+            // --- Password Toggle Functionality for Modal ---
+            // document.querySelectorAll('.modal .toggle-password').forEach(toggle => {
+            //     toggle.addEventListener('click', function() {
+            //         const targetId = this.dataset.target;
+            //         const passwordInput = document.getElementById(targetId);
+            //         const icon = this.querySelector('i');
+
+            //         if (passwordInput.type === 'password') {
+            //             passwordInput.type = 'text';
+            //             icon.classList.remove('fa-eye-slash');
+            //             icon.classList.add('fa-eye');
+            //         } else {
+            //             passwordInput.type = 'password';
+            //             icon.classList.remove('fa-eye');
+            //             icon.classList.add('fa-eye-slash');
+            //         }
+            //     });
+            // });
+
+            printPdfBtn.addEventListener('click', () => {
+                window.print();
+            });
+
+
+            // --- Initial Data Load and Filter ---
             loadPatientData();
-            closePatientHistoryModal();
-        };
+            filterData(); // Apply filter initially to show all records for the logged-in user
 
-        const deletePatientHistory = (id) => {
-            if (confirm(`Apakah Anda yakin ingin menghapus riwayat dengan ID ${id}?`)) {
-                patientHistoryData = patientHistoryData.filter(data => data.id !== id);
-                loadPatientData();
-            }
-        };
-
-        const filterData = () => {
-            loadPatientData(); // Reload data with current filter settings
-        };
-
-        // Event Listeners
-        closeButton.addEventListener('click', closePatientHistoryModal);
-        cancelButton.addEventListener('click', closePatientHistoryModal);
-        patientHistoryForm.addEventListener('submit', savePatientHistory);
-
-        // document.querySelectorAll('.modal .toggle-password').forEach(toggle => {
-        //     toggle.addEventListener('click', function() {
-        //         const targetId = this.dataset.target;
-        //         const passwordInput = document.getElementById(targetId);
-        //         const icon = this.querySelector('i');
-
-        //         if (passwordInput.type === 'password') {
-        //             passwordInput.type = 'text';
-        //             icon.classList.remove('fa-eye-slash');
-        //             icon.classList.add('fa-eye');
-        //         } else {
-        //             passwordInput.type = 'password';
-        //             icon.classList.remove('fa-eye');
-        //             icon.classList.add('fa-eye-slash');
-        //         }
-        //     });
-        // });
-
-        printPdfBtn.addEventListener('click', () => {
-            window.print();
-        });
-
-
-        // --- Initial Data Load and Filter ---
-        loadPatientData();
-        filterData(); // Apply filter initially to show all records for the logged-in user
-
-        // --- Filter Button Events ---
-        applyFilterBtn.addEventListener('click', filterData);
-        clearFilterBtn.addEventListener('click', () => {
-            filterDateInput.value = ''; // Clear the single date filter
-            filterPatientNameInput.value = ''; // Clear patient name filter
-            filterServiceSelect.value = ''; // Clear service filter
-            filterData();
+            // --- Filter Button Events ---
+            applyFilterBtn.addEventListener('click', filterData);
+            clearFilterBtn.addEventListener('click', () => {
+                dateFilter.value = ''; // Clear the single date filter
+                filterData();
+            });
         });
     </script>
 </body>
