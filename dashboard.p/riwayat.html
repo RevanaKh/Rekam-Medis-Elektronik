@@ -1100,19 +1100,6 @@
             // Mengubah ID tombol unduh
             const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
-
-            // Data dummy (gantilah dengan data aktual dari backend Anda)
-            let patientHistoryData = [
-                { id_pasien: 'P001', tanggal: '2023-01-15', diagnosis: 'Influenza', tindakan: 'Pemberian obat flu', obat: 'Paracetamol, Antihistamin', catatan: 'Pasien demam, batuk, pilek. Disarankan istirahat cukup.' },
-                { id_pasien: 'P001', tanggal: '2023-03-20', diagnosis: 'Dermatitis Kontak', tindakan: 'Pemberian salep anti-alergi', obat: 'Hydrocortisone cream', catatan: 'Ruam di tangan karena alergi sabun.' },
-                { id_pasien: 'P002', tanggal: '2023-02-10', diagnosis: 'Hipertensi', tindakan: 'Edukasi diet rendah garam, resep obat', obat: 'Amlodipine', catatan: 'Kontrol tekanan darah. Diberi jadwal kontrol selanjutnya.' },
-                { id_pasien: 'P001', tanggal: '2024-05-25', diagnosis: 'Migrain', tindakan: 'Pemberian analgesik', obat: 'Ibuprofen', catatan: 'Sakit kepala sebelah, mual. Kondisi membaik.' },
-                { id_pasien: 'P001', tanggal: '2024-05-28', diagnosis: 'Cek Kesehatan Rutin', tindakan: 'Pemeriksaan fisik, cek darah', obat: 'Multivitamin', catatan: 'Hasil cek darah normal. Disarankan tetap menjaga pola hidup sehat.' }
-            ];
-
-            // Dummy login user (gantilah dengan ID pasien yang login)
-            const loggedInPatientId = 'P001'; // Misalnya, ini adalah ID pasien yang sedang login
-
             function renderTable(dataToRender) {
                 historyTableBody.innerHTML = '';
                 if (dataToRender.length === 0) {
