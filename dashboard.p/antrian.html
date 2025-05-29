@@ -515,7 +515,7 @@
         </div>
 
         <div class="dashboard-content">
-            <div class="card" id="queueInfoCard">
+            <div class="card">
                 <h3>Informasi Antrian Anda</h3>
                 <p class="no-queue-message" id="noQueueMessage" style="display: none;">Anda tidak memiliki antrian aktif saat ini.</p>
                 <div id="activeQueueDetails" style="display: none;">
@@ -684,14 +684,15 @@
             // Mengganti window.print() dengan html2pdf
             if (printBtn) {
                 printBtn.addEventListener('click', () => {
-                    // Mendapatkan elemen kartu informasi antrian
-                    const elementToPrint = document.getElementById('queueInfoCard');
+                    // Menargetkan div dengan class 'card' yang berisi informasi antrian
+                    // Ini akan mengambil kartu pertama di dalam dashboard-content
+                    const elementToPrint = document.querySelector('.dashboard-content .card');
 
                     if (elementToPrint) {
                         // Opsi untuk PDF (ukuran margin, nama file, kualitas gambar, dll.)
                         const options = {
                             margin: 10,
-                            filename: 'Antrian_Pemeriksaan.pdf',
+                            filename: 'Antrian_Pemeriksaan.pdf', // Nama file PDF saat diunduh
                             image: { type: 'jpeg', quality: 0.98 },
                             html2canvas: { scale: 2 }, // Meningkatkan skala untuk kualitas gambar yang lebih baik
                             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -701,8 +702,8 @@
                         html2pdf().from(elementToPrint).set(options).save();
                         console.log('Antrian diunduh sebagai PDF.');
                     } else {
-                        console.error('Elemen #queueInfoCard tidak ditemukan untuk pembuatan PDF.');
-                        alert('Gagal mengunduh antrian. Pastikan informasi antrian terlihat.');
+                        console.error('Elemen kartu antrian tidak ditemukan untuk pembuatan PDF. Pastikan ada div dengan class "card" di dalam "dashboard-content".');
+                        alert('Gagal mengunduh antrian. Bagian informasi antrian tidak ditemukan.');
                     }
                 });
             }
