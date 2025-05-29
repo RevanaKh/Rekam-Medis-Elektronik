@@ -54,11 +54,12 @@
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        .sidebar.active ~ .mobile-toggle { /* Sembunyikan toggle mobile saat sidebar aktif (terbuka) */
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+        /* ATURAN CSS INI TIDAK AKAN BEKERJA KARENA POSISI ELEMEN DI HTML */
+        /* .sidebar.active ~ .mobile-toggle { /* Sembunyikan toggle mobile saat sidebar aktif (terbuka) */
+        /* opacity: 0; */
+        /* visibility: hidden; */
+        /* pointer-events: none; */
+        /* } */
 
         /* Sidebar/Navigasi Utama */
         .sidebar {
@@ -1188,13 +1189,24 @@
                 });
             }
 
-            // Fix applied here: Ensure mobileToggle is correctly displaying/hiding the sidebar
+            // **FIX STARTS HERE**
             if (mobileToggle) {
                 mobileToggle.addEventListener('click', (event) => {
                     event.stopPropagation();
                     sidebar.classList.toggle('active');
-                    // Optionally, you might want to hide the mobileToggle briefly when sidebar opens
-                    // but your CSS already handles this with `sidebar.active ~ .mobile-toggle`
+
+                    // Manually control mobile-toggle visibility based on sidebar.active
+                    if (sidebar.classList.contains('active')) {
+                        mobileToggle.style.opacity = '0';
+                        mobileToggle.style.visibility = 'hidden';
+                        mobileToggle.style.pointerEvents = 'none';
+                    } else {
+                        // This case will be handled by initLayout or other close events,
+                        // but setting it here ensures it pops back if somehow stuck.
+                        mobileToggle.style.opacity = '1';
+                        mobileToggle.style.visibility = 'visible';
+                        mobileToggle.style.pointerEvents = 'auto';
+                    }
                 });
             }
 
@@ -1258,6 +1270,7 @@
             window.addEventListener('resize', () => {
                 initLayout(); // Panggil saat window di-resize
             });
+            // **FIX ENDS HERE**
 
 
             // --- Edit Profile Modal Logic ---
