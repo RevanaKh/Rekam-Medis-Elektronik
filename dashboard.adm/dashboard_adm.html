@@ -482,7 +482,7 @@
             </li>
         </ul>
         <div class="logout-section">
-            <a href="/index.html" class="logout-link">
+            <a href="../index.html" class="logout-link">
                 <div class="logout-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -524,7 +524,7 @@
                     }
                 } else {
                     // Redirect jika tidak ada data user di sessionStorage
-                    window.location.href = './index.html';
+                    window.location.href = '../index.html';
                 }
             }
 
@@ -536,10 +536,10 @@
                     if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
                         alert('Anda tidak memiliki akses ke halaman ini.');
                         sessionStorage.clear(); // Hapus sesi jika tidak punya akses
-                        window.location.href = './index.html'; // Redirect ke login
+                        window.location.href = '../index.html'; // Redirect ke login
                     }
                 } else {
-                    window.location.href = './index.html'; // Belum login
+                    window.location.href = '../index.html'; // Belum login
                 }
             }
 
@@ -620,7 +620,7 @@
                 logoutLink.addEventListener('click', function(e) {
                     e.preventDefault(); // Mencegah navigasi langsung
                     sessionStorage.clear(); // Hapus semua data sesi
-                    window.location.href = './index.html'; // Arahkan ke halaman login
+                    window.location.href = '../index.html'; // Arahkan ke halaman login
                 });
             }
 
