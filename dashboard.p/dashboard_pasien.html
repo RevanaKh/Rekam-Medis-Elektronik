@@ -237,13 +237,10 @@
             margin-right: 0;
         }
 
-        /* Tombol Toggle untuk Desktop */
+        /* Tombol Toggle untuk Desktop - Disesuaikan */
         .toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: -20px; /* Posisikan di luar sidebar */
-            background-color: var(--primary-dark);
-            color: var(--white);
+            background-color: transparent; /* Changed to transparent for better integration */
+            color: var(--white); /* Keep the color */
             border: none;
             border-radius: 50%;
             width: 40px;
@@ -252,17 +249,22 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: var(--shadow);
             z-index: 1001; /* Di atas sidebar */
             transition: transform 0.3s ease;
+            position: absolute; /* Position within header */
+            right: 10px; /* Adjust right position */
+            top: 50%; /* Center vertically */
+            transform: translateY(-50%); /* Adjust for vertical centering */
         }
 
         .toggle-btn i {
             font-size: 1.2rem;
+            color: var(--secondary-color); /* Ensure icon color matches text */
+            transition: transform 0.3s ease;
         }
 
-        .sidebar.minimized .toggle-btn {
-            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+        .sidebar.minimized .toggle-btn i {
+            transform: rotate(180deg); /* Rotate icon when minimized */
         }
 
         /* Area Konten Utama */
@@ -576,11 +578,11 @@
     </div>
 
     <div class="sidebar" id="sidebar">
-        <button class="toggle-btn" id="sidebar-toggle">
-            <i class="fas fa-chevron-left"></i>
-        </button>
         <div class="sidebar-header">
             <div class="menu-icon">≡</div>
+            <button class="toggle-btn" id="sidebar-toggle">
+                <i class="fas fa-chevron-left"></i>
+            </button>
         </div>
         <ul class="nav-list">
             <li class="nav-item">
@@ -658,7 +660,7 @@
         </ul>
 
         <div class="logout-section">
-            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link">
+            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link" id="logoutLink">
                 <div class="logout-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -786,238 +788,477 @@
 
 
     <script>
-        <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const sidebar = document.getElementById('sidebar');
-        const mobileToggle = document.getElementById('mobile-toggle');
-        const menuIcon = document.querySelector('.menu-icon');
-        const mainContent = document.getElementById('main-content');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const logoutButton = document.getElementById('logoutButton');
+        // --- Function to initialize default accounts (placed outside the main DOMContentLoaded) ---
+        function initializeDefaultAccounts() {
+            let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+            let accountsToAdd = [];
 
-        // Elemen untuk tampilan informasi pasien
-        const summaryNama = document.getElementById('summaryNama');
-        const summaryEmail = document.getElementById('summaryEmail');
-        const summaryNik = document.getElementById('summaryNik');
-        const summaryJenisKelamin = document.getElementById('summaryJenisKelamin');
-        const summaryTempatLahir = document.getElementById('summaryTempatLahir');
-        const summaryTanggalLahir = document.getElementById('summaryTanggalLahir');
-        const summaryTelepon = document.getElementById('summaryTelepon');
-        const summaryAlamat = document.getElementById('summaryAlamat');
-        const summaryGolDarah = document.getElementById('summaryGolDarah');
+            // Admin account
+            if (!users.some(u => u.email === 'admin@gmail.com')) {
+                accountsToAdd.push({ email: 'admin@gmail.com', password: 'admin123', role: 'admin' });
+            }
 
-        // Elemen untuk Edit Profil
-        const editProfileLink = document.getElementById('editProfileLink');
-        const profileSummarySection = document.getElementById('profile-summary');
-        const editProfileFormSection = document.getElementById('edit-profile-form');
-        const profileEditForm = document.getElementById('profileEditForm');
-        const cancelEditButton = document.getElementById('cancelEdit');
+            // Dokter account
+            if (!users.some(u => u.email === 'dokter@gmail.com')) {
+                accountsToAdd.push({ email: 'dokter@gmail.com', password: 'dokter123', role: 'dokter' });
+            }
 
-        // Elemen input form edit profil
-        const editNama = document.getElementById('editNama');
-        const editEmail = document.getElementById('editEmail');
-        const editNik = document.getElementById('editNik');
-        const editJenisKelamin = document.getElementById('editJenisKelamin');
-        const editTempatLahir = document.getElementById('editTempatLahir');
-        const editTanggalLahir = document.getElementById('editTanggalLahir');
-        const editTelepon = document.getElementById('editTelepon');
-        const editAlamat = document.getElementById('editAlamat');
-        const editGolDarah = document.getElementById('editGolDarah');
+            // Apoteker account
+            if (!users.some(u => u.email === 'apoteker@gmail.com')) {
+                accountsToAdd.push({ email: 'apoteker@gmail.com', password: 'apoteker123', role: 'apoteker' });
+            }
 
-        let loggedInUser = null;
-
-        // Fungsi untuk memuat data pengguna
-        function loadUserData() {
-            const userString = sessionStorage.getItem('loggedInUser');
-            if (userString) {
-                try {
-                    loggedInUser = JSON.parse(userString);
-
-                    if (welcomeMessage) welcomeMessage.textContent = `Hallo, Selamat Datang ${loggedInUser.nama || 'Pengguna'}`;
-                    
-                    if (summaryNama) summaryNama.textContent = loggedInUser.nama || 'Tidak ada data';
-                    if (summaryEmail) summaryEmail.textContent = loggedInUser.email || 'Tidak ada data';
-                    if (summaryNik) summaryNik.textContent = loggedInUser.nik || 'Tidak ada data';
-                    if (summaryJenisKelamin) summaryJenisKelamin.textContent = loggedInUser.jenisKelamin || 'Tidak ada data';
-                    if (summaryTempatLahir) summaryTempatLahir.textContent = loggedInUser.tempatLahir || 'Tidak ada data'; // Fix: Corrected typo 'TempatLugar' to 'TempatLahir'
-                    if (summaryTanggalLahir) summaryTanggalLahir.textContent = loggedInUser.tanggalLahir || 'Tidak ada data';
-                    if (summaryTelepon) summaryTelepon.textContent = loggedInUser.telepon || 'Tidak ada data';
-                    if (summaryAlamat) summaryAlamat.textContent = loggedInUser.alamat || 'Tidak ada data';
-                    if (summaryGolDarah) summaryGolDarah.textContent = loggedInUser.golonganDarah || 'Tidak ada data';
-
-                    // Mengisi form edit profil dengan data saat ini
-                    if (editNama) editNama.value = loggedInUser.nama || '';
-                    if (editEmail) editEmail.value = loggedInUser.email || '';
-                    if (editNik) editNik.value = loggedInUser.nik || '';
-                    if (editJenisKelamin) editJenisKelamin.value = loggedInUser.jenisKelamin || '';
-                    if (editTempatLahir) editTempatLahir.value = loggedInUser.tempatLahir || '';
-                    if (editTanggalLahir) editTanggalLahir.value = loggedInUser.tanggalLahir || '';
-                    if (editTelepon) editTelepon.value = loggedInUser.telepon || '';
-                    if (editAlamat) editAlamat.value = loggedInUser.alamat || '';
-                    if (editGolDarah) editGolDarah.value = loggedInUser.golonganDarah || '';
-
-                } catch (e) {
-                    console.error('Error parsing loggedInUser from sessionStorage:', e);
-                    sessionStorage.clear();
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Path ini tetap seperti yang Anda miliki
-                }
-            } else {
-                window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Path ini tetap seperti yang Anda miliki
+            // If new accounts were added, update localStorage
+            if (accountsToAdd.length > 0) {
+                users = users.concat(accountsToAdd);
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+                console.log('Default accounts initialized/added to localStorage.');
             }
         }
 
-        // Inisialisasi status sidebar berdasarkan lebar layar
-        function initSidebarState() {
-            if (window.innerWidth <= 768) {
-                if (sidebar) sidebar.classList.remove('minimized');
-                if (sidebar) sidebar.classList.remove('active');
-                if (mainContent) mainContent.style.marginLeft = '0';
-                if (mobileToggle) mobileToggle.style.display = 'block'; 
-            } else {
-                if (sidebar) sidebar.classList.remove('active');
-                if (mainContent) {
-                    if (sidebar && sidebar.classList.contains('minimized')) {
+        // Call this function when the DOM is ready, BEFORE your main script block
+        document.addEventListener('DOMContentLoaded', initializeDefaultAccounts);
+
+        // --- Main DOMContentLoaded block ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const loginForm = document.getElementById('loginForm'); // This might be null if not on the login page
+            const registerForm = document.getElementById('registerForm'); // This might be null if not on the login page
+            const showRegisterModalBtn = document.getElementById('showRegisterModal');
+            const registerModal = document.getElementById('registerModal');
+            const successModal = document.getElementById('successModal');
+            const closeButtons = document.querySelectorAll('.close-button');
+            const togglePasswordIcons = document.querySelectorAll('.toggle-password');
+            const successModalCloseButton = document.getElementById('successModalCloseButton'); // Get the specific button
+
+            // Error message elements (only relevant for registration/login page)
+            const errorRegNik = document.getElementById('errorRegNik');
+            const errorRegTelepon = document.getElementById('errorRegTelepon');
+
+            // Function to open modal
+            function openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) modal.style.display = 'flex';
+            }
+
+            // Function to close modal
+            function closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) modal.style.display = 'none';
+            }
+
+            // Event Listeners for Modals (Conditional as they might not exist on this page)
+            if (showRegisterModalBtn) {
+                showRegisterModalBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    openModal('registerModal');
+                });
+            }
+
+            if (successModalCloseButton) {
+                successModalCloseButton.addEventListener('click', function() {
+                    closeModal('successModal');
+                });
+            }
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        closeModal(modal.id);
+                        // Clear error messages and reset form only if the elements exist
+                        if (errorRegNik) errorRegNik.textContent = '';
+                        if (errorRegTelepon) errorRegTelepon.textContent = '';
+                        if (registerForm) registerForm.reset();
+                    }
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                if (registerModal && event.target == registerModal) {
+                    closeModal('registerModal');
+                    if (errorRegNik) errorRegNik.textContent = '';
+                    if (errorRegTelepon) errorRegTelepon.textContent = '';
+                    if (registerForm) registerForm.reset();
+                }
+                if (successModal && event.target == successModal) {
+                    closeModal('successModal');
+                }
+            });
+
+            // Toggle Password Visibility (Conditional)
+            togglePasswordIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    const passwordInput = document.getElementById(targetId);
+                    const iconElement = this.querySelector('i');
+
+                    if (passwordInput && iconElement) {
+                        if (passwordInput.type === 'password') {
+                            passwordInput.type = 'text';
+                            iconElement.classList.remove('fa-eye-slash');
+                            iconElement.classList.add('fa-eye');
+                        } else {
+                            passwordInput.type = 'password';
+                            iconElement.classList.remove('fa-eye');
+                            iconElement.classList.add('fa-eye-slash');
+                        }
+                    }
+                });
+            });
+
+            // Registration Logic (Only if registerForm exists)
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const nama = document.getElementById('regNama').value;
+                    const email = document.getElementById('regEmail').value;
+                    const password = document.getElementById('regPassword').value;
+                    const confirmPassword = document.getElementById('regConfirmPassword').value;
+                    const nik = document.getElementById('regNik').value;
+                    const jenisKelamin = document.getElementById('regJenisKelamin').value;
+                    const alamat = document.getElementById('regAlamat').value;
+                    const tempatLahir = document.getElementById('regTempatLahir').value;
+                    const tanggalLahir = document.getElementById('regTanggalLahir').value;
+                    const telepon = document.getElementById('regTelepon').value;
+                    const golDarah = document.getElementById('regGolDarah').value;
+                    const role = 'pasien'; // SET ROLE SECARA OTOMATIS MENJADI PASIEN
+
+                    // Reset error messages
+                    if (errorRegNik) errorRegNik.textContent = '';
+                    if (errorRegTelepon) errorRegTelepon.textContent = '';
+
+                    // Password confirmation
+                    if (password !== confirmPassword) {
+                        alert('Password dan konfirmasi password tidak cocok!');
+                        return;
+                    }
+
+                    // NIK Validation (16 digits, numeric)
+                    if (!/^[0-9]{16}$/.test(nik)) {
+                        if (errorRegNik) errorRegNik.textContent = 'NIK harus 16 digit angka.';
+                        return;
+                    }
+
+                    // Phone Number Validation (starts with 08, 12 digits)
+                    if (!/^08[0-9]{10}$/.test(telepon)) {
+                        if (errorRegTelepon) errorRegTelepon.textContent = 'Nomor telepon harus diawali 08 dan terdiri dari 12 digit.';
+                        return;
+                    }
+
+                    let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+                    // Check if email already exists
+                    const emailExists = users.some(user => user.email === email);
+                    if (emailExists) {
+                        alert('Email ini sudah terdaftar. Silakan gunakan email lain atau login.');
+                        return;
+                    }
+
+                    const newUser = {
+                        nama,
+                        email,
+                        password,
+                        role,
+                        nik,
+                        jenisKelamin,
+                        alamat,
+                        tempatLahir,
+                        tanggalLahir,
+                        telepon, // Add phone number
+                        golonganDarah: golDarah // Add blood type
+                    };
+                    users.push(newUser);
+                    localStorage.setItem('registeredUsers', JSON.stringify(users));
+
+                    // Pendaftaran berhasil, tampilkan modal sukses
+                    closeModal('registerModal'); // Close registration modal
+                    openModal('successModal'); // Open success modal
+
+                    // Optionally pre-fill login email after successful registration
+                    const loginEmailInput = document.getElementById('loginEmail');
+                    const loginPasswordInput = document.getElementById('loginPassword');
+                    if (loginEmailInput) loginEmailInput.value = email;
+                    if (loginPasswordInput) loginPasswordInput.value = ''; // Clear password field
+                });
+            }
+
+
+            // --- Login Logic (Only if loginForm exists) ---
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const email = document.getElementById('loginEmail').value;
+                    const password = document.getElementById('loginPassword').value;
+
+                    let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+                    const user = users.find(u => u.email === email && u.password === password);
+
+                    if (user) {
+                        // Simpan seluruh objek user ke sessionStorage
+                        sessionStorage.setItem('loggedInUser', JSON.stringify(user));
+
+                        // Redirect based on role
+                        if (user.role === 'admin') {
+                            window.location.href = '/dashboard.adm/dashboard_adm.html';
+                        } else if (user.role === 'dokter') {
+                            window.location.href = '/dashboard.d/dashboard.dokter.html';
+                        } else if (user.role === 'apoteker') {
+                            window.location.href = '/dashboard_apoteker.html';
+                        } else if (user.role === 'pasien') {
+                            window.location.href = '/dashboard.p/dashboard_pasien.html';
+                        } else {
+                            alert('Role pengguna tidak dikenali.');
+                        }
+                    } else {
+                        alert('Email atau password salah!');
+                    }
+                });
+            }
+
+            // Tombol "Lupa Akun" (Only if forgotLink exists)
+            const forgotLink = document.getElementById('forgotLink');
+            if (forgotLink) {
+                forgotLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Silakan hubungi admin.');
+                });
+            }
+
+            // Sidebar and Mobile Menu Toggle (Copied from laporan.html and data_obat.html)
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+            const mainContent = document.getElementById('mainContent');
+
+            // Get elements for patient info and edit modal
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const summaryNama = document.getElementById('summaryNama');
+            const summaryEmail = document.getElementById('summaryEmail');
+            const summaryNik = document.getElementById('summaryNik');
+            const summaryJenisKelamin = document.getElementById('summaryJenisKelamin');
+            const summaryTempatLahir = document.getElementById('summaryTempatLahir');
+            const summaryTanggalLahir = document.getElementById('summaryTanggalLahir');
+            const summaryTelepon = document.getElementById('summaryTelepon');
+            const summaryAlamat = document.getElementById('summaryAlamat');
+            const summaryGolDarah = document.getElementById('summaryGolDarah');
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const editProfileModal = document.getElementById('editProfileModal');
+            const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+            const profileEditForm = document.getElementById('profileEditForm');
+            const editNama = document.getElementById('editNama');
+            const editEmail = document.getElementById('editEmail');
+            const editNik = document.getElementById('editNik');
+            const editJenisKelamin = document.getElementById('editJenisKelamin');
+            const editTempatLahir = document.getElementById('editTempatLahir');
+            const editTanggalLahir = document.getElementById('editTanggalLahir');
+            const editTelepon = document.getElementById('editTelepon');
+            const editAlamat = document.getElementById('editAlamat');
+            const editGolDarah = document.getElementById('editGolDarah');
+            const logoutLink = document.getElementById('logoutLink'); // Get the specific logout link
+
+            let loggedInUser = null; // Variable to store logged-in user data
+
+            // Fungsi untuk memeriksa akses berdasarkan peran
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser');
+                if (user) {
+                    const loggedInUserParsed = JSON.parse(user);
+                    if (!allowedRoles.includes(loggedInUserParsed.role)) {
+                        alert('Anda tidak memiliki akses ke halaman ini.');
+                        sessionStorage.clear();
+                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                    } else {
+                        // If access is granted, populate loggedInUser for other functions
+                        loggedInUser = loggedInUserParsed;
+                        loadUserData(); // Load user data if access is confirmed
+                    }
+                } else {
+                    // No user logged in, redirect to login page
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
+            }
+
+            // Function to load user data from sessionStorage and display it
+            function loadUserData() {
+                if (loggedInUser) { // Check if loggedInUser is already populated
+                    // Update welcome message
+                    welcomeMessage.textContent = `Hallo, Selamat Datang ${loggedInUser.nama || 'Pasien'}`;
+
+                    // Update patient information summary
+                    summaryNama.textContent = loggedInUser.nama || 'Tidak ada data';
+                    summaryEmail.textContent = loggedInUser.email || 'Tidak ada data';
+                    summaryNik.textContent = loggedInUser.nik || 'Tidak ada data';
+                    summaryJenisKelamin.textContent = loggedInUser.jenisKelamin || 'Tidak ada data';
+                    summaryTempatLahir.textContent = loggedInUser.tempatLahir || 'Tidak ada data';
+                    summaryTanggalLahir.textContent = loggedInUser.tanggalLahir || 'Tidak ada data';
+                    summaryTelepon.textContent = loggedInUser.telepon || 'Tidak ada data';
+                    summaryAlamat.textContent = loggedInUser.alamat || 'Tidak ada data';
+                    summaryGolDarah.textContent = loggedInUser.golonganDarah || 'Tidak ada data';
+                }
+            }
+
+            // Function to save updated user data to localStorage and sessionStorage
+            function saveUserData(updatedUser) {
+                let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+                const userIndex = users.findIndex(user => user.email === updatedUser.email);
+
+                if (userIndex !== -1) {
+                    users[userIndex] = updatedUser;
+                    localStorage.setItem('registeredUsers', JSON.stringify(users));
+                    sessionStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
+                    loggedInUser = updatedUser; // Update the global loggedInUser variable
+                    loadUserData(); // Reload data on dashboard
+                    alert('Profil berhasil diperbarui!');
+                } else {
+                    alert('Terjadi kesalahan saat memperbarui profil.');
+                }
+            }
+
+            // Event listener for "Edit Profil" button
+            editProfileBtn.addEventListener('click', () => {
+                if (loggedInUser) {
+                    editNama.value = loggedInUser.nama || '';
+                    editEmail.value = loggedInUser.email || ''; // Email is read-only
+                    editNik.value = loggedInUser.nik || '';
+                    editJenisKelamin.value = loggedInUser.jenisKelamin || '';
+                    editTempatLahir.value = loggedInUser.tempatLahir || '';
+                    editTanggalLahir.value = loggedInUser.tanggalLahir || '';
+                    editTelepon.value = loggedInUser.telepon || '';
+                    editAlamat.value = loggedInUser.alamat || '';
+                    editGolDarah.value = loggedInUser.golonganDarah || '';
+                    editProfileModal.style.display = 'flex'; // Show the modal
+                } else {
+                    alert('Data pengguna tidak ditemukan. Silakan login kembali.');
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
+            });
+
+            // Event listener for closing the edit profile modal
+            closeEditModalBtn.addEventListener('click', () => {
+                editProfileModal.style.display = 'none'; // Hide the modal
+            });
+
+            // Event listener for submitting the edit profile form
+            profileEditForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // NIK Validation (16 digits, numeric) for edit form
+                if (!/^[0-9]{16}$/.test(editNik.value)) {
+                    alert('NIK harus 16 digit angka.');
+                    return;
+                }
+                // Phone Number Validation (starts with 08, 12 digits) for edit form
+                if (!/^08[0-9]{10}$/.test(editTelepon.value)) {
+                    alert('Nomor telepon harus diawali 08 dan terdiri dari 12 digit.');
+                    return;
+                }
+
+                const updatedUser = {
+                    ...loggedInUser, // Keep existing user data
+                    nama: editNama.value,
+                    nik: editNik.value,
+                    jenisKelamin: editJenisKelamin.value,
+                    alamat: editAlamat.value,
+                    tempatLahir: editTempatLahir.value,
+                    tanggalLahir: editTanggalLahir.value,
+                    telepon: editTelepon.value,
+                    golonganDarah: editGolDarah.value
+                };
+                saveUserData(updatedUser);
+                editProfileModal.style.display = 'none'; // Hide the modal after saving
+            });
+
+            // Logout functionality
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                sessionStorage.removeItem('loggedInUser'); // Clear logged-in user data
+                window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Redirect to login page
+            });
+
+            // Toggle sidebar for desktop
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
                         mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
                     } else {
                         mainContent.style.marginLeft = 'var(--sidebar-width)';
                     }
-                }
-                if (mobileToggle) mobileToggle.style.display = 'none';
+                });
             }
-        }
 
-        // Event Listener untuk Mobile Toggle
-        if (mobileToggle) {
-            mobileToggle.addEventListener('click', (event) => {
-                event.stopPropagation();
-                if (sidebar) sidebar.classList.toggle('active');
-                if (mainContent) mainContent.classList.toggle('overlay-active');
-            });
-        }
+            // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    sidebar.classList.toggle('active');
+                });
+            }
 
-        // Event Listener untuk Menu Icon (di dalam sidebar)
-        if (menuIcon) {
-            menuIcon.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    if (sidebar) sidebar.classList.remove('active');
-                    if (mainContent) mainContent.classList.remove('overlay-active');
-                } else {
-                    if (sidebar) sidebar.classList.toggle('minimized');
-                    if (mainContent) {
-                        if (sidebar && sidebar.classList.contains('minimized')) {
-                            mainContent.classList.add('shifted');
+            // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    } else {
+                        sidebar.classList.toggle('minimized');
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
                         } else {
-                            mainContent.classList.remove('shifted');
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
                         }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        // Event Listener untuk Menutup Sidebar Saat Klik di Luar (Hanya di Mobile)
-        if (mainContent) {
+            // Close sidebar when clicking outside on mobile
             mainContent.addEventListener('click', () => {
-                if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('active')) {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
-                    mainContent.classList.remove('overlay-active');
                 }
             });
-        }
 
-        // Menghentikan propagasi klik pada sidebar itu sendiri
-        if (sidebar) {
+            // Prevent sidebar clicks from propagating to mainContent to close it
             sidebar.addEventListener('click', (event) => {
                 event.stopPropagation();
             });
-        }
-        
-        // Event Listener untuk Tombol Logout
-        if (logoutButton) {
-            logoutButton.addEventListener('click', () => {
-                sessionStorage.clear();
-                window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Path ini tetap seperti yang Anda miliki
-            });
-        }
 
-        // Event Listener untuk Link "Edit Profil"
-        if (editProfileLink) {
-            editProfileLink.addEventListener('click', (event) => {
-                event.preventDefault();
-                if (profileSummarySection && editProfileFormSection) {
-                    profileSummarySection.style.display = 'none';
-                    editProfileFormSection.style.display = 'block';
+            // Initialize the app
+            function init() {
+                // Check screen width on load and apply initial sidebar state
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('minimized');
+                    sidebar.classList.remove('active');
+                    mainContent.style.marginLeft = '0';
+                } else {
+                    sidebar.classList.remove('active');
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+                // Call checkAccess here to ensure loggedInUser is set and then data is loaded
+                checkAccess(['pasien']);
+            }
 
-                    // Mengisi form edit dengan data loggedInUser jika ada
-                    if (loggedInUser) {
-                        if (editNama) editNama.value = loggedInUser.nama || '';
-                        if (editEmail) editEmail.value = loggedInUser.email || '';
-                        if (editNik) editNik.value = loggedInUser.nik || '';
-                        if (editJenisKelamin) editJenisKelamin.value = loggedInUser.jenisKelamin || '';
-                        if (editTempatLahir) editTempatLahir.value = loggedInUser.tempatLahir || '';
-                        if (editTanggalLahir) editTanggalLahir.value = loggedInUser.tanggalLahir || '';
-                        if (editTelepon) editTelepon.value = loggedInUser.telepon || '';
-                        if (editAlamat) editAlamat.value = loggedInUser.alamat || '';
-                        if (editGolDarah) editGolDarah.value = loggedInUser.golonganDarah || '';
+            // Run initialization
+            init();
+
+            // Adjust main content margin on window resize for desktop view
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
                     }
+                    sidebar.classList.remove('active');
+                } else {
+                    mainContent.style.marginLeft = '0';
                 }
             });
-        }
-
-        // Event Listener untuk Form Submit Edit Profil
-        if (profileEditForm) {
-            profileEditForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                if (loggedInUser) {
-                    // Perbarui data pengguna
-                    if (editNama) loggedInUser.nama = editNama.value;
-                    if (editNik) loggedInUser.nik = editNik.value;
-                    if (editJenisKelamin) loggedInUser.jenisKelamin = editJenisKelamin.value;
-                    if (editTempatLahir) loggedInUser.tempatLahir = editTempatLahir.value;
-                    if (editTanggalLahir) loggedInUser.tanggalLahir = editTanggalLahir.value;
-                    if (editTelepon) loggedInUser.telepon = editTelepon.value;
-                    if (editAlamat) loggedInUser.alamat = editAlamat.value;
-                    if (editGolDarah) loggedInUser.golonganDarah = editGolDarah.value;
-
-                    sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
-                    // Perbarui data di localStorage juga
-                    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-                    const userIndex = registeredUsers.findIndex(u => u.email === loggedInUser.email);
-                    if (userIndex > -1) {
-                        registeredUsers[userIndex] = loggedInUser;
-                        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-                    }
-
-                    alert('Profil berhasil diperbarui!');
-                    loadUserData();
-                    if (profileSummarySection) profileSummarySection.style.display = 'block';
-                    if (editProfileFormSection) editProfileFormSection.style.display = 'none';
-                }
-            });
-        }
-
-        // Event Listener untuk Tombol Batal Edit Profil
-        if (cancelEditButton) {
-            cancelEditButton.addEventListener('click', () => {
-                if (profileSummarySection) profileSummarySection.style.display = 'block';
-                if (editProfileFormSection) editProfileFormSection.style.display = 'none';
-            });
-        }
-        
-        // Inisialisasi aplikasi
-        function init() {
-            initSidebarState();
-            loadUserData();
-        }
-
-        // Jalankan inisialisasi
-        init();
-
-        // Sesuaikan tampilan saat ukuran jendela berubah
-        window.addEventListener('resize', () => {
-            initSidebarState();
         });
-    });
-</script>
+    </script>
 </body>
 </html>
