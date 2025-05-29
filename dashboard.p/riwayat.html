@@ -1043,6 +1043,50 @@
             const clearFilterBtn = document.getElementById('clearFilterBtn');
             const printPdfBtn = document.getElementById('printPdfBtn');
 
+            // Dummy medical history data for demonstration
+            // In a real application, this would come from a backend or localStorage
+            const medicalHistoryData = [
+                {
+                    patientEmail: "pasien1@example.com",
+                    date: "2023-01-15",
+                    doctor: "Dr. Budi Santoso",
+                    diagnosis: "Flu Ringan",
+                    action: "Pemeriksaan Fisik, Resep Obat Flu",
+                    medicines: "Paracetamol, Vitamin C"
+                },
+                {
+                    patientEmail: "pasien1@example.com",
+                    date: "2023-03-20",
+                    doctor: "Dr. Siti Aminah",
+                    diagnosis: "Batuk Berdahak",
+                    action: "Auskultasi Paru, Pemberian Antibiotik",
+                    medicines: "Amoxicillin, Obat Batuk Sirup"
+                },
+                {
+                    patientEmail: "pasien2@example.com",
+                    date: "2023-02-10",
+                    doctor: "Dr. Budi Santoso",
+                    diagnosis: "Demam",
+                    action: "Pengukuran Suhu, Tes Darah Sederhana",
+                    medicines: "Ibuprofen"
+                },
+                 {
+                    patientEmail: "pasien1@example.com",
+                    date: "2024-01-25",
+                    doctor: "Dr. Budi Santoso",
+                    diagnosis: "Sakit Kepala",
+                    action: "Anamnesa, Pemberian Analgesik",
+                    medicines: "Bodrex"
+                },
+                {
+                    patientEmail: "pasien1@example.com",
+                    date: "2024-05-10",
+                    doctor: "Dr. Ayu Lestari",
+                    diagnosis: "Diare Akut",
+                    action: "Pemeriksaan Tinja, Rehidrasi Oral",
+                    medicines: "Oralit, Loperamide"
+                }
+            ];
             
 
             // --- Check Login Status and Redirect ---
@@ -1144,10 +1188,13 @@
                 });
             }
 
+            // Fix applied here: Ensure mobileToggle is correctly displaying/hiding the sidebar
             if (mobileToggle) {
                 mobileToggle.addEventListener('click', (event) => {
                     event.stopPropagation();
                     sidebar.classList.toggle('active');
+                    // Optionally, you might want to hide the mobileToggle briefly when sidebar opens
+                    // but your CSS already handles this with `sidebar.active ~ .mobile-toggle`
                 });
             }
 
@@ -1155,6 +1202,10 @@
                 menuIcon.addEventListener('click', () => {
                     if (window.innerWidth <= 768) {
                         sidebar.classList.remove('active');
+                        // Ensure mobileToggle becomes visible again when sidebar closes on mobile
+                        mobileToggle.style.opacity = '1';
+                        mobileToggle.style.visibility = 'visible';
+                        mobileToggle.style.pointerEvents = 'auto';
                     } else {
                         sidebar.classList.toggle('minimized');
                         if (sidebar.classList.contains('minimized')) {
@@ -1169,6 +1220,10 @@
             mainContent.addEventListener('click', () => {
                 if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
+                    // Ensure mobileToggle becomes visible again when sidebar closes by clicking outside
+                    mobileToggle.style.opacity = '1';
+                    mobileToggle.style.visibility = 'visible';
+                    mobileToggle.style.pointerEvents = 'auto';
                 }
             });
 
@@ -1183,6 +1238,10 @@
                     sidebar.classList.remove('minimized');
                     mainContent.style.marginLeft = '0';
                     mainContent.style.width = '100%';
+                    // Ensure mobile toggle is visible when initialized in mobile view
+                    mobileToggle.style.opacity = '1';
+                    mobileToggle.style.visibility = 'visible';
+                    mobileToggle.style.pointerEvents = 'auto';
                 } else {
                     sidebar.style.left = '0'; /* Tampilkan sidebar di desktop */
                     sidebar.classList.remove('active');
