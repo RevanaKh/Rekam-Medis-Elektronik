@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antrian Pemeriksaan</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* Your existing CSS here */
         * {
@@ -40,15 +38,21 @@
             top: 15px;
             left: 15px;
             font-size: 2rem;
-            color: var(--white);
+            color: var(--secondary-color);
             cursor: pointer;
-            z-index: 1100;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
             padding: 5px 10px;
             background-color: var(--primary-dark);
             border-radius: 5px;
             box-shadow: var(--shadow);
             line-height: 1;
             transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar.active ~ .mobile-toggle {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         /* Sidebar/Navigasi Utama */
@@ -66,7 +70,6 @@
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            left: 0;
         }
 
         .sidebar.minimized {
@@ -101,10 +104,6 @@
 
         .sidebar.minimized .menu-icon {
             font-size: 1.5rem;
-        }
-
-        .user-info {
-            display: none;
         }
 
         .nav-list {
@@ -159,7 +158,7 @@
             color: var(--white);
         }
 
-        /* Bagian Logout */
+        /* Logout Section */
         .logout-section {
             padding: 0;
             text-align: center;
@@ -231,7 +230,7 @@
         .toggle-btn {
             position: absolute;
             top: 20px;
-            right: -20px; /* Di luar sidebar agar bisa dijangkau */
+            right: -20px;
             background-color: var(--primary-dark);
             color: var(--white);
             border: none;
@@ -252,10 +251,10 @@
         }
 
         .sidebar.minimized .toggle-btn {
-            transform: translateX(-190px) rotate(180deg); /* Pindahkan saat sidebar diminimalisir */
+            transform: translateX(-190px) rotate(180deg);
         }
 
-        /* Konten Utama */
+        /* Area Konten Utama */
         .main-content {
             flex-grow: 1;
             padding: 20px;
@@ -263,20 +262,19 @@
             margin-left: var(--sidebar-width);
             width: calc(100% - var(--sidebar-width));
             overflow-y: auto;
-            overflow-x: hidden;
             position: relative;
             z-index: 1;
         }
 
-        /* Penyesuaian Responsif untuk Mobile */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             .mobile-toggle {
-                display: block; /* Tampilkan mobile toggle */
-                z-index: 10000; /* Pastikan di atas elemen lain */
+                display: block;
+                z-index: 10000;
             }
 
             .sidebar {
-                left: -250px; /* Sembunyikan sidebar di luar layar */
+                left: -250px;
                 position: fixed;
                 height: 100%;
                 z-index: 2000;
@@ -285,124 +283,270 @@
             }
 
             .sidebar.active {
-                left: 0; /* Geser masuk saat aktif */
+                left: 0;
             }
 
             .main-content {
                 margin-left: 0;
                 width: 100%;
-                padding: 15px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0;
             }
 
             .toggle-btn {
-                display: none; /* Sembunyikan toggle desktop di mobile */
+                display: none;
             }
 
             body {
                 flex-direction: column;
             }
-
-            .navbar {
-                padding: 10px 15px;
-                margin-top: 50px;
-            }
-
-            .navbar h2 {
-                font-size: 20px;
-            }
-
-            .card {
-                padding: 15px;
-                width: 100%;
-                box-sizing: border-box;
-            }
         }
 
-        /* Gaya Khusus Antrian */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Antrian Page Specific Styles */
+        .queue-container {
             background-color: var(--white);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 30px;
+            border-radius: 8px;
             box-shadow: var(--shadow);
+            max-width: 700px;
+            margin: 20px auto;
+            text-align: center;
+            position: relative;
         }
 
-        .navbar .left-section h2 {
-            margin: 0;
-            color: var(--text-color);
-            font-size: 24px;
-        }
-
-        .navbar .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .navbar .user-profile span {
-            font-weight: bold;
+        .queue-container h2 {
             color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 2.2rem;
         }
 
-        .dashboard-content {
-            display: grid;
-            grid-template-columns: 1fr;
+        .queue-info {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: var(--light-color);
+        }
+
+        .queue-info p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .queue-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 20px 0;
+            display: block;
+        }
+
+        /* Styling for "Antrian Saat Ini" in its new position */
+        .current-queue {
+            margin-top: 20px; /* Space from the elements above it */
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            font-weight: bold;
+            display: block; /* Ensure it takes its own line */
+        }
+
+
+        .action-buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
             gap: 20px;
         }
 
-        .card {
-            background-color: var(--white);
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .card h3 {
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-
-        .card p {
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-
-        .highlight-queue {
-            font-size: 3em;
-            font-weight: bold;
-            color: var(--primary-dark);
-            display: block;
-            margin: 20px 0;
-        }
-
-        .print-btn {
-            background-color: var(--primary-color);
-            color: var(--white);
-            border: none;
+        .action-buttons button {
             padding: 12px 25px;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
-            margin-top: 20px;
+            font-size: 1.1rem;
             transition: background-color 0.3s ease;
         }
 
-        .print-btn:hover {
+        .action-buttons .btn-check-in {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .action-buttons .btn-check-in:hover {
             background-color: var(--primary-dark);
         }
 
-        .no-queue-message {
-            color: #777;
-            font-style: italic;
-            margin-top: 20px;
+        .action-buttons .btn-cancel {
+            background-color: #f44336;
+            color: var(--white);
         }
+
+        .action-buttons .btn-cancel:hover {
+            background-color: #d32f2f;
+        }
+
+        .action-buttons .btn-print { /* New style for print button */
+            background-color: #2196F3; /* Blue color */
+            color: var(--white);
+        }
+
+        .action-buttons .btn-print:hover {
+            background-color: #1976D2; /* Darker blue */
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 10001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            padding-top: 60px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-backdrop.modal-active {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 15% from the top and centered */
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+        }
+
+        .modal-content p {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .modal-buttons .btn-confirm {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .modal-buttons .btn-confirm:hover {
+            background-color: var(--primary-dark);
+        }
+        .modal-buttons .btn-cancel-modal {
+            background-color: #ddd;
+            color: var(--secondary-color);
+        }
+        .modal-buttons .btn-cancel-modal:hover {
+            background-color: #ccc;
+        }
+
+        /*
+        // @media print block commented out to allow full web page printing
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background: none;
+            }
+            body > *:not(.queue-container) {
+                display: none;
+            }
+            .queue-container {
+                display: block;
+                width: 100%;
+                max-width: none;
+                margin: 10mm;
+                padding: 20mm;
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                text-align: center;
+                background-color: #fff;
+            }
+            .queue-container h2 {
+                font-size: 2rem;
+                margin-bottom: 20px;
+                color: #333;
+            }
+            .queue-info {
+                margin-top: 30px;
+                padding: 20px;
+                border: 1px solid #ddd;
+                background-color: #f9f9f9;
+            }
+            .queue-info p {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+            .queue-number {
+                font-size: 5rem;
+                margin: 20px 0;
+                color: var(--primary-dark);
+            }
+            .current-queue {
+                font-size: 1.5rem;
+                margin-top: 20px;
+            }
+            .action-buttons {
+                display: none;
+            }
+        }
+        */
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <div class="mobile-toggle" id="mobile-toggle">
@@ -506,213 +650,337 @@
     </div>
 
     <div class="main-content" id="main-content">
-        <div class="navbar">
-            <div class="left-section">
-                <h2>Antrian Pemeriksaan</h2>
+        <div class="queue-container">
+            <h2>Antrian Pemeriksaan Anda</h2>
+            <div class="queue-info">
+                <p>Nomor Antrian Anda:</p>
+                <span class="queue-number" id="queueNumber">--</span>
+                <p>Jenis Layanan: <span id="serviceType">--</span></p>
+                <p>Poli: <span id="poliDisplay">--</span></p>
+                <p>Dokter: <span id="dokterDisplay">--</span></p>
+                <p class="current-queue">Antrian Saat Ini: <span id="currentQueue">--</span></p>
             </div>
-            <div class="user-profile">
-                <span id="userName"></span> </div>
-        </div>
 
-        <div class="dashboard-content">
-            <div class="card">
-                <h3>Informasi Antrian Anda</h3>
-                <p class="no-queue-message" id="noQueueMessage" style="display: none;">Anda tidak memiliki antrian aktif saat ini.</p>
-                <div id="activeQueueDetails" style="display: none;">
-                    <p>Nomor Antrian Anda: <span id="currentQueueNumber" class="highlight-queue">000</span></p>
-                    <p>Waktu Tunggu Estimasi: <span id="estimatedWaitTime">Sedang Dihitung</span></p>
-                    <p>Nama Dokter: <span id="doctorName"></span></p>
-                    <p>Layanan: <span id="serviceType"></span></p>
-                </div>
-                <button class="print-btn" id="printBtn">Cetak Antrian</button>
+            <div class="action-buttons">
+                <button class="btn-check-in" id="checkInBtn">Check-in</button>
+                <button class="btn-cancel" id="cancelBtn">Batalkan Antrian</button>
+                <button class="btn-print" id="printBtn">Cetak Antrian</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Berhasil Check-in!</h3>
+            <p>Antrian Anda telah dikonfirmasi. Mohon menunggu panggilan.</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Konfirmasi Pembatalan</h3>
+            <p>Apakah Anda yakin ingin membatalkan antrian ini?</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" id="confirmCancelBtn">Ya, Batalkan</button>
+                <button class="btn-cancel-modal" data-dismiss="modal">Tidak</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cancelSuccessModal" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Antrian Dibatalkan</h3>
+            <p>Antrian Anda telah berhasil dibatalkan.</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" data-dismiss="modal">OK</button>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('main-content');
-            const sidebarToggle = document.getElementById('sidebar-toggle');
-            const mobileToggle = document.getElementById('mobile-toggle');
-            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+        // Sidebar and Mobile Menu Toggle (Copied from dashboard_adm.html)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+        const mainContent = document.getElementById('main-content');
 
-            const currentQueueNumberSpan = document.getElementById('currentQueueNumber');
-            const estimatedWaitTimeSpan = document.getElementById('estimatedWaitTime');
-            const doctorNameSpan = document.getElementById('doctorName');
-            const serviceTypeSpan = document.getElementById('serviceType');
-            const noQueueMessage = document.getElementById('noQueueMessage');
-            const activeQueueDetails = document.getElementById('activeQueueDetails');
-            const printBtn = document.getElementById('printBtn'); // Pastikan ini ada
-
-            let queueUpdateInterval; // Untuk menyimpan ID interval
-
-            // --- Check Login Status and Redirect ---
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (!loggedInUser || loggedInUser.role !== 'pasien') {
-                alert('Anda harus login sebagai pasien untuk mengakses halaman ini.');
-                window.location.href = 'index.html'; // Redirect to login page
-                return; // Stop execution if not logged in or not a patient
-            }
-
-            const userNameSpan = document.getElementById('userName');
-            if (userNameSpan) {
-                userNameSpan.textContent = loggedInUser.nama || 'Pasien'; // Display the patient's name
-            }
-
-            // --- Dummy Queue Data (replace with actual API call) ---
-            const dummyQueueData = [
-                { id: 'Q001', patientEmail: 'pasien1@example.com', queueNumber: '005', doctor: 'Dr. Budi Santoso', service: 'Pemeriksaan Umum', status: 'waiting' },
-                { id: 'Q002', patientEmail: 'pasien2@example.com', queueNumber: '001', doctor: 'Dr. Ani Wijaya', service: 'Vaksinasi', status: 'completed' }
-            ];
-
-            function fetchAndUpdateQueue() {
-                // In a real application, this would be an AJAX call to your backend
-                // to get the loggedInUser's current queue status.
-
-                const patientQueue = dummyQueueData.find(q =>
-                    q.patientEmail === loggedInUser.email && q.status === 'waiting'
-                );
-
-                if (patientQueue) {
-                    currentQueueNumberSpan.textContent = patientQueue.queueNumber;
-                    doctorNameSpan.textContent = patientQueue.doctor;
-                    serviceTypeSpan.textContent = patientQueue.service;
-
-                    // Dummy logic for estimated wait time
-                    const currentQueueNum = parseInt(patientQueue.queueNumber);
-                    if (currentQueueNum <= 3) {
-                        estimatedWaitTimeSpan.textContent = 'Kurang dari 15 menit';
-                    } else if (currentQueueNum <= 7) {
-                        estimatedWaitTimeSpan.textContent = 'Sekitar 15-30 menit';
-                    } else {
-                        estimatedWaitTimeSpan.textContent = 'Lebih dari 30 menit';
-                    }
-
-                    noQueueMessage.style.display = 'none';
-                    activeQueueDetails.style.display = 'block';
-                    printBtn.style.display = 'block'; // Show print button if there's an active queue
-                } else {
-                    noQueueMessage.style.display = 'block';
-                    activeQueueDetails.style.display = 'none';
-                    printBtn.style.display = 'none'; // Hide print button if no active queue
+          // Fungsi untuk memeriksa akses berdasarkan peran
+        function checkAccess(allowedRoles) {
+            const user = sessionStorage.getItem('loggedInUser');
+            if (user) {
+                const loggedInUser = JSON.parse(user);
+                if (!allowedRoles.includes(loggedInUser.role)) {
+                    alert('Anda tidak memiliki akses ke halaman ini.');
+                    sessionStorage.clear();
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
+            } else {
+                window.location.href = '/Rekam-Medis-Elektronik/index.html';
             }
+        }
+ // Jalankan pemeriksaan akses terlebih dahulu
+        checkAccess(['pasien']);
 
-            // Initial fetch
-            fetchAndUpdateQueue();
+        // Toggle sidebar for desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('minimized');
+                // Adjust main content margin based on sidebar state
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            });
+        }
 
-            // Set interval for real-time updates (e.g., every 10 seconds)
-            queueUpdateInterval = setInterval(fetchAndUpdateQueue, 10000);
+        // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
+                sidebar.classList.toggle('active');
+            });
+        }
 
-            // --- Sidebar and Mobile Menu Toggle ---
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', () => {
-                    console.log('Desktop sidebar toggle clicked!');
+        // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
+        if (menuIcon) {
+            menuIcon.addEventListener('click', () => {
+                // For mobile, this should close the sidebar if open
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+                // For desktop, this toggles minimization
+                else {
                     sidebar.classList.toggle('minimized');
                     if (sidebar.classList.contains('minimized')) {
                         mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
                     } else {
                         mainContent.style.marginLeft = 'var(--sidebar-width)';
                     }
-                });
-            }
-
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', (event) => {
-                    console.log('Mobile toggle clicked!');
-                    event.stopPropagation();
-                    sidebar.classList.toggle('active');
-                });
-            }
-
-            if (menuIcon) {
-                menuIcon.addEventListener('click', () => {
-                    console.log('Menu icon (inside sidebar) clicked!');
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('active');
-                    } else {
-                        sidebar.classList.toggle('minimized');
-                        if (sidebar.classList.contains('minimized')) {
-                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                        } else {
-                            mainContent.style.marginLeft = 'var(--sidebar-width)';
-                        }
-                    }
-                });
-            }
-
-            mainContent.addEventListener('click', () => {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
-                    console.log('Main content clicked, closing mobile sidebar');
-                    sidebar.classList.remove('active');
                 }
             });
+        }
 
-            sidebar.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
+        // Close sidebar when clicking outside on mobile
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
 
-            function initLayout() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                    sidebar.classList.remove('minimized');
-                    mainContent.style.marginLeft = '0';
-                    mainContent.style.width = '100%';
+        // Prevent sidebar clicks from propagating to mainContent to close it
+        sidebar.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+
+        // Initialize the app
+        function init() {
+            // Check screen width on load and apply initial sidebar state
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
+                sidebar.classList.remove('active'); // Ensure hidden by default
+                mainContent.style.marginLeft = '0';
+            } else {
+                sidebar.classList.remove('active'); // Ensure not active on desktop
+                mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
+            }
+        }
+
+        // Run initialization
+        init();
+
+        // Adjust main content margin on window resize for desktop view
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
                 } else {
-                    sidebar.style.left = '0';
-                    sidebar.classList.remove('active');
-                    sidebar.classList.remove('minimized');
                     mainContent.style.marginLeft = 'var(--sidebar-width)';
-                    mainContent.style.width = 'calc(100% - var(--sidebar-width))';
+                }
+                sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+
+        // --- Antrian Page Specific JavaScript ---
+        let currentQueueInterval; // Declare a variable to hold the interval ID
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // First, try to load data from localStorage
+            let queueData = JSON.parse(localStorage.getItem('currentQueueData'));
+
+            if (queueData) {
+                // If data exists in localStorage, display it
+                displayQueueInfo(queueData.queueNumber, queueData.serviceType, queueData.poli, queueData.dokter);
+            } else {
+                // If not in localStorage, check URL parameters (for new registrations)
+                const urlParams = new URLSearchParams(window.location.search);
+                const queueNumberStr = urlParams.get('queue');
+                const serviceType = urlParams.get('service');
+                const poli = urlParams.get('poli');
+                const dokter = urlParams.get('dokter');
+
+                if (queueNumberStr) { // Only if a new queue number is provided
+                    const newQueueData = {
+                        queueNumber: queueNumberStr,
+                        serviceType: serviceType,
+                        poli: poli,
+                        dokter: dokter
+                    };
+                    // Save new data to localStorage
+                    localStorage.setItem('currentQueueData', JSON.stringify(newQueueData));
+                    displayQueueInfo(newQueueData.queueNumber, newQueueData.serviceType, newQueueData.poli, newQueueData.dokter);
+                } else {
+                    // No queue data found anywhere, reset display
+                    resetQueueDisplay();
                 }
             }
 
-            initLayout();
-            window.addEventListener('resize', initLayout);
+            // Start updating current queue display
+            startCurrentQueueUpdate();
+        });
 
-            // --- Logout Function ---
-            window.logout = function() {
-                if (confirm('Apakah Anda yakin ingin logout?')) {
-                    sessionStorage.clear();
-                    localStorage.removeItem('loggedInUser');
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                }
-            };
+        function displayQueueInfo(queueNumber, serviceType, poli, dokter) {
+            document.getElementById('queueNumber').textContent = queueNumber || '--';
+            document.getElementById('serviceType').textContent = serviceType || '--';
+            document.getElementById('poliDisplay').textContent = poli || '--';
+            document.getElementById('dokterDisplay').textContent = dokter || '--';
+            // Enable buttons if there's queue data
+            document.getElementById('checkInBtn').disabled = false;
+            document.getElementById('cancelBtn').disabled = false;
+            document.getElementById('printBtn').disabled = false; // Enable print button
+        }
 
-            // --- PERUBAHAN FUNGSI CETAK ANTRIAN MENJADI UNDUH PDF ---
-            // Mengganti window.print() dengan html2pdf
-            if (printBtn) {
-                printBtn.addEventListener('click', () => {
-                    // Menargetkan div dengan class 'card' yang berisi informasi antrian
-                    // Ini akan mengambil kartu pertama di dalam dashboard-content
-                    const elementToPrint = document.querySelector('.dashboard-content .card');
+        function resetQueueDisplay() {
+            document.getElementById('queueNumber').textContent = '--';
+            document.getElementById('serviceType').textContent = '--';
+            document.getElementById('poliDisplay').textContent = '--';
+            document.getElementById('dokterDisplay').textContent = '--';
+            document.getElementById('currentQueue').textContent = '--'; // Ensure current queue also resets
+            document.getElementById('checkInBtn').disabled = true;
+            document.getElementById('cancelBtn').disabled = true;
+            document.getElementById('printBtn').disabled = true; // Disable print button
+            clearInterval(currentQueueInterval); // Stop the interval when queue is reset
+        }
 
-                    if (elementToPrint) {
-                        // Opsi untuk PDF (ukuran margin, nama file, kualitas gambar, dll.)
-                        const options = {
-                            margin: 10,
-                            filename: 'Antrian_Pemeriksaan.pdf', // Nama file PDF saat diunduh
-                            image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: { scale: 2 }, // Meningkatkan skala untuk kualitas gambar yang lebih baik
-                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                        };
+        function startCurrentQueueUpdate() {
+            const userQueueNumberStr = document.getElementById('queueNumber').textContent;
+            const userQueueNumber = parseInt(userQueueNumberStr.replace('Q-', ''));
 
-                        // Membuat dan mengunduh PDF
-                        html2pdf().from(elementToPrint).set(options).save();
-                        console.log('Antrian diunduh sebagai PDF.');
+            // Clear any existing interval to prevent multiple intervals running
+            if (currentQueueInterval) {
+                clearInterval(currentQueueInterval);
+            }
+
+            if (!isNaN(userQueueNumber) && userQueueNumber > 0) {
+                // Start 20 numbers before user's queue, or at 1
+                let currentQueue = Math.max(1, userQueueNumber - 20);
+                document.getElementById('currentQueue').textContent = currentQueue;
+
+                currentQueueInterval = setInterval(() => {
+                    if (currentQueue < userQueueNumber) {
+                        currentQueue++;
+                        document.getElementById('currentQueue').textContent = currentQueue;
                     } else {
-                        console.error('Elemen kartu antrian tidak ditemukan untuk pembuatan PDF. Pastikan ada div dengan class "card" di dalam "dashboard-content".');
-                        alert('Gagal mengunduh antrian. Bagian informasi antrian tidak ditemukan.');
+                        // If it reaches or exceeds user's number, stop the interval
+                        clearInterval(currentQueueInterval);
                     }
-                });
+                }, 5000); // Updated to 5 seconds (5000ms)
+            } else {
+                document.getElementById('currentQueue').textContent = '--';
             }
+        }
 
-            // Clear interval when leaving the page (optional, but good practice)
-            window.addEventListener('beforeunload', () => {
-                clearInterval(queueUpdateInterval);
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('modal-active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('modal-active');
+        }
+
+        // Close Button Event Listeners
+        document.querySelectorAll('.modal-close, [data-dismiss="modal"]').forEach(element => {
+            element.addEventListener('click', event => {
+                const modal = event.target.closest('.modal-backdrop');
+                modal.classList.remove('modal-active');
             });
         });
+
+        // Check-In Button Event Listener
+        document.getElementById('checkInBtn').addEventListener('click', () => {
+            openModal('successModal');
+            // NO LONGER REMOVING FROM LOCAL STORAGE OR RESETTING DISPLAY HERE
+            // The queue data will persist after check-in.
+            // You might want to disable the check-in button after successful check-in
+            document.getElementById('checkInBtn').disabled = true;
+        });
+
+        // Cancel Button Event Listener
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            openModal('confirmModal');
+        });
+
+        // Confirm Cancel Button Event Listener
+        document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+            closeModal('confirmModal');
+            openModal('cancelSuccessModal');
+            // When queue is cancelled, clear the queue data from localStorage
+            localStorage.removeItem('currentQueueData');
+            resetQueueDisplay(); // Clear display immediately and stop interval
+        });
+
+        // Print Button Event Listener (MODIFIED FOR PDF DOWNLOAD)
+        document.getElementById('printBtn').addEventListener('click', () => {
+            const options = {
+                margin: 10,
+                filename: 'antrian-pemeriksaan.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            const element = document.querySelector('.queue-container');
+            html2pdf().from(element).set(options).save();
+        });
+
+
+        // Close Modals When Clicking Outside
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', event => {
+                if (event.target === backdrop) {
+                    backdrop.classList.remove('modal-active');
+                }
+            });
+        });
+
+        // --- User Data Handling ---
+        const userNameSpan = document.getElementById('userName'); // Assuming you have an element with id="userName" in your header
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+
+        if (loggedInUser && loggedInUser.role === 'pasien') {
+            // Check if userNameSpan exists before trying to set textContent
+            if (userNameSpan) {
+                userNameSpan.textContent = loggedInUser.nama || 'Pasien'; // Display the patient's name
+            }
+        } else {
+            // If no user is logged in or role is not patient, redirect to login page
+            // Consider if this should always happen if userNameSpan is not found,
+            // or if antrian.html can be accessed directly without a logged-in user.
+            // For now, keeping the original logic:
+            window.location.href = '/Rekam-Medis-Elektronik/index.html';
+        }
     </script>
 </body>
 </html>
