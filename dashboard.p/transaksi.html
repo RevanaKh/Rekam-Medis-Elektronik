@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaksi Pasien</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Sistem Informasi Klinik - Transaksi Pasien</title>
     <style>
         /* Variabel CSS (dari dashboard_pasien.html untuk konsistensi) */
         :root {
@@ -29,479 +28,633 @@
         }
 
         body {
-            display: flex; /* Penting untuk layout sidebar dan konten */
+            display: flex;
             min-height: 100vh;
             background-color: var(--light-color);
-            overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan */
+            overflow-x: hidden; /* Mencegah scroll horizontal */
         }
 
-        /* NEW/MODIFIED CSS FOR SIDEBAR AND MAIN CONTENT TOGGLE */
+        /* Mobile Toggle outside sidebar (dari dashboard_pasien.html) */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1; /* Align text vertically */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        /* Sidebar/Navigasi Utama (dari dashboard_pasien.html) */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
-            color: var(--white);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
+            color: var(--secondary-color);
             transition: all 0.3s ease;
             flex-shrink: 0;
-            box-shadow: var(--shadow);
-            position: fixed; /* Menjaga sidebar tetap di tempatnya */
-            height: 100vh; /* Memastikan sidebar mengambil tinggi penuh */
-            z-index: 1000;
+            position: fixed; /* Sidebar tetap di posisi */
+            height: 100%; /* Tinggi penuh */
+            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
+            overflow-x: hidden; /* Penting: Mencegah scroll horizontal di dalam sidebar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.minimized {
-            width: var(--sidebar-minimized-width);
+            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
         }
 
-        .sidebar .logo {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--white);
-            transition: opacity 0.3s ease;
-        }
-
-        .sidebar.minimized .logo {
-            opacity: 0;
-            height: 0;
-            overflow: hidden;
-        }
-
-        .sidebar nav ul {
-            list-style: none;
-        }
-
-        .sidebar nav ul li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar nav ul li a {
-            color: var(--white);
-            text-decoration: none;
-            padding: 10px 15px;
+        .sidebar-header {
             display: flex;
             align-items: center;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, padding 0.3s ease;
-        }
-
-        .sidebar nav ul li a:hover,
-        .sidebar nav ul li a.active {
+            padding: 20px;
             background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+            position: relative;
+            justify-content: flex-start; /* Ensure items start from left */
+            gap: 10px;
         }
 
-        .sidebar nav ul li a i {
+        .sidebar.minimized .sidebar-header {
+            justify-content: center; /* Center menu icon when minimized */
+            padding: 20px 0; /* Adjust padding for minimized state */
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1; /* Ensure proper alignment */
+            padding: 0 5px; /* Add some padding around the icon */
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem; /* Smaller icon when minimized */
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1; /* Allow nav list to grow */
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+        }
+
+        .nav-icon {
             margin-right: 10px;
-            font-size: 18px;
-            width: 20px;
+            width: 24px; /* Fixed width for SVG icon */
+            height: 24px; /* Fixed height for SVG icon */
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor; /* Inherit color from parent */
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0; /* No margin when minimized */
+            justify-content: center;
+            display: flex;
+            width: 100%; /* Take full width of minimized item */
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0; /* Hide text when minimized */
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section (dari dashboard_pasien.html) */
+        .logout-section {
+            padding: 0;
             text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
         }
 
-        .sidebar nav ul li a span {
-            transition: opacity 0.3s ease, max-width 0.3s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            max-width: 100%;
-        }
-
-        .sidebar.minimized nav ul li a span {
-            opacity: 0;
-            max-width: 0;
-        }
-
-        .sidebar .logout-btn {
+        .logout-link {
             background-color: var(--secondary-color);
             color: var(--white);
-            padding: 10px 15px;
-            border-radius: 5px;
             text-align: center;
-            margin-top: auto;
-            text-decoration: none;
-            transition: background-color 0.3s ease, opacity 0.3s ease;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden; /* Penting: Mencegah scrollbar horizontal pada link logout */
         }
 
-        .sidebar .logout-btn i {
-            margin-right: 10px;
+        .logout-link:hover {
+            background-color: #222;
         }
 
-        .sidebar.minimized .logout-btn {
-            opacity: 0;
-            pointer-events: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
             justify-content: center;
-            align-items: center;
-            margin-left: auto;
-            margin-right: auto;
-            overflow: hidden;
         }
 
-        .sidebar.minimized .logout-btn i {
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
             margin-right: 0;
         }
 
-        .sidebar.minimized .logout-btn span {
-            display: none;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        .main-content.sidebar-minimized {
-            margin-left: var(--sidebar-minimized-width);
-            width: calc(100% - var(--sidebar-minimized-width));
-        }
-
-        .header {
-            background-color: var(--white);
-            padding: 15px 20px;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        .header .left-section {
-            display: flex;
-            align-items: center;
-        }
-
-        /* MENU TOGGLE BUTTON STYLES */
-        .header .menu-toggle {
-            background: none;
+        /* Tombol Toggle untuk Desktop (dari dashboard_pasien.html) */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px; /* Posisikan di luar sidebar */
+            background-color: var(--primary-dark);
+            color: var(--white);
             border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-color);
-            margin-right: 20px;
-            padding: 5px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .header .menu-toggle:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .header h1 {
-            font-size: 24px;
-            color: var(--text-color);
-            margin: 0;
-        }
-
-        .header .user-profile {
-            display: flex;
-            align-items: center;
-        }
-
-        .header .user-profile .username {
-            margin-right: 10px;
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .header .user-profile .profile-pic {
+            border-radius: 50%;
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            background-color: #ccc;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
-            color: var(--text-color);
             cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001; /* Di atas sidebar */
+            transition: transform 0.3s ease;
         }
 
-        /* Main Content Area */
-        main {
-            padding: 20px;
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+        }
+
+        /* Area Konten Utama (dari dashboard_pasien.html) */
+        .main-content {
             flex-grow: 1;
-            background-color: var(--light-color);
-        }
-
-        .page-title {
-            color: var(--text-color);
-            margin-bottom: 20px;
-        }
-
-        .controls-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            background-color: var(--white);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            align-items: center;
-        }
-
-        .controls-container label {
-            font-weight: bold;
-            color: var(--text-color);
-        }
-
-        .controls-container input[type="text"],
-        .controls-container select,
-        .controls-container input[type="date"] {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            min-width: 150px;
-            flex: 1;
-        }
-
-        .table-container {
-            background-color: var(--white);
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            overflow-x: auto;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
+            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
+            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
+            position: relative;
+            z-index: 1;
         }
 
-        table {
+        /* Responsive adjustments (dari dashboard_pasien.html) */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block; /* Show on mobile */
+                z-index: 10000; /* Ensure it's always on top */
+            }
+
+            .sidebar {
+                left: -250px; /* Hide sidebar off-screen */
+                position: fixed; /* Ensure it stays off-screen */
+                height: 100%;
+                z-index: 2000; /* Higher than main content */
+                background-color: var(--primary-color); /* Ensure background for visual separation */
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
+            }
+
+            .sidebar.active {
+                left: 0; /* Slide in when active */
+            }
+
+            .main-content {
+                margin-left: 0; /* No margin on mobile */
+                width: 100%; /* Full width */
+                position: relative; /* Crucial for z-index to work against sidebar */
+                z-index: 1; /* Main content below active sidebar */
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
+            }
+
+            .toggle-btn {
+                display: none; /* Hide desktop toggle on mobile */
+            }
+
+            body {
+                flex-direction: column; /* Stack elements vertically */
+            }
+        }
+
+        /* Original transaksi.html styles for content */
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-color); /* Changed from --dark-color */
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .transaction-container {
+            background-color: var(--white); /* Changed from #fff */
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .transaction-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
-        table thead th {
-            background-color: var(--primary-color);
-            color: var(--white);
+        .transaction-table th, .transaction-table td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
-        table tbody td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            color: var(--text-color);
+        .transaction-table th {
+            background-color: var(--primary-color);
+            color: var(--secondary-color); /* Changed from #000 */
+            font-weight: 600;
         }
 
-        table tbody tr:hover {
-            background-color: #f9f9f9;
+        .transaction-table tbody tr:hover {
+            background-color: var(--light-color);
         }
 
-        .status-badge {
+        .status-paid {
+            background-color: #d1fae5;
+            color: #047857;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: var(--white); /* Changed from #fff */
+            border-radius: 5px;
             padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9em;
-            font-weight: bold;
-            color: var(--white);
+            box-shadow: var(--shadow);
+            flex: 1;
+            min-width: 200px;
         }
 
-        .status-badge.pending { background-color: #ff9800; } /* Orange */
-        .status-badge.completed { background-color: var(--success-color); }
-        .status-badge.cancelled { background-color: var(--danger-color); }
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 8px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-box i {
+            color: #888;
+            margin-right: 5px;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-box select {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            font-size: 14px;
+            background-color: var(--white); /* Changed from #fff */
+        }
 
         .pagination {
             display: flex;
             justify-content: center;
-            align-items: center;
             margin-top: 20px;
-            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .pagination button {
-            background-color: var(--white);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
+            background-color: var(--white); /* Changed from #fff */
+            border: 1px solid #ddd;
             padding: 8px 12px;
+            margin: 0 5px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: all 0.2s ease;
+        }
+
+        .pagination button:hover {
+            background-color: var(--light-color);
         }
 
         .pagination button.active {
             background-color: var(--primary-color);
-            color: var(--white);
+            color: var(--secondary-color); /* Changed from #000 */
+            border-color: var(--primary-color);
         }
 
-        .pagination button:hover:not(.active) {
-            background-color: #e0f2f1; /* Light hover effect */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo">Klinik</div>
-        <nav>
-            <ul>
-                <li><a href="#"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-                <li><a href="#" class="active"><i class="fas fa-exchange-alt"></i> <span>Transaksi</span></a></li>
-                <li><a href="riwayat.html"><i class="fas fa-history"></i> <span>Riwayat</span></a></li>
-            </ul>
-        </nav>
-        <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <div class="left-section">
-                <button class="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1>Transaksi Pasien</h1>
-            </div>
-            <div class="user-profile">
-                <span class="username">Dr. Budi</span>
-                <div class="profile-pic"><i class="fas fa-user-md"></i></div>
-            </div>
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
         </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="pendaftaran_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Pendaftaran Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_d.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="antrian.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Antrian Pemeriksaan</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="transaksi.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="riwayat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Riwayat Pasien</div>
+                </a>
+            </li>
+        </ul>
 
-        <main>
-            <div class="controls-container">
-                <label for="search">Cari Transaksi:</label>
-                <input type="text" id="search" placeholder="Cari berdasarkan ID, layanan...">
+        <div class="logout-section">
+            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
 
-                <label for="statusFilter">Status:</label>
+    <div class="main-content" id="main-content">
+        <h1 class="page-title">Transaksi Pasien</h1>
+        
+        <div class="search-filter">
+            <div class="search-box">
+                <i>&#x1F50D;</i>
+                <input type="text" id="searchInput" placeholder="Cari transaksi...">
+            </div>
+            <div class="filter-box">
                 <select id="statusFilter">
                     <option value="">Semua Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="completed">Selesai</option>
-                    <option value="cancelled">Dibatalkan</option>
+                    <option value="paid">Lunas</option>
+                    <option value="pending">Menunggu Pembayaran</option>
                 </select>
-
-                <label for="dateFilter">Tanggal:</label>
-                <input type="date" id="dateFilter">
+                <select id="dateFilter">
+                    <option value="">Semua Tanggal</option>
+                    <option value="7">7 Hari Terakhir</option>
+                    <option value="30">30 Hari Terakhir</option>
+                    <option value="90">3 Bulan Terakhir</option>
+                </select>
             </div>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Transaksi</th>
-                            <th>Tanggal</th>
-                            <th>Layanan</th>
-                            <th>Jumlah</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transactionTableBody">
-                        </tbody>
-                </table>
+        </div>
+        
+        <div class="transaction-container">
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>No. Transaksi</th>
+                        <th>Tanggal</th>
+                        <th>Layanan</th>
+                        <th>Total Biaya</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionTableBody">
+                    </tbody>
+            </table>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <i>&#x1F4C4;</i>
+                <p>Tidak ada data transaksi yang tersedia</p>
             </div>
-
-            <div class="pagination" id="pagination">
-                <button id="prevPage">Sebelumnya</button>
-                <button class="page-number active">1</button>
-                <button class="page-number">2</button>
-                <button class="page-number">3</button>
-                <button id="nextPage">Berikutnya</button>
+        </div>
+        
+        <div class="pagination" id="pagination">
             </div>
-        </main>
     </div>
 
     <script>
-        // MENU TOGGLE JAVASCRIPT (NEW)
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
 
-            if (menuToggle && sidebar && mainContent) {
-                menuToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('minimized');
-                    mainContent.classList.toggle('sidebar-minimized');
-                });
+
+          // Fungsi untuk memeriksa akses berdasarkan peran
+        function checkAccess(allowedRoles) {
+            const user = sessionStorage.getItem('loggedInUser');
+            if (user) {
+                const loggedInUser = JSON.parse(user);
+                if (!allowedRoles.includes(loggedInUser.role)) {
+                    alert('Anda tidak memiliki akses ke halaman ini.');
+                    sessionStorage.clear();
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
             } else {
-                console.error("DEBUG: One or more required elements for menu toggle not found:");
-                if (!menuToggle) console.error("  - Element with class 'menu-toggle' is missing.");
-                if (!sidebar) console.error("  - Element with class 'sidebar' is missing.");
-                if (!mainContent) console.error("  - Element with class 'main-content' is missing.");
+                window.location.href = '/Rekam-Medis-Elektronik/index.html';
             }
-        });
-
-        // Existing JavaScript for Transaksi Page
-        const transactions = [
-            { id: 'TRX001', date: '2023-01-15', service: 'Pemeriksaan Umum', amount: 150000, status: 'completed' },
-            { id: 'TRX002', date: '2023-01-15', service: 'Cabut Gigi', amount: 300000, status: 'pending' },
-            { id: 'TRX003', date: '2023-01-16', service: 'Scaling Gigi', amount: 200000, status: 'completed' },
-            { id: 'TRX004', date: '2023-01-16', service: 'Konsultasi Gizi', amount: 100000, status: 'cancelled' },
-            { id: 'TRX005', date: '2023-01-17', service: 'Vaksinasi Flu', amount: 250000, status: 'completed' },
-            { id: 'TRX006', date: '2023-01-17', service: 'Check Up Lengkap', amount: 500000, status: 'pending' },
-            { id: 'TRX007', date: '2023-01-18', service: 'Fisioterapi', amount: 180000, status: 'completed' },
-            { id: 'TRX008', date: '2023-01-18', service: 'Pemeriksaan Darah', amount: 120000, status: 'pending' },
-            { id: 'TRX009', date: '2023-01-19', service: 'Pengobatan Jerawat', amount: 175000, status: 'completed' },
-            { id: 'TRX010', date: '2023-01-19', service: 'Tes COVID-19', amount: 90000, status: 'completed' },
-            { id: 'TRX011', date: '2023-01-20', service: 'Ganti Perban', amount: 50000, status: 'pending' },
-            { id: 'TRX012', date: '2023-01-20', service: 'Imunisasi Anak', amount: 220000, status: 'completed' },
-            { id: 'TRX013', date: '2023-01-21', service: 'Konsultasi Psikologi', amount: 250000, status: 'cancelled' },
-            { id: 'TRX014', date: '2023-01-21', service: 'Suntik Vitamin C', amount: 150000, status: 'completed' },
-            { id: 'TRX015', date: '2023-01-22', service: 'Pembersihan Telinga', amount: 80000, status: 'pending' }
-        ];
-
-        const transactionsPerPage = 5;
+        }
+ // Jalankan pemeriksaan akses terlebih dahulu
+        checkAccess(['pasien']);
+        
+        // Pagination logic
+        const itemsPerPage = 5;
         let currentPage = 1;
-        let filteredTransactions = [];
-
-        const transactionTableBody = document.getElementById('transactionTableBody');
-        const searchInput = document.getElementById('search');
-        const statusFilter = document.getElementById('statusFilter');
-        const dateFilter = document.getElementById('dateFilter');
-        const pagination = document.getElementById('pagination');
-
-        const formatDate = (dateString) => {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
-        };
-
-        const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(amount);
-        };
-
-        const getStatusDisplay = (status) => {
-            let className = '';
-            let text = '';
-            switch (status) {
-                case 'pending':
-                    className = 'pending';
-                    text = 'Pending';
-                    break;
-                case 'completed':
-                    className = 'completed';
-                    text = 'Selesai';
-                    break;
-                case 'cancelled':
-                    className = 'cancelled';
-                    text = 'Dibatalkan';
-                    break;
-                default:
-                    className = '';
-                    text = status;
-            }
-            return `<span class="status-badge ${className}">${text}</span>`;
-        };
 
         const displayTransactions = (page) => {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedTransactions = transactions.slice(startIndex, endIndex);
+            
             transactionTableBody.innerHTML = '';
-            const start = (page - 1) * transactionsPerPage;
-            const end = start + transactionsPerPage;
-            const paginatedTransactions = filteredTransactions.slice(start, end);
-
+            
+            if (paginatedTransactions.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
             paginatedTransactions.forEach(transaction => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -516,12 +669,12 @@
         };
 
         const setupPagination = () => {
+            const pageCount = Math.ceil(transactions.length / itemsPerPage);
             pagination.innerHTML = '';
-            const pageCount = Math.ceil(filteredTransactions.length / transactionsPerPage);
-
+            
+            // Previous button
             const prevButton = document.createElement('button');
-            prevButton.id = 'prevPage';
-            prevButton.textContent = 'Sebelumnya';
+            prevButton.innerHTML = '&laquo;';
             prevButton.addEventListener('click', () => {
                 if (currentPage > 1) {
                     currentPage--;
@@ -530,22 +683,28 @@
                 }
             });
             pagination.appendChild(prevButton);
-
+            
+            // Page buttons
             for (let i = 1; i <= pageCount; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.classList.add('page-number');
-                pageButton.textContent = i;
-                pageButton.addEventListener('click', () => {
+                const button = document.createElement('button');
+                button.innerText = i;
+                
+                if (i === currentPage) {
+                    button.classList.add('active');
+                }
+                
+                button.addEventListener('click', () => {
                     currentPage = i;
                     displayTransactions(currentPage);
                     updatePaginationButtons();
                 });
-                pagination.appendChild(pageButton);
+                
+                pagination.appendChild(button);
             }
-
+            
+            // Next button
             const nextButton = document.createElement('button');
-            nextButton.id = 'nextPage';
-            nextButton.textContent = 'Berikutnya';
+            nextButton.innerHTML = '&raquo;';
             nextButton.addEventListener('click', () => {
                 if (currentPage < pageCount) {
                     currentPage++;
@@ -554,51 +713,277 @@
                 }
             });
             pagination.appendChild(nextButton);
-
-            updatePaginationButtons(); // Set initial active state
         };
 
         const updatePaginationButtons = () => {
-            const buttons = pagination.querySelectorAll('.page-number');
-            buttons.forEach(button => {
-                if (parseInt(button.textContent) === currentPage) {
+            const buttons = pagination.querySelectorAll('button');
+            buttons.forEach((button, index) => {
+                // Skip first and last buttons (prev/next)
+                if (index === 0 || index === buttons.length - 1) return;
+                
+                const pageNumber = index;
+                if (pageNumber === currentPage) {
                     button.classList.add('active');
                 } else {
                     button.classList.remove('active');
                 }
             });
-
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage === Math.ceil(filteredTransactions.length / transactionsPerPage);
         };
 
+        // Sidebar and Mobile Menu Toggle (Copied from dashboard_pasien.html)
+        // Toggle sidebar for desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('minimized');
+                // Adjust main content margin based on sidebar state
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            });
+        }
+
+        // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
+        if (menuIcon) {
+            menuIcon.addEventListener('click', () => {
+                // For mobile, this should close the sidebar if open
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+                // For desktop, this toggles minimization
+                else {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                }
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Prevent sidebar clicks from propagating to mainContent to close it
+        sidebar.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+
+        // Initialize the app (from dashboard_pasien.html)
+        function init() {
+            // Check screen width on load and apply initial sidebar state
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
+                sidebar.classList.remove('active'); // Ensure hidden by default
+                mainContent.style.marginLeft = '0';
+            } else {
+                sidebar.classList.remove('active'); // Ensure not active on desktop
+                mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
+            }
+        }
+
+        // Run initialization
+        init();
+
+        // Adjust main content margin on window resize for desktop view (from dashboard_pasien.html)
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+                sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+
+
+        // Search and Filter Functionality
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const dateFilter = document.getElementById('dateFilter');
+        
         const filterTransactions = () => {
             const searchTerm = searchInput.value.toLowerCase();
-            const selectedStatus = statusFilter.value;
-            const selectedDate = dateFilter.value;
-
-            filteredTransactions = transactions.filter(transaction => {
-                const matchesSearch = transaction.id.toLowerCase().includes(searchTerm) ||
-                                      transaction.service.toLowerCase().includes(searchTerm);
-                const matchesStatus = selectedStatus === '' || transaction.status === selectedStatus;
-                const matchesDate = selectedDate === '' || transaction.date === selectedDate;
+            const statusValue = statusFilter.value;
+            const dateValue = parseInt(dateFilter.value) || 0;
+            
+            // Filter based on search term, status, and date
+            const filteredTransactions = transactions.filter(transaction => {
+                // Search term filter
+                const matchesSearch = searchTerm === '' || 
+                    transaction.id.toLowerCase().includes(searchTerm) ||
+                    transaction.service.toLowerCase().includes(searchTerm);
+                
+                // Status filter
+                const matchesStatus = statusValue === '' || transaction.status === statusValue;
+                
+                // Date filter
+                let matchesDate = true;
+                if (dateValue > 0) {
+                    const currentDate = new Date();
+                    const transactionDate = new Date(transaction.date);
+                    const daysDifference = Math.floor((currentDate - transactionDate) / (1000 * 60 * 60 * 24));
+                    matchesDate = daysDifference <= dateValue;
+                }
+                
                 return matchesSearch && matchesStatus && matchesDate;
             });
-
-            currentPage = 1; // Reset to first page after filtering
-            displayTransactions(currentPage);
-            setupPagination(); // Re-setup pagination for filtered data
+            
+            // Update display with filtered transactions
+            currentPage = 1;
+            
+            // Store filtered transactions for pagination
+            window.filteredTransactions = filteredTransactions;
+            
+            // Update pagination
+            const pageCount = Math.ceil(filteredTransactions.length / itemsPerPage);
+            pagination.innerHTML = '';
+            
+            if (filteredTransactions.length === 0) {
+                emptyState.style.display = 'block';
+                transactionTableBody.innerHTML = '';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // Display first page of filtered results
+            const startIndex = 0;
+            const endIndex = Math.min(itemsPerPage, filteredTransactions.length);
+            const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
+            
+            transactionTableBody.innerHTML = '';
+            
+            paginatedTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.id}</td>
+                    <td>${formatDate(transaction.date)}</td>
+                    <td>${transaction.service}</td>
+                    <td>${formatCurrency(transaction.amount)}</td>
+                    <td>${getStatusDisplay(transaction.status)}</td>
+                `;
+                transactionTableBody.appendChild(row);
+            });
+            
+            setupPaginationForFiltered(filteredTransactions);
         };
-
+        
+        const setupPaginationForFiltered = (filteredData) => {
+            const pageCount = Math.ceil(filteredData.length / itemsPerPage);
+            pagination.innerHTML = '';
+            
+            if (pageCount <= 1) {
+                return;
+            }
+            
+            // Previous button
+            const prevButton = document.createElement('button');
+            prevButton.innerHTML = '&laquo;';
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayFilteredPage(currentPage, filteredData);
+                    updatePaginationButtonsFiltered(pageCount);
+                }
+            });
+            pagination.appendChild(prevButton);
+            
+            // Page buttons
+            for (let i = 1; i <= pageCount; i++) {
+                const button = document.createElement('button');
+                button.innerText = i;
+                
+                if (i === currentPage) {
+                    button.classList.add('active');
+                }
+                
+                button.addEventListener('click', () => {
+                    currentPage = i;
+                    displayFilteredPage(currentPage, filteredData);
+                    updatePaginationButtonsFiltered(pageCount);
+                });
+                
+                pagination.appendChild(button);
+            }
+            
+            // Next button
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = '&raquo;';
+            nextButton.addEventListener('click', () => {
+                if (currentPage < pageCount) {
+                    currentPage++;
+                    displayFilteredPage(currentPage, filteredData);
+                    updatePaginationButtonsFiltered(pageCount);
+                }
+            });
+            pagination.appendChild(nextButton);
+        };
+        
+        const displayFilteredPage = (page, filteredData) => {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
+            const paginatedTransactions = filteredData.slice(startIndex, endIndex);
+            
+            transactionTableBody.innerHTML = '';
+            
+            paginatedTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.id}</td>
+                    <td>${formatDate(transaction.date)}</td>
+                    <td>${transaction.service}</td>
+                    <td>${formatCurrency(transaction.amount)}</td>
+                    <td>${getStatusDisplay(transaction.status)}</td>
+                `;
+                transactionTableBody.appendChild(row);
+            });
+        };
+        
+        const updatePaginationButtonsFiltered = (pageCount) => {
+            const buttons = pagination.querySelectorAll('button');
+            buttons.forEach((button, index) => {
+                // Skip first and last buttons (prev/next)
+                if (index === 0 || index === buttons.length - 1) return;
+                
+                const pageNumber = index;
+                if (pageNumber === currentPage) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        };
+        
         // Event Listeners
         searchInput.addEventListener('input', filterTransactions);
         statusFilter.addEventListener('change', filterTransactions);
         dateFilter.addEventListener('change', filterTransactions);
 
         // Initialize
-        filteredTransactions = transactions; // Initialize filteredTransactions with all data
         displayTransactions(currentPage);
         setupPagination();
+        
+        // Set initial filtered transactions
+        window.filteredTransactions = transactions;
     </script>
 </body>
 </html>
