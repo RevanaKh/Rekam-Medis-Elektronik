@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi Klinik - Transaksi Pasien</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Variabel CSS (dari dashboard_pasien.html untuk konsistensi) */
         :root {
@@ -427,7 +428,6 @@
             font-size: 14px;
             background-color: var(--white); /* Changed from #fff */
         }
-
         .pagination {
             display: flex;
             justify-content: center;
@@ -469,10 +469,7 @@
     </style>
 </head>
 <body>
-    <div class="mobile-toggle" id="mobile-toggle">
-        ≡
-    </div>
-
+    <div class="mobile-toggle" id="mobile-toggle"> ≡ </div>
     <div class="sidebar" id="sidebar">
         <button class="toggle-btn" id="sidebar-toggle">
             <i class="fas fa-chevron-left"></i>
@@ -510,480 +507,366 @@
                 <a href="jadwal_d.html" class="nav-link">
                     <div class="nav-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Jadwal Praktek Dokter</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="antrian.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="16" y1="2" x2="16" y2="6"></line>
                             <line x1="8" y1="2" x2="8" y2="6"></line>
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
                     </div>
-                    <div class="nav-text">Antrian Pemeriksaan</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="transaksi.html" class="nav-link active">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                            <line x1="1" y1="10" x2="23" y2="10"></line>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Transaksi Pasien</div>
+                    <div class="nav-text">Jadwal Dokter</div>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="riwayat.html" class="nav-link">
                     <div class="nav-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
-                            <line x1="12" y1="8" x2="12" y2="16"></line>
-                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22 6 12 13 2 6"></polyline>
                         </svg>
                     </div>
-                    <div class="nav-text">Riwayat Pasien</div>
+                    <div class="nav-text">Riwayat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="transaksi.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="pengaturan.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82-.33H9A1.65 1.65 0 0 0 10 3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09z"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Pengaturan</div>
                 </a>
             </li>
         </ul>
-
         <div class="logout-section">
-            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link">
+            <a href="#" class="logout-link">
                 <div class="logout-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                        <polyline points="17 16 22 12 17 8"></polyline>
+                        <line x1="22" y1="12" x2="10" y2="12"></line>
                     </svg>
                 </div>
-                <div class="logout-text">LOG OUT</div>
+                <div class="logout-text">Logout</div>
             </a>
         </div>
     </div>
 
     <div class="main-content" id="main-content">
-        <h1 class="page-title">Transaksi Pasien</h1>
-        
+        <h1 class="page-title">Riwayat Transaksi Pasien</h1>
+
         <div class="search-filter">
             <div class="search-box">
-                <i>&#x1F50D;</i>
+                <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="Cari transaksi...">
             </div>
             <div class="filter-box">
                 <select id="statusFilter">
                     <option value="">Semua Status</option>
-                    <option value="paid">Lunas</option>
-                    <option value="pending">Menunggu Pembayaran</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
                 </select>
-                <select id="dateFilter">
-                    <option value="">Semua Tanggal</option>
-                    <option value="7">7 Hari Terakhir</option>
-                    <option value="30">30 Hari Terakhir</option>
-                    <option value="90">3 Bulan Terakhir</option>
-                </select>
+                <input type="date" id="dateFilter">
             </div>
         </div>
-        
+
         <div class="transaction-container">
             <table class="transaction-table">
                 <thead>
                     <tr>
-                        <th>No. Transaksi</th>
+                        <th>ID</th>
                         <th>Tanggal</th>
                         <th>Layanan</th>
-                        <th>Total Biaya</th>
+                        <th>Jumlah</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="transactionTableBody">
                     </tbody>
             </table>
-            
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <i>&#x1F4C4;</i>
-                <p>Tidak ada data transaksi yang tersedia</p>
-            </div>
         </div>
-        
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Tidak ada riwayat transaksi yang ditemukan.</p>
+        </div>
+
         <div class="pagination" id="pagination">
             </div>
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle');
+            const mobileToggleBtn = document.getElementById('mobile-toggle');
+            const mainContent = document.getElementById('main-content');
+            const minimizedSidebarWidth = 'var(--sidebar-minimized-width)';
+            const fullSidebarWidth = 'var(--sidebar-width)';
 
-
-          // Fungsi untuk memeriksa akses berdasarkan peran
-        function checkAccess(allowedRoles) {
-            const user = sessionStorage.getItem('loggedInUser');
-            if (user) {
-                const loggedInUser = JSON.parse(user);
-                if (!allowedRoles.includes(loggedInUser.role)) {
-                    alert('Anda tidak memiliki akses ke halaman ini.');
-                    sessionStorage.clear();
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                }
-            } else {
-                window.location.href = '/Rekam-Medis-Elektronik/index.html';
-            }
-        }
- // Jalankan pemeriksaan akses terlebih dahulu
-        checkAccess(['pasien']);
-        
-        // Pagination logic
-        const itemsPerPage = 5;
-        let currentPage = 1;
-
-        const displayTransactions = (page) => {
-            const startIndex = (page - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedTransactions = transactions.slice(startIndex, endIndex);
-            
-            transactionTableBody.innerHTML = '';
-            
-            if (paginatedTransactions.length === 0) {
-                emptyState.style.display = 'block';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            
-            paginatedTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${formatDate(transaction.date)}</td>
-                    <td>${transaction.service}</td>
-                    <td>${formatCurrency(transaction.amount)}</td>
-                    <td>${getStatusDisplay(transaction.status)}</td>
-                `;
-                transactionTableBody.appendChild(row);
-            });
-        };
-
-        const setupPagination = () => {
-            const pageCount = Math.ceil(transactions.length / itemsPerPage);
-            pagination.innerHTML = '';
-            
-            // Previous button
-            const prevButton = document.createElement('button');
-            prevButton.innerHTML = '&laquo;';
-            prevButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayTransactions(currentPage);
-                    updatePaginationButtons();
-                }
-            });
-            pagination.appendChild(prevButton);
-            
-            // Page buttons
-            for (let i = 1; i <= pageCount; i++) {
-                const button = document.createElement('button');
-                button.innerText = i;
-                
-                if (i === currentPage) {
-                    button.classList.add('active');
-                }
-                
-                button.addEventListener('click', () => {
-                    currentPage = i;
-                    displayTransactions(currentPage);
-                    updatePaginationButtons();
-                });
-                
-                pagination.appendChild(button);
-            }
-            
-            // Next button
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = '&raquo;';
-            nextButton.addEventListener('click', () => {
-                if (currentPage < pageCount) {
-                    currentPage++;
-                    displayTransactions(currentPage);
-                    updatePaginationButtons();
-                }
-            });
-            pagination.appendChild(nextButton);
-        };
-
-        const updatePaginationButtons = () => {
-            const buttons = pagination.querySelectorAll('button');
-            buttons.forEach((button, index) => {
-                // Skip first and last buttons (prev/next)
-                if (index === 0 || index === buttons.length - 1) return;
-                
-                const pageNumber = index;
-                if (pageNumber === currentPage) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            });
-        };
-
-        // Sidebar and Mobile Menu Toggle (Copied from dashboard_pasien.html)
-        // Toggle sidebar for desktop
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('minimized');
-                // Adjust main content margin based on sidebar state
-                if (sidebar.classList.contains('minimized')) {
-                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                }
-            });
-        }
-
-        // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
-        if (mobileToggle) {
-            mobileToggle.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
-                sidebar.classList.toggle('active');
-            });
-        }
-
-        // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
-        if (menuIcon) {
-            menuIcon.addEventListener('click', () => {
-                // For mobile, this should close the sidebar if open
+            // Function to set main content margin
+            const setMainContentMargin = () => {
                 if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                }
-                // For desktop, this toggles minimization
-                else {
-                    sidebar.classList.toggle('minimized');
+                    mainContent.style.marginLeft = '0';
+                } else {
                     if (sidebar.classList.contains('minimized')) {
-                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        mainContent.style.marginLeft = minimizedSidebarWidth;
                     } else {
-                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                        mainContent.style.marginLeft = fullSidebarWidth;
                     }
                 }
-            });
-        }
+            };
 
-        // Close sidebar when clicking outside on mobile
-        mainContent.addEventListener('click', () => {
-            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
-            }
-        });
-
-        // Prevent sidebar clicks from propagating to mainContent to close it
-        sidebar.addEventListener('click', (event) => {
-            event.stopPropagation();
-        });
-
-
-        // Initialize the app (from dashboard_pasien.html)
-        function init() {
-            // Check screen width on load and apply initial sidebar state
-            if (window.innerWidth <= 768) {
-                sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
-                sidebar.classList.remove('active'); // Ensure hidden by default
-                mainContent.style.marginLeft = '0';
-            } else {
-                sidebar.classList.remove('active'); // Ensure not active on desktop
-                mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
-            }
-        }
-
-        // Run initialization
-        init();
-
-        // Adjust main content margin on window resize for desktop view (from dashboard_pasien.html)
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                if (sidebar.classList.contains('minimized')) {
-                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                }
-                sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
-            } else {
-                mainContent.style.marginLeft = '0';
-            }
-        });
-
-
-        // Search and Filter Functionality
-        const searchInput = document.getElementById('searchInput');
-        const statusFilter = document.getElementById('statusFilter');
-        const dateFilter = document.getElementById('dateFilter');
-        
-        const filterTransactions = () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const statusValue = statusFilter.value;
-            const dateValue = parseInt(dateFilter.value) || 0;
-            
-            // Filter based on search term, status, and date
-            const filteredTransactions = transactions.filter(transaction => {
-                // Search term filter
-                const matchesSearch = searchTerm === '' || 
-                    transaction.id.toLowerCase().includes(searchTerm) ||
-                    transaction.service.toLowerCase().includes(searchTerm);
-                
-                // Status filter
-                const matchesStatus = statusValue === '' || transaction.status === statusValue;
-                
-                // Date filter
-                let matchesDate = true;
-                if (dateValue > 0) {
-                    const currentDate = new Date();
-                    const transactionDate = new Date(transaction.date);
-                    const daysDifference = Math.floor((currentDate - transactionDate) / (1000 * 60 * 60 * 24));
-                    matchesDate = daysDifference <= dateValue;
-                }
-                
-                return matchesSearch && matchesStatus && matchesDate;
-            });
-            
-            // Update display with filtered transactions
-            currentPage = 1;
-            
-            // Store filtered transactions for pagination
-            window.filteredTransactions = filteredTransactions;
-            
-            // Update pagination
-            const pageCount = Math.ceil(filteredTransactions.length / itemsPerPage);
-            pagination.innerHTML = '';
-            
-            if (filteredTransactions.length === 0) {
-                emptyState.style.display = 'block';
-                transactionTableBody.innerHTML = '';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            
-            // Display first page of filtered results
-            const startIndex = 0;
-            const endIndex = Math.min(itemsPerPage, filteredTransactions.length);
-            const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
-            
-            transactionTableBody.innerHTML = '';
-            
-            paginatedTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${formatDate(transaction.date)}</td>
-                    <td>${transaction.service}</td>
-                    <td>${formatCurrency(transaction.amount)}</td>
-                    <td>${getStatusDisplay(transaction.status)}</td>
-                `;
-                transactionTableBody.appendChild(row);
-            });
-            
-            setupPaginationForFiltered(filteredTransactions);
-        };
-        
-        const setupPaginationForFiltered = (filteredData) => {
-            const pageCount = Math.ceil(filteredData.length / itemsPerPage);
-            pagination.innerHTML = '';
-            
-            if (pageCount <= 1) {
-                return;
-            }
-            
-            // Previous button
-            const prevButton = document.createElement('button');
-            prevButton.innerHTML = '&laquo;';
-            prevButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayFilteredPage(currentPage, filteredData);
-                    updatePaginationButtonsFiltered(pageCount);
-                }
-            });
-            pagination.appendChild(prevButton);
-            
-            // Page buttons
-            for (let i = 1; i <= pageCount; i++) {
-                const button = document.createElement('button');
-                button.innerText = i;
-                
-                if (i === currentPage) {
-                    button.classList.add('active');
-                }
-                
-                button.addEventListener('click', () => {
-                    currentPage = i;
-                    displayFilteredPage(currentPage, filteredData);
-                    updatePaginationButtonsFiltered(pageCount);
+            // Toggle sidebar for desktop
+            if (sidebarToggleBtn) {
+                sidebarToggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+                    setMainContentMargin();
                 });
-                
-                pagination.appendChild(button);
             }
-            
-            // Next button
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = '&raquo;';
-            nextButton.addEventListener('click', () => {
-                if (currentPage < pageCount) {
-                    currentPage++;
-                    displayFilteredPage(currentPage, filteredData);
-                    updatePaginationButtonsFiltered(pageCount);
-                }
-            });
-            pagination.appendChild(nextButton);
-        };
-        
-        const displayFilteredPage = (page, filteredData) => {
-            const startIndex = (page - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
-            const paginatedTransactions = filteredData.slice(startIndex, endIndex);
-            
-            transactionTableBody.innerHTML = '';
-            
-            paginatedTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${formatDate(transaction.date)}</td>
-                    <td>${transaction.service}</td>
-                    <td>${formatCurrency(transaction.amount)}</td>
-                    <td>${getStatusDisplay(transaction.status)}</td>
-                `;
-                transactionTableBody.appendChild(row);
-            });
-        };
-        
-        const updatePaginationButtonsFiltered = (pageCount) => {
-            const buttons = pagination.querySelectorAll('button');
-            buttons.forEach((button, index) => {
-                // Skip first and last buttons (prev/next)
-                if (index === 0 || index === buttons.length - 1) return;
-                
-                const pageNumber = index;
-                if (pageNumber === currentPage) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            });
-        };
-        
-        // Event Listeners
-        searchInput.addEventListener('input', filterTransactions);
-        statusFilter.addEventListener('change', filterTransactions);
-        dateFilter.addEventListener('change', filterTransactions);
 
-        // Initialize
-        displayTransactions(currentPage);
-        setupPagination();
-        
-        // Set initial filtered transactions
-        window.filteredTransactions = transactions;
+            // Toggle sidebar for mobile
+            if (mobileToggleBtn) {
+                mobileToggleBtn.addEventListener('click', () => {
+                    sidebar.classList.add('active');
+                    // No margin change for main content on mobile, sidebar overlays
+                });
+            }
+
+            // Close sidebar when clicking outside on mobile
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            // Prevent sidebar click from closing it on mobile
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            // Initialize on load
+            const init = () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('minimized');
+                    sidebar.classList.remove('active');
+                    mainContent.style.marginLeft = '0';
+                } else {
+                    sidebar.classList.remove('active');
+                    sidebar.classList.remove('minimized'); // Ensure it starts expanded on desktop
+                    setMainContentMargin();
+                }
+            };
+            init();
+
+            // Adjust main content margin on window resize
+            window.addEventListener('resize', () => {
+                init(); // Re-initialize sidebar state based on new window size
+            });
+
+
+            // Original transaksi.html JavaScript (kept below the sidebar logic)
+
+            // Dummy Data Transaksi
+            const transactions = [
+                { id: 'TRX001', date: '2023-01-15', service: 'Pemeriksaan Umum', amount: 150000, status: 'Paid' },
+                { id: 'TRX002', date: '2023-01-20', service: 'Cabut Gigi', amount: 300000, status: 'Pending' },
+                { id: 'TRX003', date: '2023-02-01', service: 'Scaling Gigi', amount: 200000, status: 'Paid' },
+                { id: 'TRX004', date: '2023-02-10', service: 'Vaksinasi Flu', amount: 100000, status: 'Paid' },
+                { id: 'TRX005', date: '2023-02-15', service: 'Konsultasi Gizi', amount: 80000, status: 'Cancelled' },
+                { id: 'TRX006', date: '2023-03-01', service: 'Pemeriksaan Mata', amount: 180000, status: 'Paid' },
+                { id: 'TRX007', date: '2023-03-05', service: 'Fisioterapi', amount: 250000, status: 'Pending' },
+                { id: 'TRX008', date: '2023-03-10', service: 'Rapid Test', amount: 75000, status: 'Paid' },
+                { id: 'TRX009', date: '2023-03-12', service: 'Tes Darah Lengkap', amount: 120000, status: 'Paid' },
+                { id: 'TRX010', date: '2023-03-18', service: 'Pembersihan Karang Gigi', amount: 220000, status: 'Pending' },
+                { id: 'TRX011', date: '2024-01-05', service: 'Checkup Tahunan', amount: 250000, status: 'Paid' },
+                { id: 'TRX012', date: '2024-01-10', service: 'Konsultasi Online', amount: 90000, status: 'Pending' },
+                { id: 'TRX013', date: '2024-01-15', service: 'Terapi Fisik', amount: 180000, status: 'Paid' },
+                { id: 'TRX014', date: '2024-02-01', service: 'Suntik Vitamin', amount: 70000, status: 'Paid' },
+                { id: 'TRX015', date: '2024-02-05', service: 'USG Kandungan', amount: 350000, status: 'Paid' },
+            ];
+
+            const transactionTableBody = document.getElementById('transactionTableBody');
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const dateFilter = document.getElementById('dateFilter');
+            const pagination = document.getElementById('pagination');
+            const emptyState = document.getElementById('emptyState');
+
+            let currentPage = 1;
+            const rowsPerPage = 5;
+            window.filteredTransactions = []; // Define as global for filtering functions
+
+            const formatDate = (dateString) => {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            };
+
+            const formatCurrency = (amount) => {
+                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+            };
+
+            const getStatusDisplay = (status) => {
+                switch (status) {
+                    case 'Paid':
+                        return `<span class="status-paid">${status}</span>`;
+                    case 'Pending':
+                        return `<span class="status-pending">${status}</span>`;
+                    case 'Cancelled':
+                        return `<span class="status-cancelled">${status}</span>`;
+                    default:
+                        return status;
+                }
+            };
+
+            const filterTransactions = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedStatus = statusFilter.value;
+                const selectedDate = dateFilter.value;
+
+                window.filteredTransactions = transactions.filter(transaction => {
+                    const matchesSearch = Object.values(transaction).some(value =>
+                        String(value).toLowerCase().includes(searchTerm)
+                    );
+                    const matchesStatus = selectedStatus === '' || transaction.status === selectedStatus;
+                    const matchesDate = selectedDate === '' || transaction.date === selectedDate;
+
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
+
+                currentPage = 1; // Reset to first page on filter
+                displayTransactions(currentPage);
+                setupPagination();
+            };
+
+            const displayTransactions = (page) => {
+                transactionTableBody.innerHTML = '';
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const paginatedItems = window.filteredTransactions.slice(start, end);
+
+                if (paginatedItems.length === 0) {
+                    emptyState.style.display = 'block';
+                    pagination.style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    pagination.style.display = 'flex'; // Show pagination when data exists
+                    paginatedItems.forEach(transaction => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${transaction.id}</td>
+                            <td>${formatDate(transaction.date)}</td>
+                            <td>${transaction.service}</td>
+                            <td>${formatCurrency(transaction.amount)}</td>
+                            <td>${getStatusDisplay(transaction.status)}</td>
+                        `;
+                        transactionTableBody.appendChild(row);
+                    });
+                }
+            };
+
+            const setupPagination = () => {
+                pagination.innerHTML = '';
+                const pageCount = Math.ceil(window.filteredTransactions.length / rowsPerPage);
+
+                if (pageCount <= 1 && window.filteredTransactions.length > 0) {
+                    // If only one page and data exists, still show one active button for clarity
+                    const button = document.createElement('button');
+                    button.innerText = '1';
+                    button.classList.add('active');
+                    button.addEventListener('click', () => {
+                        currentPage = 1;
+                        displayTransactions(currentPage);
+                        updatePaginationButtonsFiltered(pageCount);
+                    });
+                    pagination.appendChild(button);
+                    return; // Exit if only one page needed
+                } else if (pageCount <= 1 && window.filteredTransactions.length === 0) {
+                     pagination.style.display = 'none'; // Hide pagination if no results
+                     return;
+                }
+
+
+                const prevButton = document.createElement('button');
+                prevButton.innerText = 'Sebelumnya';
+                prevButton.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        displayTransactions(currentPage);
+                        updatePaginationButtonsFiltered(pageCount);
+                    }
+                });
+                pagination.appendChild(prevButton);
+
+                for (let i = 1; i <= pageCount; i++) {
+                    const button = document.createElement('button');
+                    button.innerText = i;
+                    if (i === currentPage) {
+                        button.classList.add('active');
+                    }
+                    button.addEventListener('click', () => {
+                        currentPage = i;
+                        displayTransactions(currentPage);
+                        updatePaginationButtonsFiltered(pageCount);
+                    });
+                    pagination.appendChild(button);
+                }
+
+                const nextButton = document.createElement('button');
+                nextButton.innerText = 'Berikutnya';
+                nextButton.addEventListener('click', () => {
+                    if (currentPage < pageCount) {
+                        currentPage++;
+                        displayTransactions(currentPage);
+                        updatePaginationButtonsFiltered(pageCount);
+                    }
+                });
+                pagination.appendChild(nextButton);
+            };
+            
+            const updatePaginationButtonsFiltered = (pageCount) => {
+                const buttons = pagination.querySelectorAll('button');
+                buttons.forEach((button, index) => {
+                    // Skip first and last buttons (prev/next)
+                    if (index === 0 || index === buttons.length - 1) {
+                         if (button.innerText === 'Sebelumnya') {
+                            button.disabled = currentPage === 1;
+                        } else if (button.innerText === 'Berikutnya') {
+                            button.disabled = currentPage === pageCount;
+                        }
+                        return;
+                    }
+                    
+                    const pageNumber = parseInt(button.innerText);
+                    if (pageNumber === currentPage) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+            };
+            
+            // Event Listeners for original content
+            searchInput.addEventListener('input', filterTransactions);
+            statusFilter.addEventListener('change', filterTransactions);
+            dateFilter.addEventListener('change', filterTransactions);
+
+            // Initialize original content
+            filterTransactions(); // Call filter once to load initial data and set up pagination
+        });
     </script>
 </body>
 </html>
