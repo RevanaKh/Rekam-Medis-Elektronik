@@ -489,7 +489,7 @@
         </ul>
 
         <div class="logout-section">
-            <a href="./index.html" class="logout-link">
+            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link">
                 <div class="logout-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -543,10 +543,10 @@
                     if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
                         alert('Anda tidak memiliki akses ke halaman ini.');
                         sessionStorage.clear(); // Hapus sesi jika tidak punya akses
-                        window.location.href = './index.html'; // Redirect ke login
+                        window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Redirect ke login
                     }
                 } else {
-                    window.location.href = './index.html'; // Belum login
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Belum login
                 }
             }
 
@@ -609,7 +609,7 @@
                 logoutLink.addEventListener('click', (e) => {
                     e.preventDefault();
                     localStorage.removeItem('loggedInUser'); // Clear user data on logout
-                    window.location.href = './index.html'; // Redirect to login page
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Redirect to login page
                 });
             }
 
