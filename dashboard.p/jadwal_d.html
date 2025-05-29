@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Praktek Dokter</title>
+    <style>
+        /* Variabel CSS (konsisten dengan pendaftaran_pasien.html & antrian.html) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1; /* Align text vertically */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed; /* Sidebar tetap di posisi */
+            height: 100%; /* Tinggi penuh */
+            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
+            overflow-x: hidden; /* Penting: Mencegah scroll horizontal di dalam sidebar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+            position: relative;
+            justify-content: flex-start; /* Ensure items start from left */
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center; /* Center menu icon when minimized */
+            padding: 20px 0; /* Adjust padding for minimized state */
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1; /* Ensure proper alignment */
+            padding: 0 5px; /* Add some padding around the icon */
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem; /* Smaller icon when minimized */
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1; /* Allow nav list to grow */
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px; /* Fixed width for SVG icon */
+            height: 24px; /* Fixed height for SVG icon */
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor; /* Inherit color from parent */
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0; /* No margin when minimized */
+            justify-content: center;
+            display: flex;
+            width: 100%; /* Take full width of minimized item */
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0; /* Hide text when minimized */
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden; /* Penting: Mencegah scrollbar horizontal pada link logout */
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px; /* Posisikan di luar sidebar */
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001; /* Di atas sidebar */
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+        }
+
+        /* Area Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
+            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
+            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block; /* Show on mobile */
+                z-index: 10000; /* Ensure it's always on top */
+            }
+
+            .sidebar {
+                left: -250px; /* Hide sidebar off-screen */
+                position: fixed; /* Ensure it stays off-screen */
+                height: 100%;
+                z-index: 2000; /* Higher than main content */
+                background-color: var(--primary-color); /* Ensure background for visual separation */
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
+            }
+
+            .sidebar.active {
+                left: 0; /* Slide in when active */
+            }
+
+            .main-content {
+                margin-left: 0; /* No margin on mobile */
+                width: 100%; /* Full width */
+                position: relative; /* Crucial for z-index to work against sidebar */
+                z-index: 1; /* Main content below active sidebar */
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
+            }
+
+            .toggle-btn {
+                display: none; /* Hide desktop toggle on mobile */
+            }
+
+            body {
+                flex-direction: column; /* Stack elements vertically */
+            }
+        }
+
+        /* Jadwal Dokter Specific Styles */
+        .schedule-container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            max-width: 1200px; /* Wider for schedule content */
+            margin: 20px auto;
+        }
+
+        .schedule-container h2 {
+            color: var(--primary-dark);
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+            align-items: flex-end; /* Align buttons and inputs */
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px; /* Minimum width for filter dropdowns */
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--white);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-buttons .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .filter-buttons .btn-apply {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .filter-buttons .btn-apply:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .filter-buttons .btn-reset {
+            background-color: #ddd;
+            color: var(--secondary-color);
+        }
+
+        .filter-buttons .btn-reset:hover {
+            background-color: #ccc;
+        }
+
+        @media (max-width: 600px) {
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                min-width: unset;
+                width: 100%;
+            }
+            .filter-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .schedule-grid {
+            display: flex; /* Use flexbox to stack cards vertically */
+            flex-direction: column; /* Stack them in a column */
+            gap: 25px;
+            max-width: 900px; /* Optional: limit max width of grid */
+            margin: 0 auto; /* Center the grid */
+        }
+
+        .doctor-card {
+            background-color: var(--white);
+            border: 1px solid #eee;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex; /* Use flexbox for internal layout */
+            align-items: center; /* Align items vertically */
+            gap: 20px; /* Space between image and text content */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            justify-content: center; /* Center content when wrapped */
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .doctor-card img {
+            width: 100px;
+            height: 100px;
+            min-width: 100px; /* Prevent shrinking below 100px */
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            flex-shrink: 0; /* Prevent image from shrinking */
+        }
+
+        .doctor-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Allow info to take available space */
+            text-align: left; /* Align text to left within info block */
+            min-width: 200px; /* Ensure info block has minimum width before wrapping */
+        }
+
+        .doctor-card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+            text-align: left;
+        }
+
+        .doctor-card p {
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        .doctor-card strong {
+            font-weight: bold;
+        }
+
+        .doctor-card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+            flex-grow: 1; /* Allow schedule list to take available space */
+            min-width: 250px; /* Give schedule list a minimum width */
+        }
+
+        .doctor-card ul li {
+            background-color: var(--light-color);
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        .doctor-card ul li:last-child {
+            margin-bottom: 0;
+        }
+
+        .no-results-message {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+        .no-results-message .btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .no-results-message .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* General Info Sections (Jam Operasi, Kontak Darurat) - Back to original */
+        .info-section {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .info-section h3 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+            text-align: center; /* Center the list items for general info */
+        }
+
+        .info-section ul li {
+            padding: 8px 0;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center content in list item */
+            gap: 10px; /* Space between icon and text */
+        }
+
+        .info-section ul li i {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        /* Removed profile-layout specific styles */
+        /* No longer need .profile-layout, .profile-main, .profile-image, .profile-details specific styles */
+
+        @media (max-width: 768px) {
+            .info-section {
+                padding: 20px;
+            }
+            .info-section h3 {
+                font-size: 1.5rem;
+            }
+            .info-section ul li {
+                font-size: 1rem;
+            }
+
+            /* Doctor Card on smaller screens */
+            .doctor-card {
+                flex-direction: column; /* Stack image and text vertically */
+                text-align: center;
+            }
+            .doctor-card img {
+                margin-bottom: 15px;
+            }
+            .doctor-info {
+                text-align: center;
+                min-width: unset; /* Remove min-width to allow more flexibility */
+            }
+            .doctor-card h3, .doctor-card p {
+                text-align: center;
+            }
+            .doctor-card ul {
+                text-align: center;
+                min-width: unset;
+                width: 100%; /* Take full width on small screens */
+            }
+            .doctor-card ul li {
+                justify-content: center; /* Center schedule items */
+            }
+        }
+
+        /* Desktop layout for info sections - Reset to default .info-section styling */
+        @media (min-width: 769px) {
+            /* No specific .profile-layout overrides needed here, back to standard .info-section */
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="pendaftaran_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Pendaftaran Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_d.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="antrian.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Antrian Pemeriksaan</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="transaksi.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="riwayat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Riwayat Pasien</div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="schedule-container">
+            <h2>Jadwal Praktek Dokter</h2>
+
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="filterPoli">Poli:</label>
+                    <select id="filterPoli">
+                        <option value="">Semua Poli</option>
+                        <option value="Poli Umum">Poli Umum</option>
+                        <option value="Poli Gigi">Poli Gigi</option>
+                        <option value="Poli Mata">Poli Mata</option>
+                        <option value="Poli THT">Poli THT</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterHari">Hari:</label>
+                    <select id="filterHari">
+                        <option value="">Semua Hari</option>
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jumat</option>
+                        <option value="Sabtu">Sabtu</option>
+                        <option value="Minggu">Minggu</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterDokter">Dokter:</label>
+                    <select id="filterDokter">
+                        <option value="">Semua Dokter</option>
+                        <option value="Revana Khoerunnisa">Revana Khoerunnisa</option>
+                        <option value="Rifa Nazla Kamillia">Rifa Nazla Kamillia</option>
+                        <option value="Nailah Tsani Armydiani">Nailah Tsani Armydiani</option>
+                        <option value="Salwa Azzahra Nurrohmah">Salwa Azzahra Nurrohmah</option>
+                    </select>
+                </div>
+                <div class="filter-buttons">
+                    <button class="btn btn-apply" onclick="applyFilters()">Terapkan Filter</button>
+                    <button class="btn btn-reset" onclick="resetFilters()">Reset Filter</button>
+                </div>
+            </div>
+
+            <div class="schedule-grid" id="doctorScheduleGrid">
+                </div>
+        </div>
+
+        <div class="info-section">
+            <h3>Jam Operasional</h3>
+            <ul>
+                <li><i class="far fa-calendar-alt"></i> Senin - Jumat: 08:00 - 20:00 WIB</li>
+                <li><i class="far fa-calendar-alt"></i> Sabtu-Minggu & Hari Libur Nasional: Tutup</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h3>Kontak Darurat</h3>
+            <ul>
+                <li><i class="fas fa-phone-alt"></i> Unit Gawat Darurat (UGD): (022) 1234 5678</li>
+                <li><i class="fas fa-phone-alt"></i> Informasi Umum: (022) 8765 4321</li>
+                <li><i class="far fa-envelope"></i> Email: info@iri bos.com</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar and Mobile Menu Toggle (Consistent with other files)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+        const mainContent = document.getElementById('main-content');
+
+        
+          // Fungsi untuk memeriksa akses berdasarkan peran
+        function checkAccess(allowedRoles) {
+            const user = sessionStorage.getItem('loggedInUser');
+            if (user) {
+                const loggedInUser = JSON.parse(user);
+                if (!allowedRoles.includes(loggedInUser.role)) {
+                    alert('Anda tidak memiliki akses ke halaman ini.');
+                    sessionStorage.clear();
+                    window.location.href = '/index.html';
+                }
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+ // Jalankan pemeriksaan akses terlebih dahulu
+        checkAccess(['pasien']);
+
+        // Toggle sidebar for desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('minimized');
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            });
+        }
+
+        // Toggle sidebar for mobile
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Toggle sidebar from inside (for smaller screens)
+        if (menuIcon) {
+            menuIcon.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                } else {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                }
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Prevent sidebar clicks from propagating
+        sidebar.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        // Initialize sidebar state on load and resize
+        function initSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('minimized');
+                sidebar.classList.remove('active');
+                mainContent.style.marginLeft = '0';
+            } else {
+                sidebar.classList.remove('active');
+                mainContent.style.marginLeft = 'var(--sidebar-width)';
+            }
+        }
+        initSidebar();
+        window.addEventListener('resize', initSidebar);
+
+
+        // Jadwal Dokter Data (Example Data)
+        const doctorSchedules = [
+            {
+                id: 1,
+                name: "Revana Khoerunnisa",
+                specialty: "Poli Umum",
+                image: "/assets/reva.jpg", // Placeholder image
+                schedule: [
+                    { day: "Senin", time: "09:00 - 12:00" }
+                ]
+            },
+            {
+                id: 2,
+                name: "Rifa Nazla Kamillia",
+                specialty: "Poli Mata",
+                image: "/assets/rifa.jpg",
+                schedule: [
+                    { day: "Selasa", time: "10:00 - 13:00" }
+                ]
+            },
+            {
+                id: 3,
+                name: "Nailah Tsani Armydiani",
+                specialty: "Poli Gigi",
+                image: "/assets/nailah.jpg",
+                schedule: [
+                    { day: "Rabu", time: "08:00 - 12:00" }
+                ]
+            },
+            {
+                id: 4,
+                name: "Salwa Azzahra Nurrohmah",
+                specialty: "Poli THT",
+                image: "/assets/salwa.jpg",
+                schedule: [
+                    { day: "Jumat", time: "13:00 - 16:00" }
+                ]
+            }
+            // Add more doctors as needed
+        ];
+
+        function renderDoctorCards(doctorsToRender) {
+            const grid = document.getElementById('doctorScheduleGrid');
+            grid.innerHTML = ''; // Clear existing cards
+
+            if (doctorsToRender.length === 0) {
+                showNoResultsMessage(true);
+                return;
+            } else {
+                showNoResultsMessage(false);
+            }
+
+            doctorsToRender.forEach(doctor => {
+                const card = document.createElement('div');
+                card.classList.add('doctor-card');
+
+                let scheduleHtml = '<ul>';
+                if (doctor.schedule && doctor.schedule.length > 0) {
+                    doctor.schedule.forEach(slot => {
+                        scheduleHtml += `<li><strong>${slot.day}:</strong> <span>${slot.time}</span></li>`;
+                    });
+                } else {
+                    scheduleHtml += '<li>Tidak ada jadwal tersedia.</li>';
+                }
+                scheduleHtml += '</ul>';
+
+                card.innerHTML = `
+                    <img src="${doctor.image}" alt="Foto ${doctor.name}">
+                    <div class="doctor-info">
+                        <h3>${doctor.name}</h3>
+                        <p><strong>Poli:</strong> ${doctor.specialty}</p>
+                    </div>
+                    ${scheduleHtml}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function applyFilters() {
+            const filterPoli = document.getElementById('filterPoli').value;
+            const filterHari = document.getElementById('filterHari').value;
+            const filterDokter = document.getElementById('filterDokter').value;
+
+            const filteredDoctors = doctorSchedules.filter(doctor => {
+                const matchesPoli = filterPoli === "" || doctor.specialty === filterPoli;
+                const matchesDokter = filterDokter === "" || doctor.name === filterDokter;
+                const matchesHari = filterHari === "" || doctor.schedule.some(s => s.day === filterHari);
+                return matchesPoli && matchesDokter && matchesHari;
+            });
+
+            renderDoctorCards(filteredDoctors);
+        }
+
+        function resetFilters() {
+            document.getElementById('filterPoli').value = "";
+            document.getElementById('filterHari').value = "";
+            document.getElementById('filterDokter').value = "";
+            applyFilters(); // Re-render with all doctors
+        }
+
+        function showNoResultsMessage(show) {
+            let noResultsEl = document.getElementById('noResultsMessage');
+            if (show && !noResultsEl) {
+                noResultsEl = document.createElement('div');
+                noResultsEl.id = 'noResultsMessage';
+                noResultsEl.classList.add('no-results-message');
+                noResultsEl.innerHTML = 'Maaf, tidak ada jadwal dokter yang sesuai dengan kriteria pencarian Anda. <br><button class="btn" onclick="resetFilters()">Reset Filter</button>';
+
+                const scheduleContainer = document.querySelector('.schedule-container');
+                if (scheduleContainer) {
+                    scheduleContainer.appendChild(noResultsEl);
+                }
+            } else if (!show && noResultsEl) {
+                noResultsEl.remove();
+            }
+        }
+
+        // Initialize filters and render cards on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if URL has query parameters for filtering (e.g., from pendaftaran_pasien.html)
+            const urlParams = new URLSearchParams(window.location.search);
+            const poliParam = urlParams.get('poli');
+            const hariParam = urlParams.get('hari'); // This might not be set from pendaftaran
+            const dokterParam = urlParams.get('dokter'); // This might not be set from pendaftaran
+
+            // Set filter values if they exist in URL
+            if (poliParam) document.getElementById('filterPoli').value = decodeURIComponent(poliParam);
+            if (hariParam) document.getElementById('filterHari').value = decodeURIComponent(hariParam);
+            if (dokterParam) document.getElementById('filterDokter').value = decodeURIComponent(dokterParam);
+
+            applyFilters(); // Apply filters if any were set, or show all if none.
+        });
+
+        // --- User Data Handling ---
+        const userNameSpan = document.getElementById('userName'); // Assuming you have an element with id="userName" in your header
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+
+        if (loggedInUser && loggedInUser.role === 'pasien') {
+            userNameSpan.textContent = loggedInUser.nama || 'Pasien'; // Display the patient's name
+        } else {
+            // If no user is logged in or role is not patient, redirect to login page
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

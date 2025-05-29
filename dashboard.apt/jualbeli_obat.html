@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi Obat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Variabel CSS (dari t-pasien.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden; /* Prevent horizontal scroll on the body */
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1; /* Align text vertically */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0;
+            justify-content: center;
+            display: flex;
+            width: 100%;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg);
+        }
+
+        /* Area Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+                z-index: 10000;
+            }
+
+            .sidebar {
+                left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0; /* Remove margin for mobile */
+                width: 100%;
+                position: relative;
+                z-index: 1;
+            }
+
+            .toggle-btn {
+                display: none; /* Hide desktop toggle button on mobile */
+            }
+
+            body {
+                flex-direction: column; /* Stack elements vertically on smaller screens */
+            }
+
+            .table-container {
+                padding: 15px; /* Adjust padding for smaller screens */
+            }
+
+            .action-bar, .tab-actions {
+                flex-direction: column; /* Stack buttons and search bar */
+                align-items: flex-start; /* Align items to the start */
+            }
+
+            .search-bar input {
+                width: 100%; /* Full width for search input on mobile */
+            }
+
+            .btn-action {
+                width: 100%; /* Full width for action buttons */
+                justify-content: center; /* Center text and icon */
+            }
+
+            .transaction-form-section .form-group {
+                flex-direction: column; /* Stack form inputs */
+                gap: 10px; /* Adjust gap for stacking */
+            }
+
+            .transaction-form-section .form-group > div {
+                min-width: unset; /* Remove min-width when stacked */
+            }
+        }
+
+        /* Table Specific Styles */
+        .table-container {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            /* Center the table container itself */
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%; /* Ensure it doesn't overflow */
+        }
+
+        .table-container h2 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-size: 1.8em;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 10px; /* Space between items when wrapped */
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 200px;
+        }
+
+        .btn-action {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none; /* For link buttons */
+        }
+
+        .btn-add {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        .btn-add:hover {
+            background-color: #008f6b;
+        }
+
+        .btn-print {
+            background-color: #007bff; /* Blue for print */
+            color: var(--white);
+        }
+
+        .btn-print:hover {
+            background-color: #0056b3;
+        }
+
+        /* Table Wrapper for horizontal scroll */
+        .table-responsive {
+            overflow-x: auto; /* Enable horizontal scrolling only for the table content */
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            min-width: 600px; /* Ensure table doesn't get too narrow on small screens */
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th, table td {
+            border: 1px solid #eee;
+            padding: 12px 15px;
+            text-align: left; /* Default for screen, will be overridden by print for centering */
+            font-size: 0.95em;
+        }
+
+        table th {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-buttons button, .action-buttons a {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 0 5px;
+            transition: color 0.2s ease;
+            color: #666; /* Default color for icons */
+            padding: 0; /* Remove padding from button */
+            display: inline-flex; /* Align icon better */
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .action-buttons button:hover .fa-edit { color: #007bff; } /* Blue for edit */
+        .action-buttons button:hover .fa-trash-alt { color: var(--danger-color); } /* Red for delete */
+        .action-buttons button:hover .fa-info-circle { color: #28a745; } /* Green for info */
+
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-save {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        .btn-save:hover {
+            background-color: #008f6b;
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background-color: #bbb;
+        }
+
+        /* Detail Modal specific styles */
+        #detailModal .modal-content {
+            max-width: 450px;
+        }
+
+        #detailModal p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        #detailModal p strong {
+            color: var(--secondary-color);
+            display: inline-block;
+            width: 120px; /* Align labels */
+        }
+        
+        /* Specific styles for Transaksi Obat page */
+        .transaction-form-section {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .transaction-form-section h2 {
+            color: var(--secondary-color);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .transaction-form-section .form-group {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping of form groups */
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transaction-form-section .form-group > div {
+            flex: 1;
+            min-width: 200px; /* Minimum width for each form field container */
+        }
+
+        .transaction-form-section .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .transaction-form-section .form-group input,
+        .transaction-form-section .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .transaction-form-section .form-group input:focus,
+        .transaction-form-section .form-group select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .add-transaction-btn {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .add-transaction-btn:hover {
+            background-color: #008f6b;
+        }
+
+        .tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ccc;
+    /* flex-wrap: wrap; /* Hapus atau override ini */ */
+    gap: 5px; /* Space between tabs */
+    overflow-x: auto; /* Tambahkan ini untuk scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* Untuk smooth scrolling di iOS */
+    padding-bottom: 5px; /* Ruang untuk scrollbar jika muncul */
+}
+
+.tab-button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #555;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 5px 5px 0 0;
+    /* margin-right: 5px; /* Bisa dihapus jika gap sudah di set */ */
+    flex-shrink: 0; /* Pastikan tombol tidak menyusut */
+}
+
+/* Tambahan untuk mobile view agar ada sedikit padding di samping tabs */
+@media (max-width: 768px) {
+    .tabs {
+        padding-left: 15px; /* Sesuaikan dengan padding main-content */
+        padding-right: 15px; /* Sesuaikan dengan padding main-content */
+        box-sizing: border-box; /* Pastikan padding tidak membuat overflow */
+        justify-content: flex-start; /* Pastikan tidak ada space-between yang memecah */
+    }
+}
+
+        .tab-button.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border-bottom: 2px solid var(--primary-dark);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Actions for tab content */
+        .tab-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Print Specific Styles */
+        @media print {
+            body {
+                background-color: #fff;
+                display: block; /* Override flex */
+                margin: 0;
+                padding: 0;
+            }
+
+            .sidebar, .mobile-toggle, .toggle-btn,
+            .transaction-form-section, .tabs, .tab-actions,
+            .main-content > h2, /* Hide the main heading "Transaksi Obat" if you only want tab titles */
+            table th:last-child, /* Hide the "Aksi" column header */
+            table td:last-child { /* Hide the "Aksi" column data */
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 20px; /* Adjust padding for print layout */
+            }
+
+            .table-container {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                padding: 0;
+                margin: 0 auto; /* Center the table container on the page */
+                width: 95%; /* Adjust width for better print layout */
+            }
+
+            .table-container h2 { /* The tab specific h2 */
+                display: block !important;
+                text-align: center;
+                margin-bottom: 15px;
+                font-size: 1.5em;
+                color: #000;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 0;
+                min-width: unset; /* Remove min-width for print */
+            }
+
+            table th, table td {
+                border: 1px solid #ccc;
+                padding: 8px 12px;
+                text-align: center; /* Default center for print */
+                font-size: 0.85em;
+            }
+
+            /* Align specific columns to the left for print if desired */
+            /* For Sales Table */
+            #salesTable th:nth-child(1), /* ID Transaksi */
+            #salesTable td:nth-child(1),
+            #salesTable th:nth-child(2), /* Tanggal Transaksi */
+            #salesTable td:nth-child(2),
+            #salesTable th:nth-child(3), /* Nama Obat */
+            #salesTable td:nth-child(3) {
+                text-align: left;
+            }
+
+            /* For Purchases Table */
+            #purchasesTable th:nth-child(1), /* ID Transaksi */
+            #purchasesTable td:nth-child(1),
+            #purchasesTable th:nth-child(2), /* Tanggal Transaksi */
+            #purchasesTable td:nth-child(2),
+            #purchasesTable th:nth-child(3), /* Nama Obat */
+            #purchasesTable td:nth-child(3) {
+                text-align: left;
+            }
+
+            /* Ensure only the active tab content is visible */
+            .tab-content:not(.active) {
+                display: none !important;
+            }
+
+            /* Adjust background for table headers for print */
+            table th {
+                background-color: #e0e0e0;
+                color: #000;
+            }
+            table tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+            table tr:hover {
+                background-color: #f2f2f2; /* Remove hover effect for print */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_apt.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_obat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Obat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jualbeli_obat.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Obat</div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="transaction-form-section">
+            <h2>Tambah Transaksi</h2>
+            <form id="transactionForm">
+                <div class="form-group">
+                    <div>
+                        <label for="transactionType">Jenis Transaksi:</label>
+                        <select id="transactionType" required>
+                            <option value="">Pilih Jenis</option>
+                            <option value="penjualan">Penjualan</option>
+                            <option value="pembelian">Pembelian</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="drugSelect">Pilih Obat:</label>
+                        <select id="drugSelect" required>
+                            <option value="">Pilih Obat</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="quantity">Jumlah:</label>
+                        <input type="number" id="quantity" min="1" required>
+                    </div>
+                    <div>
+                        <label for="transactionDate">Tanggal Transaksi:</label>
+                        <input type="date" id="transactionDate" required>
+                    </div>
+                </div>
+                <button type="submit" class="add-transaction-btn"><i class="fas fa-plus"></i> Tambah Transaksi</button>
+            </form>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" id="salesTabBtn">Daftar Penjualan</button>
+            <button class="tab-button" id="purchasesTabBtn">Daftar Pembelian</button>
+        </div>
+
+        <div id="salesTabContent" class="tab-content active table-container">
+            <h2>Daftar Penjualan</h2>
+            <div class="tab-actions">
+                <div class="search-bar">
+                    <input type="text" id="searchSalesInput" placeholder="Cari penjualan...">
+                    <button class="btn-action btn-add" id="searchSalesBtn">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                </div>
+                <button class="btn-action btn-print" id="printSalesBtn">
+                    <i class="fas fa-print"></i> Print Penjualan
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Transaksi</th>
+                            <th>Tanggal Transaksi</th>
+                            <th>Nama Obat</th>
+                            <th>Jumlah</th>
+                            <th>Harga Satuan</th>
+                            <th>Total Harga</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="purchasesTabContent" class="tab-content table-container">
+            <h2>Daftar Pembelian</h2>
+            <div class="tab-actions">
+                <div class="search-bar">
+                    <input type="text" id="searchPurchasesInput" placeholder="Cari pembelian...">
+                    <button class="btn-action btn-add" id="searchPurchasesBtn">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                </div>
+                <button class="btn-action btn-print" id="printPurchasesBtn">
+                    <i class="fas fa-print"></i> Print Pembelian
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Transaksi</th>
+                            <th>Tanggal Transaksi</th>
+                            <th>Nama Obat</th>
+                            <th>Jumlah</th>
+                            <th>Harga Satuan</th>
+                            <th>Total Harga</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchasesTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+        const mainContent = document.getElementById('mainContent');
+        const logoutLink = document.querySelector('.logout-link');
+
+        // Transaction form elements
+        const transactionForm = document.getElementById('transactionForm');
+        const transactionTypeSelect = document.getElementById('transactionType');
+        const drugSelect = document.getElementById('drugSelect');
+        const quantityInput = document.getElementById('quantity');
+        const transactionDateInput = document.getElementById('transactionDate');
+
+        // Table bodies
+        const salesTableBody = document.getElementById('salesTableBody');
+        const purchasesTableBody = document.getElementById('purchasesTableBody');
+
+        // Tab buttons and content
+        const salesTabBtn = document.getElementById('salesTabBtn');
+        const purchasesTabBtn = document.getElementById('purchasesTabBtn');
+        const salesTabContent = document.getElementById('salesTabContent');
+        const purchasesTabContent = document.getElementById('purchasesTabContent');
+
+        // Search inputs and buttons
+        const searchSalesInput = document.getElementById('searchSalesInput');
+        const searchSalesBtn = document.getElementById('searchSalesBtn');
+        const searchPurchasesInput = document.getElementById('searchPurchasesInput');
+        const searchPurchasesBtn = document.getElementById('searchPurchasesBtn');
+
+        // Print buttons
+        const printSalesBtn = document.getElementById('printSalesBtn');
+        const printPurchasesBtn = document.getElementById('printPurchasesBtn');
+
+        // Fungsi untuk memeriksa akses berdasarkan peran
+        function checkAccess(allowedRoles) {
+            const user = sessionStorage.getItem('loggedInUser');
+            if (user) {
+                const loggedInUser = JSON.parse(user);
+                if (!allowedRoles.includes(loggedInUser.role)) {
+                    alert('Anda tidak memiliki akses ke halaman ini.');
+                    sessionStorage.clear();
+                    window.location.href = '/index.html';
+                }
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+
+        // Jalankan pemeriksaan akses terlebih dahulu
+        checkAccess(['apoteker']);
+
+        // Sidebar and layout logic (unchanged, as provided in your original file)
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('minimized');
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            });
+        }
+
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        if (menuIcon) {
+            menuIcon.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                } else {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                }
+            });
+        }
+
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        sidebar.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        if (logoutLink) {
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('loggedInUser');
+                window.location.href = '/index.html';
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+                sidebar.classList.remove('active'); // Ensure sidebar is not active on desktop if resized from mobile
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+
+        // Set initial margin for main content based on screen width
+        if (window.innerWidth <= 768) {
+            mainContent.style.marginLeft = '0';
+        } else {
+            mainContent.style.marginLeft = 'var(--sidebar-width)';
+        }
+
+
+        // --- Transaction Data Management ---
+        let sales = JSON.parse(localStorage.getItem('sales')) || [];
+        let purchases = JSON.parse(localStorage.getItem('purchases')) || [];
+        let drugs = JSON.parse(localStorage.getItem('drugs')) || [];
+
+        let currentSaleId = sales.length > 0 ? Math.max(...sales.map(s => s.id)) + 1 : 1;
+        let currentPurchaseId = purchases.length > 0 ? Math.max(...purchases.map(p => p.id)) + 1 : 1;
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(number);
+        }
+
+        function populateDrugSelects() {
+            drugSelect.innerHTML = '<option value="">Pilih Obat</option>';
+            drugs.forEach(drug => {
+                const option = document.createElement('option');
+                option.value = drug.id;
+                option.textContent = drug.namaObat;
+                drugSelect.appendChild(option);
+            });
+        }
+
+        function renderSalesTable(filter = '') {
+            salesTableBody.innerHTML = '';
+            const filteredSales = sales.filter(sale =>
+                sale.namaObat.toLowerCase().includes(filter.toLowerCase()) ||
+                sale.transactionDate.includes(filter)
+            );
+
+            filteredSales.forEach(sale => {
+                const row = salesTableBody.insertRow();
+                row.insertCell().textContent = sale.id;
+                row.insertCell().textContent = sale.transactionDate;
+                row.insertCell().textContent = sale.namaObat;
+                row.insertCell().textContent = sale.quantity;
+                row.insertCell().textContent = formatRupiah(sale.unitPrice);
+                row.insertCell().textContent = formatRupiah(sale.totalPrice);
+                
+                const actionsCell = row.insertCell();
+                actionsCell.classList.add('action-buttons');
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                deleteBtn.title = 'Hapus Penjualan';
+                deleteBtn.onclick = () => deleteTransaction('sale', sale.id);
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+        function renderPurchasesTable(filter = '') {
+            purchasesTableBody.innerHTML = '';
+            const filteredPurchases = purchases.filter(purchase =>
+                purchase.namaObat.toLowerCase().includes(filter.toLowerCase()) ||
+                purchase.transactionDate.includes(filter)
+            );
+
+            filteredPurchases.forEach(purchase => {
+                const row = purchasesTableBody.insertRow();
+                row.insertCell().textContent = purchase.id;
+                row.insertCell().textContent = purchase.transactionDate;
+                row.insertCell().textContent = purchase.namaObat;
+                row.insertCell().textContent = purchase.quantity;
+                row.insertCell().textContent = formatRupiah(purchase.unitPrice);
+                row.insertCell().textContent = formatRupiah(purchase.totalPrice);
+                
+                const actionsCell = row.insertCell();
+                actionsCell.classList.add('action-buttons');
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                deleteBtn.title = 'Hapus Pembelian';
+                deleteBtn.onclick = () => deleteTransaction('purchase', purchase.id);
+                actionsCell.appendChild(deleteBtn);
+            });
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+
+            const type = transactionTypeSelect.value;
+            const drugId = parseInt(drugSelect.value);
+            const quantity = parseInt(quantityInput.value);
+            const transactionDate = transactionDateInput.value;
+
+            if (!type || !drugId || !quantity || !transactionDate) {
+                alert('Semua kolom harus diisi!');
+                return;
+            }
+
+            const drug = drugs.find(d => d.id === drugId);
+
+            if (!drug) {
+                alert('Obat tidak ditemukan.');
+                return;
+            }
+
+            if (type === 'penjualan') {
+                if (drug.stok < quantity) {
+                    alert('Stok obat tidak mencukupi untuk penjualan ini.');
+                    return;
+                }
+                drug.stok -= quantity;
+                const newSale = {
+                    id: currentSaleId++,
+                    transactionDate,
+                    namaObat: drug.namaObat,
+                    quantity,
+                    unitPrice: drug.hargaJual,
+                    totalPrice: quantity * drug.hargaJual
+                };
+                sales.push(newSale);
+                localStorage.setItem('sales', JSON.stringify(sales));
+                renderSalesTable();
+                switchTab('sales');
+            } else if (type === 'pembelian') {
+                drug.stok += quantity;
+                const newPurchase = {
+                    id: currentPurchaseId++,
+                    transactionDate,
+                    namaObat: drug.namaObat,
+                    quantity,
+                    unitPrice: drug.hargaBeli,
+                    totalPrice: quantity * drug.hargaBeli
+                };
+                purchases.push(newPurchase);
+                localStorage.setItem('purchases', JSON.stringify(purchases));
+                renderPurchasesTable();
+                switchTab('purchases');
+            }
+
+            localStorage.setItem('drugs', JSON.stringify(drugs)); // Update drug stock
+            transactionForm.reset(); // Clear form
+            populateDrugSelects(); // Re-populate to show updated stock if needed (though not directly visible in select)
+        }
+
+        function deleteTransaction(type, id) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus transaksi ${type} ini?`)) {
+                return;
+            }
+
+            if (type === 'sale') {
+                const transaction = sales.find(s => s.id === id);
+                if (transaction) {
+                    const drug = drugs.find(d => d.namaObat === transaction.namaObat);
+                    if (drug) {
+                        drug.stok += transaction.quantity; // Restore stock for sales
+                        localStorage.setItem('drugs', JSON.stringify(drugs));
+                    }
+                }
+                sales = sales.filter(s => s.id !== id);
+                localStorage.setItem('sales', JSON.stringify(sales));
+                renderSalesTable();
+            } else if (type === 'purchase') {
+                const transaction = purchases.find(p => p.id === id);
+                if (transaction) {
+                    const drug = drugs.find(d => d.namaObat === transaction.namaObat);
+                    if (drug) {
+                        drug.stok -= transaction.quantity; // Deduct stock for purchases
+                        localStorage.setItem('drugs', JSON.stringify(drugs));
+                    }
+                }
+                purchases = purchases.filter(p => p.id !== id);
+                localStorage.setItem('purchases', JSON.stringify(purchases));
+                renderPurchasesTable();
+            }
+            populateDrugSelects(); // Update drug select if stock changed
+        }
+
+
+        // Tab switching logic
+        function switchTab(activeTab) {
+            salesTabContent.classList.remove('active');
+            purchasesTabContent.classList.remove('active');
+            salesTabBtn.classList.remove('active');
+            purchasesTabBtn.classList.remove('active');
+
+            if (activeTab === 'sales') {
+                salesTabContent.classList.add('active');
+                salesTabBtn.classList.add('active');
+                renderSalesTable(searchSalesInput.value); // Re-render with current filter
+            } else if (activeTab === 'purchases') {
+                purchasesTabContent.classList.add('active');
+                purchasesTabBtn.classList.add('active');
+                renderPurchasesTable(searchPurchasesInput.value); // Re-render with current filter
+            }
+        }
+
+        // Event Listeners
+        transactionForm.addEventListener('submit', addTransaction);
+
+        salesTabBtn.addEventListener('click', () => switchTab('sales'));
+        purchasesTabBtn.addEventListener('click', () => switchTab('purchases'));
+
+        searchSalesInput.addEventListener('input', (e) => renderSalesTable(e.target.value));
+        searchSalesBtn.addEventListener('click', () => renderSalesTable(searchSalesInput.value));
+
+        searchPurchasesInput.addEventListener('input', (e) => renderPurchasesTable(e.target.value));
+        searchPurchasesBtn.addEventListener('click', () => renderPurchasesTable(searchPurchasesInput.value));
+
+        // Print functionality
+        printSalesBtn.addEventListener('click', () => {
+            // Ensure sales tab content is active for printing
+            switchTab('sales'); // Make sure sales tab is active before printing
+            window.print();
+        });
+
+        printPurchasesBtn.addEventListener('click', () => {
+            // Ensure purchases tab content is active for printing
+            switchTab('purchases'); // Make sure purchases tab is active before printing
+            window.print();
+        });
+
+
+        // Initial load and render
+        populateDrugSelects();
+        renderSalesTable();
+        renderPurchasesTable();
+        switchTab('sales'); // Default to sales tab on page load
+    });
+</script>
+</body>
+</html>

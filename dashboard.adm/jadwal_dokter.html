@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Praktek Dokter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variabel CSS (dari dashboard_adm.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color); /* Menggunakan light-color dari dashboard_adm.html */
+            overflow-x: hidden;
+        }
+
+        /* Mobile Toggle outside sidebar (dari dashboard_adm.html) */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1; /* Align text vertically */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        /* Sidebar/Navigasi Utama (dari dashboard_adm.html) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed; /* Sidebar tetap di posisi */
+            height: 100%; /* Tinggi penuh */
+            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
+            overflow-x: hidden; /* Penting: Mencegah scroll horizontal di dalam sidebar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+            position: relative;
+            justify-content: flex-start; /* Ensure items start from left */
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center; /* Center menu icon when minimized */
+            padding: 20px 0; /* Adjust padding for minimized state */
+        }
+
+        .menu-icon { /* Mengganti .menu-icon-svg dari jadwal_dokter.html */
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1; /* Ensure proper alignment */
+            padding: 0 5px; /* Add some padding around the icon */
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem; /* Smaller icon when minimized */
+        }
+
+        .nav-list { /* Menambahkan nav-list dari dashboard_adm.html */
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1; /* Allow nav list to grow */
+        }
+
+        .nav-item { /* Menambahkan nav-item dari dashboard_adm.html */
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color); /* Menggunakan secondary-color untuk teks nav */
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+        }
+
+        .nav-icon { /* Menambahkan nav-icon dari dashboard_adm.html */
+            margin-right: 10px;
+            width: 24px; /* Fixed width for SVG icon */
+            height: 24px; /* Fixed height for SVG icon */
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg { /* Menambahkan svg styling dari dashboard_adm.html */
+            width: 100%;
+            height: 100%;
+            stroke: currentColor; /* Inherit color from parent */
+            fill: none; /* Pastikan tidak ada fill default */
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0; /* No margin when minimized */
+            justify-content: center;
+            display: flex;
+            width: 100%; /* Take full width of minimized item */
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0; /* Hide text when minimized */
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section (dari dashboard_adm.html) */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden; /* Penting: Mencegah scrollbar horizontal pada link logout */
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none; /* Pastikan tidak ada fill default */
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop (dari dashboard_adm.html) */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px; /* Posisikan di luar sidebar */
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001; /* Di atas sidebar */
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+        }
+
+        /* Area Konten Utama (dari dashboard_adm.html) */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
+            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
+            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments (dari dashboard_adm.html) */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block; /* Show on mobile */
+                z-index: 10000; /* Ensure it's always on top */
+            }
+
+            .sidebar {
+                left: -250px; /* Hide sidebar off-screen */
+                position: fixed; /* Ensure it stays off-screen */
+                height: 100%;
+                z-index: 2000; /* Higher than main content */
+                background-color: var(--primary-color); /* Ensure background for visual separation */
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
+            }
+
+            .sidebar.active {
+                left: 0; /* Slide in when active */
+            }
+
+            .main-content {
+                margin-left: 0; /* No margin on mobile */
+                width: 100%; /* Full width */
+                position: relative; /* Crucial for z-index to work against sidebar */
+                z-index: 1; /* Main content below active sidebar */
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
+            }
+
+            .toggle-btn {
+                display: none; /* Hide desktop toggle on mobile */
+            }
+
+            body {
+                flex-direction: column; /* Stack elements vertically */
+            }
+        }
+
+        /* Global styles for content */
+        .header {
+            background-color: var(--white); /* Menggunakan white dari variabel */
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow); /* Menggunakan shadow dari variabel */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card {
+            background-color: var(--white); /* Menggunakan white dari variabel */
+            border-radius: 5px;
+            box-shadow: var(--shadow); /* Menggunakan shadow dari variabel */
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #6c757d;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color); /* Menggunakan border-color yang ada */
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white); /* Menggunakan white dari variabel */
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark); /* Menggunakan primary-dark dari variabel */
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            color: var(--white);
+        }
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: var(--secondary-color); /* Menggunakan secondary-color untuk teks */
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .btn-danger {
+            background-color: var(--danger-color); /* Menggunakan danger-color dari variabel */
+            color: var(--white);
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .jadwal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .jadwal-table th, .jadwal-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .jadwal-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .jadwal-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .jadwal-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .search-filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-filter-section .form-group {
+            flex: 1;
+            min-width: 180px;
+            margin-bottom: 0;
+        }
+        
+        .search-filter-section .form-control {
+            border-radius: 4px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--white);
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-color);
+        }
+
+        .pagination-btn.active, .pagination-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+
+        /* Modal Styles (for 'Tambah Jadwal Baru' dan 'View Details') */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 10000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%; /* Could be adjusted */
+            max-width: 500px; /* Max width for consistency */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Styles for View Details Modal Content */
+        .view-details p {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .view-details strong {
+            display: inline-block;
+            width: 120px; /* Adjust as needed for alignment */
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_adm.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_dokter.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 3v6a6 6 0 0 0 12 0V3"></path>
+                            <circle cx="12" cy="14" r="4"></circle>
+                            <line x1="12" y1="18" x2="12" y2="21"></line>
+                            <line x1="9" y1="21" x2="15" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_obat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="9"></line>
+                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                            <line x1="9" y1="19" x2="15" y2="19"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Obat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="t-pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="tambah_akun.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="17" y1="11" x2="23" y2="11"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Tambah Akun</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="laporan.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Laporan</div>
+                </a>
+            </li>
+        </ul>
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="header">
+            <h1>Jadwal Praktek Dokter</h1>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-calendar-alt"></i> Daftar Jadwal</h2>
+                <button class="btn btn-primary" id="addJadwalBtn"><i class="fas fa-plus"></i> Tambah Jadwal Baru</button>
+            </div>
+            <div class="card-body">
+                <div class="search-filter-section">
+                    <div class="form-group">
+                        <label for="doctorSearch">Cari Dokter:</label>
+                        <input type="text" id="doctorSearch" class="form-control" placeholder="Nama Dokter">
+                    </div>
+                    <div class="form-group">
+                        <label for="poliFilter">Filter Poli:</label>
+                        <select id="poliFilter" class="form-control">
+                            <option value="">Semua Poli</option>
+                            <option value="umum">Umum</option>
+                            <option value="gigi">Gigi</option>
+                            <option value="mata">Mata</option>
+                            <option value="THT">THT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hariFilter">Filter Hari:</label>
+                        <select id="hariFilter" class="form-control">
+                            <option value="">Semua Hari</option>
+                            <option value="senin">Senin</option>
+                            <option value="selasa">Selasa</option>
+                            <option value="rabu">Rabu</option>
+                            <option value="kamis">Kamis</option>
+                            <option value="jumat">Jumat</option>
+                            <option value="sabtu">Sabtu</option>
+                            <option value="minggu">Minggu</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-info" id="applyFilterBtn"><i class="fas fa-filter"></i> Terapkan</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="jadwal-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Nama Dokter</th>
+                                <th>Poli</th>
+                                <th>Hari Praktek</th>
+                                <th>Jam Mulai</th>
+                                <th>Jam Selesai</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td>Revana Khoerunnisa</td>
+                                <td>Umum</td>
+                                <td>Senin</td>
+                                <td>09:00</td>
+                                <td>12:00</td>
+                                <td><span style="color: green;">Aktif</span></td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-info btn-sm view-btn"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-warning btn-sm edit-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-danger btn-sm delete-btn"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td>Rifa Nazla Kamillia</td>
+                                <td>Mata</td>
+                                <td>Selasa</td>
+                                <td>10:00</td>
+                                <td>13:00</td>
+                                <td><span style="color: green;">Aktif</span></td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-info btn-sm view-btn"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-warning btn-sm edit-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-danger btn-sm delete-btn"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3.</td>
+                                <td>Nailah Tsani Armydiani</td>
+                                <td>Gigi</td>
+                                <td>Rabu</td>
+                                <td>08:00</td>
+                                <td>12:00</td>
+                                <td><span style="color: green;">Aktif</span></td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-info btn-sm view-btn"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-warning btn-sm edit-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-danger btn-sm delete-btn"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>4.</td>
+                                <td>Salwa Azzahra Nurrohmah</td>
+                                <td>THT</td>
+                                <td>Jumat</td>
+                                <td>13:00</td>
+                                <td>16:00</td>
+                                <td><span style="color: green;">Aktif</span></td>
+                                <td class="action-buttons">
+                                    <button class="btn btn-info btn-sm view-btn"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-warning btn-sm edit-btn"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-danger btn-sm delete-btn"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="jadwalModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalTitle">Tambah Jadwal Baru</h2>
+            <form id="jadwalForm">
+                <input type="hidden" id="jadwalId"> <div class="form-group">
+                    <label for="modalDoctorName">Nama Dokter:</label>
+                    <input type="text" id="modalDoctorName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalPoli">Poli:</label>
+                    <select id="modalPoli" class="form-control" required>
+                        <option value="">Pilih Poli</option>
+                        <option value="umum">Umum</option>
+                        <option value="gigi">Mata</option>
+                        <option value="gigi">Gigi</option>
+                        <option value="THT">THT</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modalDay">Hari Praktek:</label>
+                    <select id="modalDay" class="form-control" required>
+                        <option value="">Pilih Hari</option>
+                        <option value="senin">Senin</option>
+                        <option value="selasa">Selasa</option>
+                        <option value="rabu">Rabu</option>
+                        <option value="kamis">Kamis</option>
+                        <option value="jumat">Jumat</option>
+                        <option value="sabtu">Sabtu</option>
+                        <option value="minggu">Minggu</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modalStartTime">Jam Mulai:</label>
+                    <input type="time" id="modalStartTime" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalEndTime">Jam Selesai:</label>
+                    <input type="time" id="modalEndTime" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalStatus">Status:</label>
+                    <select id="modalStatus" class="form-control" required>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Tidak Aktif">Tidak Aktif</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelModalBtn">Batal</button>
+                    <button type="submit" class="btn btn-primary" id="saveJadwalBtn">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="viewDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Detail Jadwal</h2>
+            <div class="view-details">
+                <p><strong>No:</strong> <span id="viewNo"></span></p>
+                <p><strong>Nama Dokter:</strong> <span id="viewDoctorName"></span></p>
+                <p><strong>Poli:</strong> <span id="viewPoli"></span></p>
+                <p><strong>Hari Praktek:</strong> <span id="viewDay"></span></p>
+                <p><strong>Jam Mulai:</strong> <span id="viewStartTime"></span></p>
+                <p><strong>Jam Selesai:</strong> <span id="viewEndTime"></span></p>
+                <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-secondary close-button">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteConfirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Konfirmasi Hapus</h2>
+            <p>Apakah Anda yakin ingin menghapus jadwal ini?</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Batal</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+           // Function to load user data from sessionStorage and display it
+            function loadUserData() {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    // Update welcome message
+                    const welcomeUserElement = document.getElementById('welcome-user'); // Dapatkan elemen span
+                    if (welcomeUserElement) {
+                        // Tampilkan nama jika ada, jika tidak, tampilkan email
+                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
+                    }
+                } else {
+                    // Redirect jika tidak ada data user di sessionStorage
+                    window.location.href = '/index.html';
+                }
+            }
+
+            // Fungsi untuk memeriksa akses berdasarkan peran
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
+                        alert('Anda tidak memiliki akses ke halaman ini.');
+                        sessionStorage.clear(); // Hapus sesi jika tidak punya akses
+                        window.location.href = '/index.html'; // Redirect ke login
+                    }
+                } else {
+                    window.location.href = '/index.html'; // Belum login
+                }
+            }
+
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['admin']); // Hanya 'admin' role yang bisa mengakses halaman ini
+
+
+
+            // Sidebar and Mobile Menu Toggle (Copied from dashboard_adm.html)
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+            const mainContent = document.getElementById('main-content');
+
+
+            // Toggle sidebar for desktop
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+                    // Adjust main content margin based on sidebar state
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                });
+            }
+
+            // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    // For mobile, this should close the sidebar if open
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    }
+                    // For desktop, this toggles minimization
+                    else {
+                        sidebar.classList.toggle('minimized');
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        } else {
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
+                        }
+                    }
+                });
+            }
+
+            // Close sidebar when clicking outside on mobile
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            // Prevent sidebar clicks from propagating to mainContent to close it
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+
+            // Initialize the app
+            function init() {
+                // Check screen width on load and apply initial sidebar state
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
+                    sidebar.classList.remove('active'); // Ensure hidden by default
+                    mainContent.style.marginLeft = '0';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
+                }
+            }
+
+            // Run initialization
+            init();
+
+            // Adjust main content margin on window resize for desktop view
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                    sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
+                } else {
+                    mainContent.style.marginLeft = '0';
+                }
+            });
+
+            // --- Modal and Form Handling ---
+            const jadwalModal = document.getElementById('jadwalModal');
+            const viewDetailsModal = document.getElementById('viewDetailsModal');
+            const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+            const addJadwalBtn = document.getElementById('addJadwalBtn');
+            const closeModalBtns = document.querySelectorAll('.modal .close-button');
+            const cancelModalBtn = document.getElementById('cancelModalBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const jadwalForm = document.getElementById('jadwalForm');
+            const tableBody = document.querySelector('.jadwal-table tbody');
+
+            let currentEditingRow = null;
+
+            // Open Add Jadwal Modal
+            addJadwalBtn.addEventListener('click', () => {
+                jadwalForm.reset();
+                document.getElementById('jadwalId').value = '';
+                document.getElementById('modalTitle').textContent = 'Tambah Jadwal Baru';
+                jadwalModal.style.display = 'flex';
+            });
+
+            // Close Modals
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    jadwalModal.style.display = 'none';
+                    viewDetailsModal.style.display = 'none';
+                    deleteConfirmationModal.style.display = 'none';
+                });
+            });
+
+            cancelModalBtn.addEventListener('click', () => {
+                jadwalModal.style.display = 'none';
+            });
+
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteConfirmationModal.style.display = 'none';
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === jadwalModal) {
+                    jadwalModal.style.display = 'none';
+                }
+                if (event.target === viewDetailsModal) {
+                    viewDetailsModal.style.display = 'none';
+                }
+                if (event.target === deleteConfirmationModal) {
+                    deleteConfirmationModal.style.display = 'none';
+                }
+            });
+
+            // Handle Form Submission (Add/Edit)
+            jadwalForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const doctorName = document.getElementById('modalDoctorName').value;
+                const poli = document.getElementById('modalPoli').value;
+                const day = document.getElementById('modalDay').value;
+                const startTime = document.getElementById('modalStartTime').value;
+                const endTime = document.getElementById('modalEndTime').value;
+                const status = document.getElementById('modalStatus').value;
+                const jadwalId = document.getElementById('jadwalId').value;
+
+                if (jadwalId) {
+                    // Edit existing row
+                    currentEditingRow.children[1].textContent = doctorName;
+                    currentEditingRow.children[2].textContent = poli.charAt(0).toUpperCase() + poli.slice(1);
+                    currentEditingRow.children[3].textContent = day.charAt(0).toUpperCase() + day.slice(1);
+                    currentEditingRow.children[4].textContent = startTime;
+                    currentEditingRow.children[5].textContent = endTime;
+                    currentEditingRow.children[6].innerHTML = `<span style="color: ${status === 'Aktif' ? 'green' : 'red'};">${status}</span>`;
+                    alert('Jadwal berhasil diperbarui!');
+                } else {
+                    // Add new row
+                    const newRow = tableBody.insertRow();
+                    const rowCount = tableBody.rows.length;
+
+                    newRow.insertCell().textContent = rowCount + ".";
+                    newRow.insertCell().textContent = doctorName;
+                    newRow.insertCell().textContent = poli.charAt(0).toUpperCase() + poli.slice(1);
+                    newRow.insertCell().textContent = day.charAt(0).toUpperCase() + day.slice(1);
+                    newRow.insertCell().textContent = startTime;
+                    newRow.insertCell().textContent = endTime;
+                    const statusCell = newRow.insertCell();
+                    statusCell.innerHTML = `<span style="color: ${status === 'Aktif' ? 'green' : 'red'};">${status}</span>`;
+                    const actionCell = newRow.insertCell();
+                    actionCell.classList.add('action-buttons');
+                    actionCell.innerHTML = `
+                        <button class="btn btn-info btn-sm view-btn"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-warning btn-sm edit-btn"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm delete-btn"><i class="fas fa-trash"></i></button>
+                    `;
+                    alert('Jadwal berhasil ditambahkan!');
+                }
+                jadwalModal.style.display = 'none';
+                attachTableActionListeners(); // Re-attach listeners for new/updated rows
+            });
+
+            // Table Actions (Edit, View, Delete)
+            function attachTableActionListeners() {
+                // Clear existing listeners to prevent duplicates
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.removeEventListener('click', handleEditClick);
+                });
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.removeEventListener('click', handleDeleteClick);
+                });
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.removeEventListener('click', handleViewClick);
+                });
+
+                // Attach new listeners
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', handleEditClick);
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', handleDeleteClick);
+                });
+
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.addEventListener('click', handleViewClick);
+                });
+            }
+
+            function handleEditClick() {
+                currentEditingRow = this.closest('tr');
+                const cells = currentEditingRow.children;
+                document.getElementById('jadwalId').value = cells[0].textContent.replace('.', '');
+                document.getElementById('modalDoctorName').value = cells[1].textContent;
+                document.getElementById('modalPoli').value = cells[2].textContent.toLowerCase();
+                document.getElementById('modalDay').value = cells[3].textContent.toLowerCase();
+                document.getElementById('modalStartTime').value = cells[4].textContent;
+                document.getElementById('modalEndTime').value = cells[5].textContent;
+                document.getElementById('modalStatus').value = cells[6].textContent.trim();
+                
+                document.getElementById('modalTitle').textContent = 'Edit Jadwal';
+                jadwalModal.style.display = 'flex';
+            }
+
+            function handleDeleteClick() {
+                currentEditingRow = this.closest('tr');
+                deleteConfirmationModal.style.display = 'flex';
+            }
+
+            function handleViewClick() {
+                const cells = this.closest('tr').children;
+                document.getElementById('viewNo').textContent = cells[0].textContent;
+                document.getElementById('viewDoctorName').textContent = cells[1].textContent;
+                document.getElementById('viewPoli').textContent = cells[2].textContent;
+                document.getElementById('viewDay').textContent = cells[3].textContent;
+                document.getElementById('viewStartTime').textContent = cells[4].textContent;
+                document.getElementById('viewEndTime').textContent = cells[5].textContent;
+                document.getElementById('viewStatus').textContent = cells[6].textContent.trim();
+                
+                viewDetailsModal.style.display = 'flex';
+            }
+
+            // Initial attachment of listeners
+            attachTableActionListeners();
+
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (currentEditingRow) {
+                    currentEditingRow.remove();
+                    deleteConfirmationModal.style.display = 'none';
+                    alert('Jadwal berhasil dihapus!');
+                    // Re-index rows after deletion
+                    document.querySelectorAll('.jadwal-table tbody tr').forEach((row, index) => {
+                        row.children[0].textContent = (index + 1) + ".";
+                    });
+                }
+            });
+
+            // Filter table logic
+            document.getElementById('doctorSearch').addEventListener('keyup', filterTable);
+            document.getElementById('poliFilter').addEventListener('change', filterTable);
+            document.getElementById('hariFilter').addEventListener('change', filterTable);
+            document.getElementById('applyFilterBtn').addEventListener('click', filterTable);
+
+            function filterTable() {
+                const doctorName = document.getElementById('doctorSearch').value.toLowerCase();
+                const poliValue = document.getElementById('poliFilter').value.toLowerCase();
+                const hariValue = document.getElementById('hariFilter').value.toLowerCase();
+                
+                const rows = document.querySelectorAll('.jadwal-table tbody tr');
+                
+                rows.forEach(row => {
+                    const doctor = row.children[1].textContent.toLowerCase();
+                    const poli = row.children[2].textContent.toLowerCase();
+                    const hari = row.children[3].textContent.toLowerCase();
+                    
+                    let showRow = true;
+                    
+                    if (doctorName && !doctor.includes(doctorName)) {
+                        showRow = false;
+                    }
+
+                    if (poliValue && !poli.includes(poliValue)) {
+                        showRow = false;
+                    }
+                    
+                    if (hariValue && !hari.includes(hariValue)) {
+                        showRow = false;
+                    }
+                    
+                    row.style.display = showRow ? '' : 'none';
+                });
+            }
+
+            // Pagination (demo only - not functional)
+            document.querySelectorAll('.pagination-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!this.classList.contains('active')) {
+                        document.querySelector('.pagination-btn.active').classList.remove('active');
+                        this.classList.add('active');
+                        // Here you would handle actual pagination to display different data
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

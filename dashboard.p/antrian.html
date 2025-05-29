@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antrian Pemeriksaan</title>
+    <style>
+        /* Your existing CSS here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang */
+            --primary-dark: #00b686; /* Hijau gelap */
+            --secondary-color: #333; /* Warna teks gelap */
+            --light-color: #f4f4f4; /* Background umum */
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar.active ~ .mobile-toggle {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg);
+        }
+
+        /* Area Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+                z-index: 10000;
+            }
+
+            .sidebar {
+                left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                position: relative;
+                z-index: 1;
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-btn {
+                display: none;
+            }
+
+            body {
+                flex-direction: column;
+            }
+        }
+
+        /* Antrian Page Specific Styles */
+        .queue-container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            max-width: 700px;
+            margin: 20px auto;
+            text-align: center;
+            position: relative;
+        }
+
+        .queue-container h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+
+        .queue-info {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: var(--light-color);
+        }
+
+        .queue-info p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .queue-number {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 20px 0;
+            display: block;
+        }
+
+        /* Styling for "Antrian Saat Ini" in its new position */
+        .current-queue {
+            margin-top: 20px; /* Space from the elements above it */
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            font-weight: bold;
+            display: block; /* Ensure it takes its own line */
+        }
+
+
+        .action-buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .action-buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-buttons .btn-check-in {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .action-buttons .btn-check-in:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .action-buttons .btn-cancel {
+            background-color: #f44336;
+            color: var(--white);
+        }
+
+        .action-buttons .btn-cancel:hover {
+            background-color: #d32f2f;
+        }
+
+        .action-buttons .btn-print { /* New style for print button */
+            background-color: #2196F3; /* Blue color */
+            color: var(--white);
+        }
+
+        .action-buttons .btn-print:hover {
+            background-color: #1976D2; /* Darker blue */
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 10001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            padding-top: 60px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-backdrop.modal-active {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 15% from the top and centered */
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close:hover,
+        .modal-close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+        }
+
+        .modal-content p {
+            font-size: 1.1rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .modal-buttons .btn-confirm {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .modal-buttons .btn-confirm:hover {
+            background-color: var(--primary-dark);
+        }
+        .modal-buttons .btn-cancel-modal {
+            background-color: #ddd;
+            color: var(--secondary-color);
+        }
+        .modal-buttons .btn-cancel-modal:hover {
+            background-color: #ccc;
+        }
+
+        /*
+        // @media print block commented out to allow full web page printing
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background: none;
+            }
+            body > *:not(.queue-container) {
+                display: none;
+            }
+            .queue-container {
+                display: block;
+                width: 100%;
+                max-width: none;
+                margin: 10mm;
+                padding: 20mm;
+                box-shadow: none;
+                border: none;
+                border-radius: 0;
+                text-align: center;
+                background-color: #fff;
+            }
+            .queue-container h2 {
+                font-size: 2rem;
+                margin-bottom: 20px;
+                color: #333;
+            }
+            .queue-info {
+                margin-top: 30px;
+                padding: 20px;
+                border: 1px solid #ddd;
+                background-color: #f9f9f9;
+            }
+            .queue-info p {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+            .queue-number {
+                font-size: 5rem;
+                margin: 20px 0;
+                color: var(--primary-dark);
+            }
+            .current-queue {
+                font-size: 1.5rem;
+                margin-top: 20px;
+            }
+            .action-buttons {
+                display: none;
+            }
+        }
+        */
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="pendaftaran_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Pendaftaran Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_d.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="antrian.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Antrian Pemeriksaan</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="transaksi.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="riwayat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Riwayat Pasien</div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="queue-container">
+            <h2>Antrian Pemeriksaan Anda</h2>
+            <div class="queue-info">
+                <p>Nomor Antrian Anda:</p>
+                <span class="queue-number" id="queueNumber">--</span>
+                <p>Jenis Layanan: <span id="serviceType">--</span></p>
+                <p>Poli: <span id="poliDisplay">--</span></p>
+                <p>Dokter: <span id="dokterDisplay">--</span></p>
+                <p class="current-queue">Antrian Saat Ini: <span id="currentQueue">--</span></p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-check-in" id="checkInBtn">Check-in</button>
+                <button class="btn-cancel" id="cancelBtn">Batalkan Antrian</button>
+                <button class="btn-print" id="printBtn">Cetak Antrian</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Berhasil Check-in!</h3>
+            <p>Antrian Anda telah dikonfirmasi. Mohon menunggu panggilan.</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Konfirmasi Pembatalan</h3>
+            <p>Apakah Anda yakin ingin membatalkan antrian ini?</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" id="confirmCancelBtn">Ya, Batalkan</button>
+                <button class="btn-cancel-modal" data-dismiss="modal">Tidak</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cancelSuccessModal" class="modal-backdrop">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Antrian Dibatalkan</h3>
+            <p>Antrian Anda telah berhasil dibatalkan.</p>
+            <div class="modal-buttons">
+                <button class="btn-confirm" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar and Mobile Menu Toggle (Copied from dashboard_adm.html)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+        const mainContent = document.getElementById('main-content');
+
+          // Fungsi untuk memeriksa akses berdasarkan peran
+        function checkAccess(allowedRoles) {
+            const user = sessionStorage.getItem('loggedInUser');
+            if (user) {
+                const loggedInUser = JSON.parse(user);
+                if (!allowedRoles.includes(loggedInUser.role)) {
+                    alert('Anda tidak memiliki akses ke halaman ini.');
+                    sessionStorage.clear();
+                    window.location.href = '/index.html';
+                }
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+ // Jalankan pemeriksaan akses terlebih dahulu
+        checkAccess(['pasien']);
+
+        // Toggle sidebar for desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('minimized');
+                // Adjust main content margin based on sidebar state
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            });
+        }
+
+        // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
+        if (menuIcon) {
+            menuIcon.addEventListener('click', () => {
+                // For mobile, this should close the sidebar if open
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+                // For desktop, this toggles minimization
+                else {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                }
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Prevent sidebar clicks from propagating to mainContent to close it
+        sidebar.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+
+        // Initialize the app
+        function init() {
+            // Check screen width on load and apply initial sidebar state
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
+                sidebar.classList.remove('active'); // Ensure hidden by default
+                mainContent.style.marginLeft = '0';
+            } else {
+                sidebar.classList.remove('active'); // Ensure not active on desktop
+                mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
+            }
+        }
+
+        // Run initialization
+        init();
+
+        // Adjust main content margin on window resize for desktop view
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+                sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+
+        // --- Antrian Page Specific JavaScript ---
+        let currentQueueInterval; // Declare a variable to hold the interval ID
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // First, try to load data from localStorage
+            let queueData = JSON.parse(localStorage.getItem('currentQueueData'));
+
+            if (queueData) {
+                // If data exists in localStorage, display it
+                displayQueueInfo(queueData.queueNumber, queueData.serviceType, queueData.poli, queueData.dokter);
+            } else {
+                // If not in localStorage, check URL parameters (for new registrations)
+                const urlParams = new URLSearchParams(window.location.search);
+                const queueNumberStr = urlParams.get('queue');
+                const serviceType = urlParams.get('service');
+                const poli = urlParams.get('poli');
+                const dokter = urlParams.get('dokter');
+
+                if (queueNumberStr) { // Only if a new queue number is provided
+                    const newQueueData = {
+                        queueNumber: queueNumberStr,
+                        serviceType: serviceType,
+                        poli: poli,
+                        dokter: dokter
+                    };
+                    // Save new data to localStorage
+                    localStorage.setItem('currentQueueData', JSON.stringify(newQueueData));
+                    displayQueueInfo(newQueueData.queueNumber, newQueueData.serviceType, newQueueData.poli, newQueueData.dokter);
+                } else {
+                    // No queue data found anywhere, reset display
+                    resetQueueDisplay();
+                }
+            }
+
+            // Start updating current queue display
+            startCurrentQueueUpdate();
+        });
+
+        function displayQueueInfo(queueNumber, serviceType, poli, dokter) {
+            document.getElementById('queueNumber').textContent = queueNumber || '--';
+            document.getElementById('serviceType').textContent = serviceType || '--';
+            document.getElementById('poliDisplay').textContent = poli || '--';
+            document.getElementById('dokterDisplay').textContent = dokter || '--';
+            // Enable buttons if there's queue data
+            document.getElementById('checkInBtn').disabled = false;
+            document.getElementById('cancelBtn').disabled = false;
+            document.getElementById('printBtn').disabled = false; // Enable print button
+        }
+
+        function resetQueueDisplay() {
+            document.getElementById('queueNumber').textContent = '--';
+            document.getElementById('serviceType').textContent = '--';
+            document.getElementById('poliDisplay').textContent = '--';
+            document.getElementById('dokterDisplay').textContent = '--';
+            document.getElementById('currentQueue').textContent = '--'; // Ensure current queue also resets
+            document.getElementById('checkInBtn').disabled = true;
+            document.getElementById('cancelBtn').disabled = true;
+            document.getElementById('printBtn').disabled = true; // Disable print button
+            clearInterval(currentQueueInterval); // Stop the interval when queue is reset
+        }
+
+        function startCurrentQueueUpdate() {
+            const userQueueNumberStr = document.getElementById('queueNumber').textContent;
+            const userQueueNumber = parseInt(userQueueNumberStr.replace('Q-', ''));
+
+            // Clear any existing interval to prevent multiple intervals running
+            if (currentQueueInterval) {
+                clearInterval(currentQueueInterval);
+            }
+
+            if (!isNaN(userQueueNumber) && userQueueNumber > 0) {
+                // Start 20 numbers before user's queue, or at 1
+                let currentQueue = Math.max(1, userQueueNumber - 20);
+                document.getElementById('currentQueue').textContent = currentQueue;
+
+                currentQueueInterval = setInterval(() => {
+                    if (currentQueue < userQueueNumber) {
+                        currentQueue++;
+                        document.getElementById('currentQueue').textContent = currentQueue;
+                    } else {
+                        // If it reaches or exceeds user's number, stop the interval
+                        clearInterval(currentQueueInterval);
+                    }
+                }, 5000); // Updated to 5 seconds (5000ms)
+            } else {
+                document.getElementById('currentQueue').textContent = '--';
+            }
+        }
+
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('modal-active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('modal-active');
+        }
+
+        // Close Button Event Listeners
+        document.querySelectorAll('.modal-close, [data-dismiss="modal"]').forEach(element => {
+            element.addEventListener('click', event => {
+                const modal = event.target.closest('.modal-backdrop');
+                modal.classList.remove('modal-active');
+            });
+        });
+
+        // Check-In Button Event Listener
+        document.getElementById('checkInBtn').addEventListener('click', () => {
+            openModal('successModal');
+            // NO LONGER REMOVING FROM LOCAL STORAGE OR RESETTING DISPLAY HERE
+            // The queue data will persist after check-in.
+            // You might want to disable the check-in button after successful check-in
+            document.getElementById('checkInBtn').disabled = true;
+        });
+
+        // Cancel Button Event Listener
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            openModal('confirmModal');
+        });
+
+        // Confirm Cancel Button Event Listener
+        document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+            closeModal('confirmModal');
+            openModal('cancelSuccessModal');
+            // When queue is cancelled, clear the queue data from localStorage
+            localStorage.removeItem('currentQueueData');
+            resetQueueDisplay(); // Clear display immediately and stop interval
+        });
+
+        // Print Button Event Listener
+        document.getElementById('printBtn').addEventListener('click', () => {
+            window.print();
+        });
+
+
+        // Close Modals When Clicking Outside
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.addEventListener('click', event => {
+                if (event.target === backdrop) {
+                    backdrop.classList.remove('modal-active');
+                }
+            });
+        });
+
+        // --- User Data Handling ---
+        const userNameSpan = document.getElementById('userName'); // Assuming you have an element with id="userName" in your header
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+
+        if (loggedInUser && loggedInUser.role === 'pasien') {
+            // Check if userNameSpan exists before trying to set textContent
+            if (userNameSpan) {
+                userNameSpan.textContent = loggedInUser.nama || 'Pasien'; // Display the patient's name
+            }
+        } else {
+            // If no user is logged in or role is not patient, redirect to login page
+            // Consider if this should always happen if userNameSpan is not found,
+            // or if antrian.html can be accessed directly without a logged-in user.
+            // For now, keeping the original logic:
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Tambah Akun</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variabel CSS (dari dashboard_adm.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+            --border-color: #ddd; /* Added for table borders consistency */
+
+            /* Warna baru untuk tombol laporan sesuai gambar */
+            --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
+            --report-print-bg: #3498DB; /* Biru untuk Cetak */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden; /* Mencegah scrollbar horizontal pada body secara keseluruhan */
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100;
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar.active ~ .mobile-toggle {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg);
+        }
+
+        /* Area Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centers content horizontally within main-content */
+        }
+
+        .sidebar.minimized + .main-content {
+            margin-left: var(--sidebar-minimized-width);
+        }
+
+        /* Content Sections */
+        .content-section {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            width: 100%; /* Ensures it fills the width of its parent */
+            max-width: 1200px; /* Optional: Sets a max-width for very wide screens */
+            margin-left: auto; /* Centers the content-section if max-width is applied */
+            margin-right: auto; /* Centers the content-section if max-width is applied */
+            padding-top: 20px; /* Added some top padding to content section */
+        }
+
+        .content-section h2 { /* Added for the section header */
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .content-section h3 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        /* Styles for tables */
+        .table-responsive { /* Wrapper for scroll */
+            margin-top: 20px;
+            overflow-x: auto; /* This is crucial for horizontal scrolling */
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 100%; /* Ensures it fills the container */
+        }
+
+        table { /* Applying styles directly to the table element within .table-responsive */
+            width: 100%; /* Table will fill 100% of .table-responsive */
+            border-collapse: collapse;
+            margin-bottom: 0;
+            min-width: 650px; /* **Increase this if the table is still getting too narrow** */
+                               /* This ensures the table itself has a minimum width, triggering overflow-x on .table-responsive */
+            background-color: var(--white);
+        }
+
+        table th, table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.9em;
+            white-space: nowrap; /* Important: prevents text wrap in cells, enabling horizontal scroll */
+        }
+
+        table thead th { /* Specific for header */
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Styles specific to tambah_akun.html content - keeping form styles */
+        .card {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            width: 100%; /* Ensures form fills 100% of content-section */
+            max-width: 800px; /* Optional: Limits form width */
+            margin-left: auto; /* Centers form if max-width is applied */
+            margin-right: auto; /* Centers form if max-width is applied */
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"], input[type="email"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-start;
+        }
+        .btn { /* General button style */
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .action-buttons .btn { /* Specific styles for action buttons in table */
+            padding: 8px 12px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .action-buttons .btn-edit {
+            background-color: #2196F3;
+            color: #fff;
+        }
+        .action-buttons .btn-edit:hover {
+            background-color: #1976D2;
+        }
+
+        /* Alert styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 1rem;
+            display: none; /* Hidden by default */
+        }
+        .alert-success {
+            background-color: var(--success-color);
+            color: var(--white);
+        }
+        .alert-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+        .modal-content .button-group {
+            justify-content: center;
+        }
+
+        /* Search and Add Container */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .section-header h2 {
+            margin-bottom: 0;
+            margin-right: 20px; /* Space between title and search */
+        }
+
+        .search-add-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap; /* Allow wrapping of search and add button */
+        }
+
+        .search-input-container {
+            position: relative;
+            flex-grow: 1; /* Allow search input to grow */
+            min-width: 200px; /* Minimum width for search input */
+        }
+
+        .search-input-container input {
+            padding-left: 40px; /* Space for the icon */
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .btn-add {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-add:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+                z-index: 10000;
+                top: 10px; /* Adjusted position */
+                left: 10px; /* Adjusted position */
+                font-size: 1.8rem;
+                padding: 8px 12px;
+            }
+
+            .sidebar {
+                left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                align-items: flex-start; /* Content starts from left on mobile */
+                padding: 15px; /* Slightly smaller padding on mobile */
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-btn {
+                display: none;
+            }
+
+            body {
+                flex-direction: column;
+            }
+
+            .content-section {
+                padding: 15px; /* Smaller padding for content on mobile */
+                margin-top: 60px; /* Push content down to clear fixed mobile toggle */
+            }
+
+            .section-header {
+                flex-direction: column; /* Stack header items vertically */
+                align-items: flex-start; /* Align stacked items to the left */
+                gap: 15px;
+            }
+
+            .section-header h2 {
+                margin-bottom: 0;
+                margin-right: 0;
+            }
+
+            .search-add-container {
+                width: 100%; /* Make search/add container full width */
+                flex-direction: column; /* Stack search and add button */
+                align-items: stretch; /* Stretch items to fill width */
+                gap: 10px;
+            }
+
+            .search-input-container {
+                width: 100%; /* Search input takes full width */
+                min-width: unset; /* Remove min-width constraint */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle"> ≡ </div>
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_adm.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_dokter.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 3v6a6 6 0 0 0 12 0V3"></path>
+                            <circle cx="12" cy="14" r="4"></circle>
+                            <line x1="12" y1="18" x2="12" y2="21"></line>
+                            <line x1="9" y1="21" x2="15" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_obat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="9"></line>
+                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                            <line x1="9" y1="19" x2="15" y2="19"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Obat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="t-pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="tambah_akun.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="17" y1="11" x2="23" y2="11"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Tambah Akun</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="laporan.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Laporan</div>
+                </a>
+            </li>
+        </ul>
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="17 16 22 11 17 6"></polyline>
+                        <line x1="22" y1="11" x2="10" y2="11"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">Logout</div>
+            </a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="content-section">
+            <div class="section-header">
+                <h2>Manajemen Akun</h2>
+                <div class="search-add-container">
+                    <div class="search-input-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" placeholder="Cari Akun..." id="searchFilterInput">
+                    </div>
+                    <button class="btn btn-add" id="toggleFormBtn">
+                        <i class="fas fa-plus"></i> Tambah Akun Baru
+                    </button>
+                </div>
+            </div>
+
+            <div class="card form-container" id="accountFormContainer">
+                <h3><span id="formTitle">Tambah</span> Akun Baru</h3>
+                <div id="successAlert" class="alert alert-success"></div>
+                <div id="errorAlert" class="alert alert-danger"></div>
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role:</label>
+                        <select id="role" required>
+                            <option value="">Pilih Role</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Dokter">Dokter</option>
+                            <option value="Perawat">Perawat</option>
+                            <option value="Apoteker">Apoteker</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary" id="saveAccountBtn">Simpan</button>
+                        <button type="button" class="btn btn-danger" id="cancelFormBtn">Batal</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table id="accountTable">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeDeleteModalBtn">&times;</span>
+            <h3>Konfirmasi Hapus</h3>
+            <p>Apakah Anda yakin ingin menghapus akun ini?</p>
+            <div class="button-group">
+                <button class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
+                <button class="btn btn-primary" id="cancelDeleteBtn">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to load user data from sessionStorage and display it
+            function loadUserData() {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    // Update welcome message
+                    const welcomeUserElement = document.getElementById('welcome-user'); // Dapatkan elemen span
+                    if (welcomeUserElement) {
+                        // Tampilkan nama jika ada, jika tidak, tampilkan email
+                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
+                    }
+                } else {
+                    // Redirect jika tidak ada data user di sessionStorage
+                    window.location.href = '/index.html';
+                }
+            }
+
+            // Fungsi untuk memeriksa akses berdasarkan peran
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
+                        alert('Anda tidak memiliki akses ke halaman ini.');
+                        sessionStorage.clear(); // Hapus sesi jika tidak punya akses
+                        window.location.href = '/index.html'; // Redirect ke login
+                    }
+                } else {
+                    window.location.href = '/index.html'; // Belum login
+                }
+            }
+
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['admin']); // Hanya 'admin' role yang bisa mengakses halaman ini
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('minimized');
+                });
+            }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active') &&
+                    !sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            // Account form and table elements
+            const toggleFormBtn = document.getElementById('toggleFormBtn');
+            const accountFormContainer = document.getElementById('accountFormContainer');
+            const userForm = document.getElementById('userForm');
+            const formTitle = document.getElementById('formTitle');
+            const cancelFormBtn = document.getElementById('cancelFormBtn');
+            const accountTableBody = document.getElementById('accountTable').getElementsByTagName('tbody')[0];
+            const searchFilterInput = document.getElementById('searchFilterInput');
+
+            // Form input fields
+            const userIdInput = document.getElementById('userId');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const roleInput = document.getElementById('role');
+
+            // Alerts
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+
+            // Delete modal elements
+            const deleteModal = document.getElementById('deleteModal');
+            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+            let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+            let currentAccountIdToDelete = null;
+
+            function generateId() {
+                return 'USR-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+            }
+
+            function displayAccounts(filter = '') {
+                accountTableBody.innerHTML = '';
+                const filteredAccounts = accounts.filter(account =>
+                    account.email.toLowerCase().includes(filter.toLowerCase()) ||
+                    account.role.toLowerCase().includes(filter.toLowerCase())
+                );
+
+                filteredAccounts.forEach(account => {
+                    const row = accountTableBody.insertRow();
+                    row.dataset.id = account.id;
+
+                    row.insertCell(0).textContent = account.email;
+                    row.insertCell(1).textContent = account.role;
+
+                    const actionCell = row.insertCell(2);
+                    actionCell.classList.add('action-buttons');
+                    actionCell.innerHTML = `
+                        <button class="btn btn-edit"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger delete-btn"><i class="fas fa-trash"></i> Hapus</button>
+                    `;
+
+                    actionCell.querySelector('.btn-edit').addEventListener('click', () => editAccount(account.id));
+                    actionCell.querySelector('.delete-btn').addEventListener('click', () => showDeleteModal(account.id));
+                });
+            }
+
+            function saveAccount(event) {
+                event.preventDefault();
+
+                const id = userIdInput.value || generateId();
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                const role = roleInput.value;
+
+                if (!email || !password || !role) {
+                    showAlert(errorAlert, 'Harap isi semua field yang diperlukan!');
+                    return;
+                }
+
+                const newAccount = { id, email, password, role };
+
+                const existingIndex = accounts.findIndex(acc => acc.id === id);
+                if (existingIndex > -1) {
+                    accounts[existingIndex] = newAccount;
+                    showAlert(successAlert, 'Akun berhasil diperbarui!');
+                } else {
+                    // Check if email already exists for new account
+                    if (accounts.some(acc => acc.email === email)) {
+                        showAlert(errorAlert, 'Email sudah ada. Harap gunakan email lain.');
+                        return;
+                    }
+                    accounts.push(newAccount);
+                    showAlert(successAlert, 'Akun berhasil ditambahkan!');
+                }
+
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                userForm.reset();
+                hideForm();
+                displayAccounts();
+            }
+
+            function editAccount(id) {
+                const account = accounts.find(acc => acc.id === id);
+                if (account) {
+                    showForm(true);
+                    formTitle.textContent = 'Edit';
+                    userIdInput.value = account.id;
+                    emailInput.value = account.email;
+                    passwordInput.value = account.password; // Note: In a real app, never pre-fill password for security
+                    roleInput.value = account.role;
+                }
+            }
+
+            function showDeleteModal(id) {
+                currentAccountIdToDelete = id;
+                deleteModal.style.display = 'flex'; // Use flex to center the modal
+            }
+
+            function deleteAccount() {
+                accounts = accounts.filter(acc => acc.id !== currentAccountIdToDelete);
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                deleteModal.style.display = 'none';
+                showAlert(successAlert, 'Akun berhasil dihapus!');
+                displayAccounts();
+            }
+
+            function showForm(isEdit = false) {
+                accountFormContainer.style.display = 'block';
+                formTitle.textContent = isEdit ? 'Edit' : 'Tambah';
+                if (!isEdit) {
+                    userForm.reset();
+                    userIdInput.value = ''; // Clear ID for new accounts
+                }
+                successAlert.style.display = 'none'; // Hide alerts when showing form
+                errorAlert.style.display = 'none';
+                // Scroll to form
+                accountFormContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function hideForm() {
+                accountFormContainer.style.display = 'none';
+                userForm.reset();
+                userIdInput.value = '';
+            }
+
+            function showAlert(alertElement, message) {
+                alertElement.textContent = message;
+                alertElement.style.display = 'block';
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 3000); // Hide alert after 3 seconds
+            }
+
+            // Event Listeners
+            toggleFormBtn.addEventListener('click', function() {
+                if (accountFormContainer.style.display === 'none' || accountFormContainer.style.display === '') {
+                    showForm(false);
+                } else {
+                    hideForm();
+                }
+            });
+            cancelFormBtn.addEventListener('click', hideForm);
+            userForm.addEventListener('submit', saveAccount);
+
+            closeDeleteModalBtn.addEventListener('click', () => deleteModal.style.display = 'none');
+            cancelDeleteBtn.addEventListener('click', () => deleteModal.style.display = 'none');
+            confirmDeleteBtn.addEventListener('click', deleteAccount);
+
+            searchFilterInput.addEventListener('keyup', () => displayAccounts(searchFilterInput.value));
+
+            // Close delete modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+
+            // Initial display (hide form by default)
+            hideForm();
+            displayAccounts();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Obat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Variabel CSS (dari t-pasien.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1; /* Align text vertically */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0;
+            justify-content: center;
+            display: flex;
+            width: 100%;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg);
+        }
+
+        /* Area Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+                z-index: 10000;
+            }
+
+            .sidebar {
+                left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                position: relative;
+                z-index: 1;
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-btn {
+                display: none;
+            }
+
+            body {
+                flex-direction: column;
+            }
+        }
+
+        /* Table Specific Styles */
+        .table-container {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            overflow-x: auto; /* Enable horizontal scrolling for tables on small screens */
+            /* Center the table container itself */
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%; /* Ensure it doesn't overflow */
+        }
+
+        .table-container h2 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-size: 1.8em;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 10px; /* Space between items when wrapped */
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 200px;
+        }
+
+        .btn-action {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none; /* For link buttons */
+        }
+
+        .btn-add {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        .btn-add:hover {
+            background-color: #008f6b;
+        }
+
+        .btn-print {
+            background-color: #007bff; /* Blue for print */
+            color: var(--white);
+        }
+
+        .btn-print:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th, table td {
+            border: 1px solid #eee;
+            padding: 12px 15px;
+            text-align: left; /* Default for screen, will be overridden by print for centering */
+            font-size: 0.95em;
+        }
+
+        table th {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-buttons button, .action-buttons a {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 0 5px;
+            transition: color 0.2s ease;
+            color: #666; /* Default color for icons */
+            padding: 0; /* Remove padding from button */
+            display: inline-flex; /* Align icon better */
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .action-buttons button:hover .fa-edit { color: #007bff; } /* Blue for edit */
+        .action-buttons button:hover .fa-trash-alt { color: var(--danger-color); } /* Red for delete */
+        .action-buttons button:hover .fa-info-circle { color: #28a745; } /* Green for info */
+
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-save {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        .btn-save:hover {
+            background-color: #008f6b;
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background-color: #bbb;
+        }
+
+        /* Detail Modal specific styles */
+        #detailModal .modal-content {
+            max-width: 450px;
+        }
+
+        #detailModal p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        #detailModal p strong {
+            color: var(--secondary-color);
+            display: inline-block;
+            width: 120px; /* Align labels */
+        }
+
+        /* --- Print Specific Styles --- */
+        @media print {
+            body {
+                background-color: #fff; /* White background for print */
+                display: block; /* Override flex for printing */
+                margin: 0;
+                padding: 0;
+            }
+
+            .sidebar, .mobile-toggle, .toggle-btn, .action-bar, .modal, .main-content > h2 {
+                display: none !important; /* Hide sidebar, toggles, action bar, modals, and the main heading for printing */
+            }
+
+            .main-content {
+                margin-left: 0 !important; /* Remove margin from sidebar */
+                width: 100% !important;
+                padding: 20px; /* Adjust padding for print layout */
+            }
+
+            .table-container {
+                box-shadow: none; /* Remove shadow for printing */
+                border: 1px solid #ccc; /* Add a border around the table for clarity */
+                padding: 0; /* Remove padding from container to let table manage it */
+                margin: 0 auto; /* Center the table container on the page */
+                width: 95%; /* Adjust width for better print layout */
+            }
+
+            .table-container h2 {
+                display: block !important; /* Show the table title for print */
+                text-align: center; /* Center the table title */
+                margin-bottom: 15px;
+                font-size: 1.5em;
+                color: #000;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 0; /* Remove top margin */
+            }
+
+            table th, table td {
+                border: 1px solid #ccc; /* Ensure borders are visible in print */
+                padding: 8px 12px;
+                text-align: center; /* Center all table cells by default for print */
+                font-size: 0.85em; /* Slightly smaller font for print */
+            }
+
+            /* Align specific columns to the left for print */
+            table th:nth-child(1), /* ID */
+            table td:nth-child(1),
+            table th:nth-child(2), /* Nama Obat */
+            table td:nth-child(2),
+            table th:nth-child(3), /* Kategori */
+            table td:nth-child(3) {
+                text-align: left;
+            }
+
+            /* Exclude the "Aksi" column from printing entirely as it's interactive */
+            table th:last-child,
+            table td:last-child {
+                display: none; /* Hide the Aksi column for printing */
+            }
+
+            /* Ensure table rows look good */
+            table tr:nth-child(even) {
+                background-color: #f2f2f2; /* Lighter background for even rows */
+            }
+            table tr:hover {
+                background-color: #f2f2f2; /* Remove hover effect for print */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_apt.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_obat.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Obat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jualbeli_obat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Obat</div>
+                </a>
+            </li>
+        </ul>
+
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="table-container">
+            <h2>Data Obat</h2>
+            <div class="action-bar">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Cari obat...">
+                    <button class="btn-action btn-add" id="searchBtn">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                </div>
+                <div>
+                    <button class="btn-action btn-add" id="addDrugBtn">
+                        <i class="fas fa-plus"></i> Tambah Obat
+                    </button>
+                    <button class="btn-action btn-print" id="printTableBtn">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama Obat</th>
+                        <th>Kategori</th>
+                        <th>Stok</th>
+                        <th>Harga Jual</th>
+                        <th>Tanggal Kadaluarsa</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="drugTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="drugModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Tambah/Edit Obat</h2>
+            <form id="drugForm">
+                <input type="hidden" id="drugId">
+                <div class="form-group">
+                    <label for="namaObat">Nama Obat:</label>
+                    <input type="text" id="namaObat" required>
+                </div>
+                <div class="form-group">
+                    <label for="kategori">Kategori:</label>
+                    <input type="text" id="kategori" required>
+                </div>
+                <div class="form-group">
+                    <label for="stok">Stok:</label>
+                    <input type="number" id="stok" required>
+                </div>
+                <div class="form-group">
+                    <label for="hargaBeli">Harga Beli (per unit):</label>
+                    <input type="number" id="hargaBeli" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="hargaJual">Harga Jual (per unit):</label>
+                    <input type="number" id="hargaJual" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="tanggalKadaluarsa">Tanggal Kadaluarsa:</label>
+                    <input type="date" id="tanggalKadaluarsa" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-modal btn-cancel" id="cancelDrugBtn">Batal</button>
+                    <button type="submit" class="btn-modal btn-save">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Detail Obat</h2>
+            <p><strong>ID Obat:</strong> <span id="detailId"></span></p>
+            <p><strong>Nama Obat:</strong> <span id="detailNamaObat"></span></p>
+            <p><strong>Kategori:</strong> <span id="detailKategori"></span></p>
+            <p><strong>Stok:</strong> <span id="detailStok"></span></p>
+            <p><strong>Harga Beli:</strong> <span id="detailHargaBeli"></span></p>
+            <p><strong>Harga Jual:</strong> <span id="detailHargaJual"></span></p>
+            <p><strong>Tanggal Kadaluarsa:</strong> <span id="detailTanggalKadaluarsa"></span></p>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+    const mainContent = document.getElementById('mainContent');
+    const logoutLink = document.querySelector('.logout-link');
+
+    const drugTableBody = document.getElementById('drugTableBody');
+    const addDrugBtn = document.getElementById('addDrugBtn');
+    const drugModal = document.getElementById('drugModal');
+    const drugForm = document.getElementById('drugForm');
+    const cancelDrugBtn = document.getElementById('cancelDrugBtn');
+    const closeButtons = document.querySelectorAll('.close-button');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const printTableBtn = document.getElementById('printTableBtn');
+
+    const detailModal = document.getElementById('detailModal');
+// Fungsi untuk memeriksa akses berdasarkan peran
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
+                        alert('Anda tidak memiliki akses ke halaman ini.'); //
+                        sessionStorage.clear(); // Hapus sesi jika tidak punya akses
+                        window.location.href = '/index.html'; // Redirect ke login
+                    }
+                } else {
+                    window.location.href = '/index.html'; // Belum login
+                }
+            }
+
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['apoteker']); // Hanya 'apoteker' role yang bisa mengakses halaman ini
+
+            // Call loadUserData immediately when the script loads
+            // Note: loadUserData is not defined in the provided HTML.
+            // If it's meant to load user data, ensure it's defined elsewhere or removed if not needed.
+            // loadUserData(); 
+
+
+    // Toggle sidebar for desktop
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('minimized');
+            if (sidebar.classList.contains('minimized')) {
+                mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+            } else {
+                mainContent.style.marginLeft = 'var(--sidebar-width)';
+            }
+        });
+    }
+
+    // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+            sidebar.classList.toggle('active');
+        });
+    }
+
+    // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
+    if (menuIcon) {
+        menuIcon.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+            } else {
+                sidebar.classList.toggle('minimized');
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            }
+        });
+    }
+
+    // Close sidebar when clicking outside on mobile
+    mainContent.addEventListener('click', () => {
+        if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    });
+
+    // Prevent sidebar clicks from propagating to mainContent to close it
+    sidebar.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
+    // Logout functionality
+    if (logoutLink) {
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser'); // Consistent with dashboard_apt.html
+            window.location.href = '/index.html'; // Redirect to login page
+        });
+    }
+
+    // Adjust main content margin on window resize for desktop view
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            if (sidebar.classList.contains('minimized')) {
+                mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+            } else {
+                mainContent.style.marginLeft = 'var(--sidebar-width)';
+            }
+            sidebar.classList.remove('active');
+        } else {
+            mainContent.style.marginLeft = '0';
+        }
+    });
+
+    // Initial margin adjustment based on screen size on page load
+    if (window.innerWidth <= 768) {
+        mainContent.style.marginLeft = '0';
+    } else {
+        if (sidebar.classList.contains('minimized')) {
+            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+        } else {
+            mainContent.style.marginLeft = 'var(--sidebar-width)';
+        }
+    }
+
+
+    // --- Drug Data Management Functions ---
+    let drugs = JSON.parse(localStorage.getItem('drugs')) || [];
+    let currentDrugId = 0; // To keep track of the next available ID for new drugs
+
+    // Initialize currentDrugId based on existing drugs
+    if (drugs.length > 0) {
+        currentDrugId = Math.max(...drugs.map(d => d.id)) + 1;
+    } else {
+        currentDrugId = 1; // Start from 1 if no drugs exist
+    }
+
+
+    function renderDrugTable(filter = '') {
+        drugTableBody.innerHTML = '';
+        const filteredDrugs = drugs.filter(drug =>
+            drug.namaObat.toLowerCase().includes(filter.toLowerCase()) ||
+            drug.kategori.toLowerCase().includes(filter.toLowerCase())
+        );
+
+        filteredDrugs.forEach(drug => {
+            const row = drugTableBody.insertRow();
+            row.insertCell().textContent = drug.id;
+            row.insertCell().textContent = drug.namaObat;
+            row.insertCell().textContent = drug.kategori;
+            row.insertCell().textContent = drug.stok;
+            row.insertCell().textContent = formatRupiah(drug.hargaJual);
+            row.insertCell().textContent = drug.tanggalKadaluarsa;
+
+            const actionsCell = row.insertCell();
+            actionsCell.classList.add('action-buttons');
+
+            const detailBtn = document.createElement('button');
+            detailBtn.innerHTML = '<i class="fas fa-info-circle"></i>';
+            detailBtn.title = 'Detail';
+            detailBtn.onclick = () => showDrugDetail(drug.id);
+            actionsCell.appendChild(detailBtn);
+
+            const editBtn = document.createElement('button');
+            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+            editBtn.title = 'Edit';
+            editBtn.onclick = () => editDrug(drug.id);
+            actionsCell.appendChild(editBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteBtn.title = 'Hapus';
+            deleteBtn.onclick = () => deleteDrug(drug.id);
+            actionsCell.appendChild(deleteBtn);
+        });
+    }
+
+    function addDrug() {
+        drugForm.reset();
+        document.getElementById('drugId').value = '';
+        document.querySelector('#drugModal h2').textContent = 'Tambah Obat';
+        drugModal.style.display = 'flex';
+    }
+
+    function editDrug(id) {
+        const drug = drugs.find(d => d.id === id);
+        if (drug) {
+            document.getElementById('drugId').value = drug.id;
+            document.getElementById('namaObat').value = drug.namaObat;
+            document.getElementById('kategori').value = drug.kategori;
+            document.getElementById('stok').value = drug.stok;
+            document.getElementById('hargaBeli').value = drug.hargaBeli;
+            document.getElementById('hargaJual').value = drug.hargaJual;
+            document.getElementById('tanggalKadaluarsa').value = drug.tanggalKadaluarsa;
+            document.querySelector('#drugModal h2').textContent = 'Edit Obat';
+            drugModal.style.display = 'flex';
+        }
+    }
+
+    function saveDrug(e) {
+        e.preventDefault();
+
+        const id = document.getElementById('drugId').value;
+        const namaObat = document.getElementById('namaObat').value;
+        const kategori = document.getElementById('kategori').value;
+        const stok = parseInt(document.getElementById('stok').value);
+        const hargaBeli = parseFloat(document.getElementById('hargaBeli').value);
+        const hargaJual = parseFloat(document.getElementById('hargaJual').value);
+        const tanggalKadaluarsa = document.getElementById('tanggalKadaluarsa').value;
+
+        if (id) {
+            // Update existing drug
+            const drugIndex = drugs.findIndex(d => d.id == id);
+            if (drugIndex > -1) {
+                drugs[drugIndex] = {
+                    id: parseInt(id),
+                    namaObat,
+                    kategori,
+                    stok,
+                    hargaBeli,
+                    hargaJual,
+                    tanggalKadaluarsa
+                };
+            }
+        } else {
+            // Add new drug
+            const newDrug = {
+                id: currentDrugId++, // Use and increment currentDrugId
+                namaObat,
+                kategori,
+                stok,
+                hargaBeli,
+                hargaJual,
+                tanggalKadaluarsa
+            };
+            drugs.push(newDrug);
+        }
+
+        localStorage.setItem('drugs', JSON.stringify(drugs));
+        renderDrugTable();
+        drugModal.style.display = 'none';
+    }
+
+    function deleteDrug(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus obat ini?')) {
+            drugs = drugs.filter(drug => drug.id !== id);
+            localStorage.setItem('drugs', JSON.stringify(drugs));
+            renderDrugTable();
+        }
+    }
+
+    function showDrugDetail(id) {
+        const drug = drugs.find(d => d.id === id);
+        if (drug) {
+            document.getElementById('detailId').textContent = drug.id;
+            document.getElementById('detailNamaObat').textContent = drug.namaObat;
+            document.getElementById('detailKategori').textContent = drug.kategori;
+            document.getElementById('detailStok').textContent = drug.stok;
+            document.getElementById('detailHargaBeli').textContent = formatRupiah(drug.hargaBeli);
+            document.getElementById('detailHargaJual').textContent = formatRupiah(drug.hargaJual);
+            document.getElementById('detailTanggalKadaluarsa').textContent = drug.tanggalKadaluarsa;
+            detailModal.style.display = 'flex';
+        }
+    }
+
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(number);
+    }
+
+    // Event Listeners
+    addDrugBtn.addEventListener('click', addDrug);
+    drugForm.addEventListener('submit', saveDrug);
+    cancelDrugBtn.addEventListener('click', () => drugModal.style.display = 'none');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            button.closest('.modal').style.display = 'none';
+        });
+    });
+
+    searchInput.addEventListener('input', (e) => renderDrugTable(e.target.value));
+    searchBtn.addEventListener('click', () => renderDrugTable(searchInput.value));
+
+    printTableBtn.addEventListener('click',function () {
+                    window.print();
+                });
+    
+    // Initial render
+    renderDrugTable();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Obat</title>
+    <style>
+        /* Variabel CSS (dari t-pasien.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+
+            /* Warna baru untuk tombol laporan sesuai gambar */
+            --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
+            --report-print-bg: #3498DB; /* Biru untuk Cetak */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1; /* Align text vertically */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed; /* Sidebar tetap di posisi */
+            height: 100%; /* Tinggi penuh */
+            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
+            overflow-x: hidden; /* Penting: Mencegah scroll horizontal di dalam sidebar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+            position: relative;
+            justify-content: flex-start; /* Ensure items start from left */
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center; /* Center menu icon when minimized */
+            padding: 20px 0; /* Adjust padding for minimized state */
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1; /* Ensure proper alignment */
+            padding: 0 5px; /* Add some padding around the icon */
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem; /* Smaller icon when minimized */
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1; /* Allow nav list to grow */
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px; /* Fixed width for SVG icon */
+            height: 24px; /* Fixed height for SVG icon */
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor; /* Inherit color from parent */
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0; /* No margin when minimized */
+            justify-content: center;
+            display: flex;
+            width: 100%; /* Take full width of minimized item */
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0; /* Hide text when minimized */
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden; /* Penting: Mencegah scrollbar horizontal pada link logout */
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px; /* Posisikan di luar sidebar */
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001; /* Di atas sidebar */
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+        }
+
+        /* Area Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
+            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
+            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block; /* Show on mobile */
+                z-index: 10000; /* Ensure it's always on top */
+            }
+
+            .sidebar {
+                left: -250px; /* Hide sidebar off-screen */
+                position: fixed; /* Ensure it stays off-screen */
+                height: 100%;
+                z-index: 2000; /* Higher than main content */
+                background-color: var(--primary-color); /* Ensure background for visual separation */
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
+            }
+
+            .sidebar.active {
+                left: 0; /* Slide in when active */
+            }
+
+            .main-content {
+                margin-left: 0; /* No margin on mobile */
+                width: 100%; /* Full width */
+                position: relative; /* Crucial for z-index to work against sidebar */
+                z-index: 1; /* Main content below active sidebar */
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
+            }
+
+            .toggle-btn {
+                display: none; /* Hide desktop toggle on mobile */
+            }
+
+            body {
+                flex-direction: column; /* Stack elements vertically */
+            }
+        }
+
+        /* Styles for Data Obat content */
+        .data-obat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .data-obat-header h1 {
+            color: var(--primary-dark);
+            font-size: 2.2rem;
+        }
+
+        .search-add-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(29, 233, 182, 0.5);
+            outline: none;
+        }
+
+        .btn-add {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-add:hover {
+            background-color: #008960;
+        }
+
+        .table-container {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow-x: auto; /* For responsive tables */
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .data-table tr:hover {
+            background-color: #e9e9e9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-edit, .delete-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease;
+            color: var(--white);
+        }
+
+        .btn-edit {
+            background-color: #2196F3; /* Biru untuk edit */
+        }
+
+        .btn-edit:hover {
+            background-color: #0b7dda;
+        }
+
+        .delete-btn {
+            background-color: var(--danger-color); /* Merah untuk delete */
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000; /* Higher than sidebar */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            transform: translateY(-50px);
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: var(--secondary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-submit, .btn-cancel {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-submit {
+            background-color: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-submit:hover {
+            background-color: #45a049;
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: var(--text-color);
+        }
+
+        .btn-cancel:hover {
+            background-color: #bbb;
+        }
+
+        /* Delete Confirmation Modal */
+        .delete-modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .delete-modal-content h2 {
+            color: var(--danger-color);
+            margin-bottom: 20px;
+        }
+
+        .delete-modal-content p {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .delete-modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-confirm-delete, .btn-cancel-delete {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-confirm-delete {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+
+        .btn-confirm-delete:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn-cancel-delete {
+            background-color: #ccc;
+            color: var(--text-color);
+        }
+
+        .btn-cancel-delete:hover {
+            background-color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_adm.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_dokter.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 3v6a6 6 0 0 0 12 0V3"></path>
+                            <circle cx="12" cy="14" r="4"></circle>
+                            <line x1="12" y1="18" x2="12" y2="21"></line>
+                            <line x1="9" y1="21" x2="15" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_obat.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="9"></line>
+                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                            <line x1="9" y1="19" x2="15" y2="19"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Obat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="t-pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="tambah_akun.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="17" y1="11" x2="23" y2="11"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Tambah Akun</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="laporan.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Laporan</div>
+                </a>
+            </li>
+        </ul>
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="data-obat-header">
+            <h1>Data Obat</h1>
+            <div class="search-add-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Cari obat...">
+                <button class="btn-add" id="add-obat-btn">Tambah Obat</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Kode Obat</th>
+                        <th>Nama Obat</th>
+                        <th>Harga</th>
+                        <th>Stok</th>
+                        <th>Deskripsi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="obat-table-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="obat-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modal-title">Tambah Data Obat</h2>
+            <form id="obat-form">
+                <div class="form-group">
+                    <label for="kode-obat">Kode Obat:</label>
+                    <input type="text" id="kode-obat" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="nama-obat">Nama Obat:</label>
+                    <input type="text" id="nama-obat" required>
+                </div>
+                <div class="form-group">
+                    <label for="harga-obat">Harga:</label>
+                    <input type="number" id="harga-obat" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="stok-obat">Stok:</label>
+                    <input type="number" id="stok-obat" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="deskripsi-obat">Deskripsi:</label>
+                    <textarea id="deskripsi-obat" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">Simpan</button>
+                    <button type="button" class="btn-cancel" id="cancel-obat-btn">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="modal">
+        <div class="delete-modal-content">
+            <h2>Konfirmasi Hapus Data</h2>
+            <p>Anda yakin ingin menghapus data obat ini?</p>
+            <div class="delete-modal-actions">
+                <button class="btn-confirm-delete" id="confirm-delete-btn">Hapus</button>
+                <button class="btn-cancel-delete" id="cancel-delete-btn">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar and Mobile Menu Toggle
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+            const mainContent = document.getElementById('main-content');
+
+            // Elements for Obat management
+            const addObatBtn = document.getElementById('add-obat-btn');
+            const obatModal = document.getElementById('obat-modal');
+            const closeModalButton = obatModal.querySelector('.close-button');
+            const cancelObatBtn = document.getElementById('cancel-obat-btn');
+            const modalTitle = document.getElementById('modal-title');
+            const obatForm = document.getElementById('obat-form');
+            const obatTableBody = document.getElementById('obat-table-body');
+            const searchInput = document.getElementById('search-input');
+
+            // Elements for Delete Confirmation
+            const deleteModal = document.getElementById('delete-modal');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            let obatToDeleteKode = null; // To store the Kode Obat of the obat to be deleted
+
+            // Sidebar Toggle Logic
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                });
+            }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    } else {
+                        sidebar.classList.toggle('minimized');
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        } else {
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
+                        }
+                    }
+                });
+            }
+
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            // Adjust main content margin on window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                    sidebar.classList.remove('active');
+                } else {
+                    mainContent.style.marginLeft = '0';
+                }
+            });
+
+            // Initialize sidebar state on load
+            function initSidebar() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('minimized');
+                    sidebar.classList.remove('active');
+                    mainContent.style.marginLeft = '0';
+                } else {
+                    sidebar.classList.remove('active');
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            }
+            initSidebar(); // Call initSidebar on page load
+
+            // --- Obat Management Logic ---
+            let obats = JSON.parse(localStorage.getItem('obats')) || [];
+            let currentEditKodeObat = null; // To store the Kode Obat of the obat being edited
+
+            // Function to generate a new unique Kode Obat
+            function generateKodeObat() {
+                let newIdNum = 1;
+                let newId = '';
+                do {
+                    newId = 'OB' + String(newIdNum).padStart(3, '0');
+                    newIdNum++;
+                } while (obats.some(obat => obat.kodeObat === newId));
+                return newId;
+            }
+
+            // Function to display obats in the table
+            function displayObats(filter = '') {
+                obatTableBody.innerHTML = '';
+                const filteredObats = obats.filter(obat =>
+                    obat.namaObat.toLowerCase().includes(filter.toLowerCase()) ||
+                    obat.kodeObat.toLowerCase().includes(filter.toLowerCase())
+                );
+
+                filteredObats.forEach(obat => {
+                    const row = obatTableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${obat.kodeObat}</td>
+                        <td>${obat.namaObat}</td>
+                        <td>${obat.harga}</td>
+                        <td>${obat.stok}</td>
+                        <td>${obat.deskripsi}</td>
+                        <td class="action-buttons">
+                            <button class="btn-edit" data-id="${obat.kodeObat}">Edit</button>
+                            <button class="delete-btn" data-id="${obat.kodeObat}">Hapus</button>
+                        </td>
+                    `;
+                });
+                attachButtonListeners(); // Re-attach listeners after updating table
+            }
+
+            // Show Obat Modal (Add/Edit)
+            function showObatModal(isEdit = false, obatData = {}) {
+                obatModal.style.display = 'flex';
+                if (isEdit) {
+                    modalTitle.textContent = 'Edit Data Obat';
+                    document.getElementById('kode-obat').value = obatData.kodeObat;
+                    document.getElementById('nama-obat').value = obatData.namaObat;
+                    document.getElementById('harga-obat').value = obatData.harga;
+                    document.getElementById('stok-obat').value = obatData.stok;
+                    document.getElementById('deskripsi-obat').value = obatData.deskripsi;
+                    currentEditKodeObat = obatData.kodeObat;
+                } else {
+                    modalTitle.textContent = 'Tambah Data Obat';
+                    obatForm.reset();
+                    document.getElementById('kode-obat').value = generateKodeObat();
+                    currentEditKodeObat = null; // Reset for new entry
+                }
+            }
+
+            // Hide Obat Modal
+            function hideObatModal() {
+                obatModal.style.display = 'none';
+                obatForm.reset();
+            }
+
+            // Handle form submission (Add/Edit Obat)
+            obatForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const newObat = {
+                    kodeObat: document.getElementById('kode-obat').value,
+                    namaObat: document.getElementById('nama-obat').value,
+                    harga: parseFloat(document.getElementById('harga-obat').value),
+                    stok: parseInt(document.getElementById('stok-obat').value),
+                    deskripsi: document.getElementById('deskripsi-obat').value
+                };
+
+                if (currentEditKodeObat) {
+                    // Edit existing obat
+                    const index = obats.findIndex(o => o.kodeObat === currentEditKodeObat);
+                    if (index !== -1) {
+                        obats[index] = newObat;
+                        alert('Data obat berhasil diperbarui!');
+                    }
+                } else {
+                    // Add new obat
+                    obats.push(newObat);
+                    alert('Data obat berhasil ditambahkan!');
+                }
+                localStorage.setItem('obats', JSON.stringify(obats));
+                displayObats();
+                hideObatModal();
+            });
+
+            // Event listener for "Tambah Obat" button
+            addObatBtn.addEventListener('click', () => showObatModal(false));
+
+            // Event listeners for closing modals
+            closeModalButton.addEventListener('click', hideObatModal);
+            cancelObatBtn.addEventListener('click', hideObatModal);
+            deleteModal.querySelector('.close-button') && deleteModal.querySelector('.close-button').addEventListener('click', () => deleteModal.style.display = 'none');
+
+
+            // Handle Edit button click
+            function handleEdit(event) {
+                const kodeObat = event.target.dataset.id;
+                const obatData = obats.find(o => o.kodeObat === kodeObat);
+                if (obatData) {
+                    showObatModal(true, obatData);
+                }
+            }
+
+            // Handle Delete button click
+            function handleDelete(event) {
+                obatToDeleteKode = event.target.dataset.id;
+                deleteModal.style.display = 'flex';
+            }
+
+            // Confirm Delete
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (obatToDeleteKode) {
+                    obats = obats.filter(o => o.kodeObat !== obatToDeleteKode);
+                    localStorage.setItem('obats', JSON.stringify(obats));
+                    displayObats();
+                    alert('Data obat berhasil dihapus!');
+                    obatToDeleteKode = null;
+                }
+                deleteModal.style.display = 'none';
+            });
+
+            // Cancel Delete
+            cancelDeleteBtn.addEventListener('click', () => {
+                obatToDeleteKode = null;
+                deleteModal.style.display = 'none';
+            });
+
+            // Search/Filter functionality
+            searchInput.addEventListener('keyup', function() {
+                displayObats(searchInput.value);
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === obatModal) {
+                    obatModal.style.display = 'none';
+                }
+                if (event.target === deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+
+            // Helper to attach event listeners to dynamically created buttons
+            function attachButtonListeners() {
+                document.querySelectorAll('.btn-edit').forEach(button => {
+                    button.removeEventListener('click', handleEdit); // Prevent duplicate listeners
+                    button.addEventListener('click', handleEdit);
+                });
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.removeEventListener('click', handleDelete); // Prevent duplicate listeners
+                    button.addEventListener('click', handleDelete);
+                });
+            }
+
+            // Attach listeners on initial load
+            attachButtonListeners();
+
+            // Function to load user data from sessionStorage and display it
+            function loadUserData() {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    // Update welcome message
+                    const welcomeUserElement = document.getElementById('welcome-user'); // Dapatkan elemen span
+                    if (welcomeUserElement) {
+                        // Tampilkan nama jika ada, jika tidak, tampilkan email
+                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
+                    }
+                } else {
+                    // Redirect jika tidak ada data user di sessionStorage
+                    window.location.href = '/index.html';
+                }
+            }
+
+            // Fungsi untuk memeriksa akses berdasarkan peran
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
+                        alert('Anda tidak memiliki akses ke halaman ini.');
+                        sessionStorage.clear(); // Hapus sesi jika tidak punya akses
+                        window.location.href = '/index.html'; // Redirect ke login
+                    }
+                } else {
+                    window.location.href = '/index.html'; // Belum login
+                }
+            }
+
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['admin']); // Hanya 'admin' role yang bisa mengakses halaman ini
+
+            // Initial display
+            displayObats();
+        });
+    </script>
+</body>
+</html>

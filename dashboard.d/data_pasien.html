@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pasien</title>
+    <style>
+        /* Variabel CSS (dari dashboard_adm.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100;
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar.active ~ .mobile-toggle {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0;
+            justify-content: center;
+            display: flex;
+            width: 100%;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Toggle Button for Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+                z-index: 10000;
+            }
+
+            .sidebar {
+                left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                position: relative;
+                z-index: 1;
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-btn {
+                display: none;
+            }
+
+            body {
+                flex-direction: column;
+            }
+        }
+
+        /* Data Pasien Specific Styles */
+        .patient-table-container {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow-x: auto; /* Enable horizontal scroll for tables */
+        }
+
+        .patient-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .patient-table th, .patient-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .patient-table th {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .patient-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .patient-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .patient-table td button {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.85rem;
+        }
+
+        .patient-table td button:hover {
+            background-color: #008c6b;
+        }
+
+        /* NEW: Style for the green "Periksa" button */
+        .action-btn-primary {
+            background-color: var(--success-color); /* Uses the defined success-color for green */
+            color: var(--white);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 0.85rem;
+            margin-right: 5px; /* Added for potential spacing if more buttons are added */
+        }
+
+        .action-btn-primary:hover {
+            background-color: #45a049; /* Darker shade of green on hover */
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-container input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .search-container button {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .search-container button:hover {
+            background-color: #008c6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard.dokter.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Dashboard</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_pasien.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="pemeriksaan.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <line x1="10" y1="9" x2="10" y2="9"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Pemeriksaan</div>
+                </a>
+            </li>
+        </ul>
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="patient-table-container">
+            <h2>Daftar Pasien Menunggu</h2>
+            <h3>(Contoh) : </h3>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Cari berdasarkan Nama Pasien atau No. Antrian">
+                <button onclick="searchPatients()">Cari</button>
+            </div>
+            <table class="patient-table">
+                <thead>
+                    <tr>
+                        <th>No. Antrian</th>
+                        <th>No. RM</th>
+                        <th>Nama Pasien</th>
+                        <th>Jenis Pasien</th>
+                        <th>Poli</th>
+                        <th>Keluhan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="patientTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Specific JavaScript for Data Pasien ---
+
+             // Fungsi untuk memeriksa akses berdasarkan peran
+        function checkAccess(allowedRoles) {
+            const user = sessionStorage.getItem('loggedInUser');
+            if (user) {
+                const loggedInUser = JSON.parse(user);
+                if (!allowedRoles.includes(loggedInUser.role)) {
+                    alert('Anda tidak memiliki akses ke halaman ini.');
+                    sessionStorage.clear();
+                    window.location.href = '/index.html';
+                }
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+ // Jalankan pemeriksaan akses terlebih dahulu
+        checkAccess(['dokter']);
+        
+        const patientTableBody = document.getElementById('patientTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const logoutButton = document.getElementById('logoutButton');
+
+        // Initialize patients array from localStorage.
+        // If localStorage is empty, use the hardcoded initial data.
+        let patients = JSON.parse(localStorage.getItem('examinations')) || [
+            {
+                id: 'p001', noAntrian: 'Q-0001', noRm: 'RM-01', namaPasien: 'Andi Pratama', jenisPasien: 'BPJS', poli: 'Mata', keluhan: 'Mata merah dan gatal', status: 'Menunggu',
+                diagnosa: '', tindakan: '', obat: ''
+            },
+            {
+                id: 'p002', noAntrian: 'Q-0002', noRm: 'RM-02', namaPasien: 'Siti Aminah', jenisPasien: 'Umum', poli: 'Gigi', keluhan: 'Sakit gigi berlubang', status: 'Menunggu',
+                diagnosa: '', tindakan: '', obat: ''
+            },
+            {
+                id: 'p003', noAntrian: 'Q-0003', noRm: 'RM-03', namaPasien: 'Budi Santoso', jenisPasien: 'BPJS', poli: 'THT', keluhan: 'Telinga berdenging', status: 'Menunggu',
+                diagnosa: '', tindakan: '', obat: ''
+            }
+        ];
+
+        // Penting: Simpan data awal ini ke localStorage jika memang kosong
+        if (localStorage.getItem('examinations') === null) {
+            localStorage.setItem('examinations', JSON.stringify(patients));
+        }
+
+        // Fungsi untuk merender tabel pasien
+        function renderPatientTable(filter = '') {
+            patientTableBody.innerHTML = ''; // Bersihkan isi tabel sebelumnya
+
+            const filteredPatients = patients.filter(patient =>
+                patient.namaPasien.toLowerCase().includes(filter.toLowerCase()) ||
+                patient.noRm.toLowerCase().includes(filter.toLowerCase()) ||
+                patient.noAntrian.toLowerCase().includes(filter.toLowerCase()) ||
+                patient.status.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filteredPatients.length === 0) {
+                patientTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Tidak ada data pasien.</td></tr>`;
+                return;
+            }
+
+            filteredPatients.forEach(patient => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${patient.noAntrian}</td>
+                    <td>${patient.noRm}</td>
+                    <td>${patient.namaPasien}</td>
+                    <td>${patient.jenisPasien}</td>
+                    <td>${patient.poli}</td>
+                    <td>${patient.keluhan}</td> <td><span class="status-badge status-${patient.status.toLowerCase().replace(' ', '-')}">${patient.status}</span></td>
+                    <td>
+                        <button class="action-btn-primary" onclick="startExamination('${patient.id}')">Periksa</button>
+                    </td>
+                `;
+                patientTableBody.appendChild(row);
+            });
+        }
+
+        // Function to handle "Periksa" button click
+        window.startExamination = function(patientId) {
+            const selectedPatient = patients.find(p => p.id === patientId);
+            if (selectedPatient) {
+                // Update status to "Dalam Pemeriksaan" when initiating examination
+                selectedPatient.status = 'Dalam Pemeriksaan';
+                localStorage.setItem('examinations', JSON.stringify(patients)); // Save updated status
+                sessionStorage.setItem('selectedPatientData', JSON.stringify(selectedPatient)); // Use sessionStorage
+                window.location.href = 'dashboard.d/pemeriksaan.html';
+            } else {
+                alert('Pasien tidak ditemukan.');
+            }
+        };
+
+        // Search functionality
+        window.searchPatients = function() {
+            const filter = searchInput.value.trim();
+            renderPatientTable(filter);
+        };
+
+        // Initial render when the page loads
+        renderPatientTable(); // Panggil fungsi render saat halaman dimuat
+
+        // Listen for changes in localStorage from other tabs/windows (e.g., pemeriksaan.html)
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'examinations') {
+                patients = JSON.parse(event.newValue);
+                renderPatientTable(); // Re-render table when localStorage changes
+            }
+        });
+
+        // Logout functionality
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                sessionStorage.clear(); // Hapus semua data sesi
+                window.location.href = '/index.html'; // Redirect ke halaman login
+            });
+        }
+    });
+</script>
+    
+</body>
+</html>

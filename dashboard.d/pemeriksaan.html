@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemeriksaan Pasien</title>
+    <style>
+        /* Variabel CSS (dari dashboard_adm.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden; /* Mencegah scroll horizontal */
+        }
+
+        /* Mobile Toggle outside sidebar (from dashboard_adm.html) */
+        .mobile-toggle {
+            display: none; /* Hidden by default, shown on mobile */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: black;
+            cursor: pointer;
+            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1; /* Align text vertically */
+            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+        }
+
+        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevent interaction when hidden */
+        }
+
+        /* Sidebar/Navigasi Utama (from dashboard_adm.html) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed; /* Sidebar tetap di posisi */
+            height: 100%; /* Tinggi penuh */
+            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
+            overflow-x: hidden; /* Penting: Mencegah scroll horizontal di dalam sidebar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+            position: relative;
+            justify-content: flex-start; /* Ensure items start from left */
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center; /* Center menu icon when minimized */
+            padding: 20px 0; /* Adjust padding for minimized state */
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1; /* Ensure proper alignment */
+            padding: 0 5px; /* Add some padding around the icon */
+            color: black;
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem; /* Smaller icon when minimized */
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1; /* Allow nav list to grow */
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden; /* Menjamin konten di dalam tidak tumpah */
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px; /* Fixed width for SVG icon */
+            height: 24px; /* Fixed height for SVG icon */
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor; /* Inherit color from parent */
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0; /* No margin when minimized */
+            justify-content: center;
+            display: flex;
+            width: 100%; /* Take full width of minimized item */
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0; /* Hide text when minimized */
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section (from dashboard_adm.html) */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden; /* Penting: Mencegah scrollbar horizontal pada link logout */
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap; /* Jaga ini agar teks tetap satu baris saat sidebar penuh */
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden; /* Penting: Menyembunyikan teks yang tumpah saat minimized */
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop (from dashboard_adm.html) */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px; /* Posisikan di luar sidebar */
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001; /* Di atas sidebar */
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+        }
+
+        /* Area Konten Utama (from dashboard_adm.html) */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
+            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
+            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Responsive adjustments (from dashboard_adm.html) */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block; /* Show on mobile */
+                z-index: 10000; /* Ensure it's always on top */
+            }
+
+            .sidebar {
+                left: -250px; /* Hide sidebar off-screen */
+                position: fixed; /* Ensure it stays off-screen */
+                height: 100%;
+                z-index: 2000; /* Higher than main content */
+                background-color: var(--primary-color); /* Ensure background for visual separation */
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
+            }
+
+            .sidebar.active {
+                left: 0; /* Slide in when active */
+            }
+
+            .main-content {
+                margin-left: 0; /* No margin on mobile */
+                width: 100%; /* Full width */
+                position: relative; /* Crucial for z-index to work against sidebar */
+                z-index: 1; /* Main content below active sidebar */
+                padding: 70px 15px 20px 15px; /* Add top padding for mobile toggle */
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
+            }
+
+            .toggle-btn {
+                display: none; /* Hide desktop toggle on mobile */
+            }
+
+            body {
+                flex-direction: column; /* Stack elements vertically */
+            }
+        }
+
+        /* Specific styles for Pemeriksaan Pasien */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .pemeriksaan-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pasien-list-container {
+            flex: 1;
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .pasien-list-container h2 {
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .patient-item {
+            padding: 10px;
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .patient-item:hover {
+            background-color: #e0e0e0;
+            border-color: var(--primary-color);
+        }
+
+        .patient-item.selected {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-dark);
+        }
+
+        .patient-info strong {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .patient-info span {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .patient-item.selected .patient-info span {
+            color: var(--white);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .status-menunggu { background-color: #ffc107; color: #333; }
+        .status-dalam-pemeriksaan { background-color: #2196f3; color: white; }
+        .status-selesai { background-color: #4CAF50; color: white; }
+
+        .pemeriksaan-form-container {
+            flex: 2;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            display: none; /* Hidden by default */
+        }
+
+        .pemeriksaan-form-container h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .pemeriksaan-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .pemeriksaan-form input[type="text"],
+        .pemeriksaan-form textarea,
+        .pemeriksaan-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .pemeriksaan-form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .pemeriksaan-form button {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .pemeriksaan-form button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .save-btn {
+            background-color: var(--success-color);
+        }
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn {
+            background-color: var(--danger-color);
+        }
+        .cancel-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .table-container {
+            overflow-x: auto; /* Allow horizontal scrolling on small screens */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            min-width: 800px; /* Minimum width to maintain table structure */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .action-buttons button {
+            padding: 8px 12px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s ease;
+        }
+
+        .edit-btn {
+            background-color: #2196f3;
+            color: white;
+        }
+        .edit-btn:hover {
+            background-color: #1976d2;
+        }
+
+        .delete-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Mobile responsive adjustments for form and content */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 0;
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+
+            .pemeriksaan-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .pasien-list-container {
+                padding: 12px;
+            }
+
+            .pasien-list-container h2 {
+                font-size: 1.2rem;
+                margin-bottom: 12px;
+            }
+
+            .patient-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .patient-info {
+                width: 100%;
+            }
+
+            .patient-info strong {
+                font-size: 1rem;
+            }
+
+            .patient-info span {
+                font-size: 0.85em;
+                display: block;
+                margin-bottom: 3px;
+            }
+
+            .status-badge {
+                align-self: flex-end;
+                font-size: 0.75em;
+                padding: 4px 8px;
+            }
+
+            .pemeriksaan-form-container {
+                padding: 15px;
+            }
+
+            .pemeriksaan-form-container h2 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+
+            .pemeriksaan-form input[type="text"],
+            .pemeriksaan-form textarea,
+            .pemeriksaan-form select {
+                padding: 12px;
+                font-size: 1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .button-group button {
+                width: 100%;
+                padding: 14px;
+                font-size: 1rem;
+            }
+
+            .table-container {
+                margin: 0 -15px; /* Extend beyond container padding */
+                padding: 0 15px;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .action-buttons {
+                white-space: nowrap;
+            }
+
+            .action-buttons button {
+                padding: 6px 10px;
+                font-size: 0.8em;
+                margin-right: 3px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 70px 10px 20px 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+            }
+
+            .patient-info strong {
+                font-size: 0.95rem;
+            }
+
+            .patient-info span {
+                font-size: 0.8em;
+            }
+
+            .table-container {
+                margin: 0 -10px;
+                padding: 0 10px;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard.dokter.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Dashboard</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="pemeriksaan.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <line x1="10" y1="9" x2="10" y2="9"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Pemeriksaan</div>
+                </a>
+            </li>
+        </ul>
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">LOG OUT</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <div class="container">
+            <h1>Pemeriksaan Pasien</h1>
+
+            <div class="pemeriksaan-section">
+                <div class="pasien-list-container">
+                    <h2>Daftar Antrian Pasien</h2>
+                    <div id="patient-list">
+                        </div>
+                </div>
+
+                <div class="pemeriksaan-form-container" id="pemeriksaan-form-container">
+                    <h2>Form Pemeriksaan Pasien</h2>
+                    <form id="pemeriksaan-form" class="pemeriksaan-form">
+                        <input type="hidden" id="selected-patient-id">
+                        <label for="nama-pasien-pemeriksaan">Nama Pasien:</label>
+                        <input type="text" id="nama-pasien-pemeriksaan" readonly>
+                        <p id="selected-patient-name-display" style="font-weight: bold; margin-bottom: 15px; color: var(--primary-dark);"></p>
+
+                        <label for="diagnosa">Diagnosa:</label>
+                        <textarea id="diagnosa" placeholder="Masukkan diagnosa pasien"></textarea>
+
+                        <label for="tindakan">Tindakan:</label>
+                        <textarea id="tindakan" placeholder="Masukkan tindakan yang diberikan"></textarea>
+
+                        <label for="obat">Obat:</label>
+                        <textarea id="obat" placeholder="Masukkan resep obat"></textarea>
+
+                        <label for="status-pemeriksaan">Status Pemeriksaan:</label>
+                        <select id="status-pemeriksaan">
+                            <option value="Menunggu">Menunggu</option>
+                            <option value="Dalam Pemeriksaan">Dalam Pemeriksaan</option>
+                            <option value="Selesai">Selesai</option>
+                        </select>
+
+                        <div class="button-group">
+                            <button type="submit" class="save-btn">Simpan Pemeriksaan</button>
+                            <button type="button" class="cancel-btn" id="cancel-edit">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <h2>Riwayat Pemeriksaan</h2>
+            <div class="table-container">
+                <table id="examination-history-table">
+                    <thead>
+                        <tr>
+                            <th>No. Antrian</th>
+                            <th>No. Rekam Medis</th>
+                            <th>Nama Pasien</th>
+                            <th>Jenis Pasien</th>
+                            <th>Poli</th>
+                            <th>Keluhan</th>
+                            <th>Diagnosa</th>
+                            <th>Tindakan</th>
+                            <th>Obat</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar and Mobile Menu Toggle (Copied from dashboard_adm.html)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+        const mainContent = document.getElementById('main-content');
+
+
+        // Toggle sidebar for desktop
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('minimized');
+                // Adjust main content margin based on sidebar state
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            });
+        }
+
+        // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
+        if (menuIcon) {
+            menuIcon.addEventListener('click', () => {
+                // For mobile, this should close the sidebar if open
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+                // For desktop, this toggles minimization
+                else {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                }
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        mainContent.addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Prevent sidebar clicks from propagating to mainContent to close it
+        sidebar.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        // Initialize the app
+        function init() {
+            // Check screen width on load and apply initial sidebar state
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
+                sidebar.classList.remove('active'); // Ensure hidden by default
+                mainContent.style.marginLeft = '0';
+            } else {
+                sidebar.classList.remove('active'); // Ensure not active on desktop
+                mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
+            }
+        }
+
+        // Run initialization
+        init();
+
+        // Adjust main content margin on window resize for desktop view
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                if (sidebar.classList.contains('minimized')) {
+                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+                sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
+            } else {
+                mainContent.style.marginLeft = '0';
+            }
+        });
+
+        // Specific JavaScript for Pemeriksaan Pasien
+        document.addEventListener('DOMContentLoaded', function() {
+             // Fungsi untuk memeriksa akses berdasarkan peran
+        function checkAccess(allowedRoles) {
+            const user = sessionStorage.getItem('loggedInUser');
+            if (user) {
+                const loggedInUser = JSON.parse(user);
+                if (!allowedRoles.includes(loggedInUser.role)) {
+                    alert('Anda tidak memiliki akses ke halaman ini.');
+                    sessionStorage.clear();
+                    window.location.href = '/index.html';
+                }
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+
+        // Jalankan pemeriksaan akses terlebih dahulu
+        checkAccess(['dokter']);
+
+            const patientListDiv = document.getElementById('patient-list');
+            const pemeriksaanFormContainer = document.getElementById('pemeriksaan-form-container');
+            const pemeriksaanForm = document.getElementById('pemeriksaan-form');
+            const selectedPatientIdInput = document.getElementById('selected-patient-id');
+            const namaPasienPemeriksaan = document.getElementById('nama-pasien-pemeriksaan');
+            const selectedPatientNameDisplay = document.getElementById('selected-patient-name-display');
+            const diagnosaInput = document.getElementById('diagnosa');
+            const tindakanInput = document.getElementById('tindakan');
+            const obatInput = document.getElementById('obat');
+            const statusPemeriksaanSelect = document.getElementById('status-pemeriksaan');
+            const cancelEditButton = document.getElementById('cancel-edit');
+            const examinationHistoryTableBody = document.querySelector('#examination-history-table tbody');
+
+            let patients = JSON.parse(localStorage.getItem('examinations')) || [
+                {
+                    id: 'p001', noAntrian: 'Q-0001', noRm: 'RM-01', namaPasien: 'Andi Pratama', jenisPasien: 'BPJS', poli: 'Mata', keluhan: 'Mata merah dan gatal', status: 'Menunggu',
+                    diagnosa: '', tindakan: '', obat: ''
+                },
+                {
+                    id: 'p002', noAntrian: 'Q-0002', noRm: 'RM-02', namaPasien: 'Siti Aminah', jenisPasien: 'Umum', poli: 'Gigi', keluhan: 'Sakit gigi berlubang', status: 'Menunggu',
+                    diagnosa: '', tindakan: '', obat: ''
+                }
+                // Data pasien Budi Santoso dihapus di sini
+            ];
+
+            let currentEditingPatientId = null;
+
+            function renderPatientList() {
+                patientListDiv.innerHTML = '';
+                // Sort patients by queue number in ascending order
+                const sortedPatients = [...patients].sort((a, b) => {
+                    const numA = parseInt(a.noAntrian.replace('Q-', ''));
+                    const numB = parseInt(b.noAntrian.replace('Q-', ''));
+                    return numA - numB;
+                });
+
+                sortedPatients.forEach(patient => {
+                    if (patient.status !== 'Selesai') { // Only show patients not yet "Selesai" in the selection list
+                        const patientItem = document.createElement('div');
+                        patientItem.classList.add('patient-item');
+                        patientItem.dataset.id = patient.id;
+                        patientItem.innerHTML = `
+                            <div class="patient-info">
+                                <strong>${patient.namaPasien}</strong>
+                                <span>No. Antrian: ${patient.noAntrian} | Poli: ${patient.poli}</span>
+                                <span>Keluhan: ${patient.keluhan}</span>
+                            </div>
+                            <span class="status-badge status-${patient.status.toLowerCase().replace(/ /g, '-')}">${patient.status}</span>
+                        `;
+                        patientItem.addEventListener('click', () => selectPatient(patient.id));
+                        patientListDiv.appendChild(patientItem);
+                    }
+                });
+            }
+
+            function selectPatient(id) {
+                const selectedPatient = patients.find(p => p.id === id);
+                if (selectedPatient) {
+                    currentEditingPatientId = selectedPatient.id;
+                    namaPasienPemeriksaan.value = selectedPatient.namaPasien;
+                    selectedPatientNameDisplay.textContent = `Sedang memeriksa: ${selectedPatient.namaPasien}`;
+                    selectedPatientIdInput.value = selectedPatient.id;
+                    diagnosaInput.value = selectedPatient.diagnosa || '';
+                    tindakanInput.value = selectedPatient.tindakan || '';
+                    obatInput.value = selectedPatient.obat || '';
+                    statusPemeriksaanSelect.value = selectedPatient.status;
+                    pemeriksaanFormContainer.style.display = 'block';
+
+                    // Remove 'selected' class from all, then add to the clicked one
+                    document.querySelectorAll('.patient-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    document.querySelector(`.patient-item[data-id="${id}"]`).classList.add('selected');
+                }
+            }
+
+            function renderPatientTable() {
+                examinationHistoryTableBody.innerHTML = '';
+                // Sort patients for table display as well
+                const sortedPatients = [...patients].sort((a, b) => {
+                    const numA = parseInt(a.noAntrian.replace('Q-', ''));
+                    const numB = parseInt(b.noAntrian.replace('Q-', ''));
+                    return numA - numB;
+                });
+
+                sortedPatients.forEach(patient => {
+                    const row = examinationHistoryTableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${patient.noAntrian}</td>
+                        <td>${patient.noRm}</td>
+                        <td>${patient.namaPasien}</td>
+                        <td>${patient.jenisPasien}</td>
+                        <td>${patient.poli}</td>
+                        <td>${patient.keluhan}</td>
+                        <td>${patient.diagnosa || '-'}</td>
+                        <td>${patient.tindakan || '-'}</td>
+                        <td>${patient.obat || '-'}</td>
+                        <td><span class="status-badge status-${patient.status.toLowerCase().replace(/ /g, '-')}">${patient.status}</span></td>
+                        <td class="action-buttons">
+                            <button class="edit-btn" data-id="${patient.id}">Edit</button>
+                            <button class="delete-btn" data-id="${patient.id}">Hapus</button>
+                        </td>
+                    `;
+                });
+                attachTableEventListeners();
+            }
+
+            function attachTableEventListeners() {
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const idToEdit = event.target.dataset.id;
+                        selectPatient(idToEdit); // Use selectPatient to populate form
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const idToDelete = event.target.dataset.id;
+                        if (confirm('Apakah Anda yakin ingin menghapus data pemeriksaan ini?')) {
+                            patients = patients.filter(p => p.id !== idToDelete);
+                            localStorage.setItem('examinations', JSON.stringify(patients));
+                            renderPatientList();
+                            renderPatientTable();
+                            resetForm();
+                        }
+                    });
+                });
+            }
+
+            function resetForm() {
+                currentEditingPatientId = null;
+                pemeriksaanForm.reset();
+                selectedPatientIdInput.value = '';
+                namaPasienPemeriksaan.value = '';
+                selectedPatientNameDisplay.textContent = '';
+                pemeriksaanFormContainer.style.display = 'none';
+                document.querySelectorAll('.patient-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+            }
+
+            pemeriksaanForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const patientId = selectedPatientIdInput.value;
+                const diagnosa = diagnosaInput.value.trim();
+                const tindakan = tindakanInput.value.trim();
+                const obat = obatInput.value.trim();
+                const status = statusPemeriksaanSelect.value;
+
+                if (!patientId) {
+                    alert('Silakan pilih pasien terlebih dahulu.');
+                    return;
+                }
+
+                if (!diagnosa || !tindakan || !obat) {
+                    alert('Harap lengkapi semua bidang: Diagnosa, Tindakan, dan Obat.');
+                    return;
+                }
+
+                const patientIndex = patients.findIndex(p => p.id === patientId);
+                if (patientIndex > -1) {
+                    patients[patientIndex].diagnosa = diagnosa;
+                    patients[patientIndex].tindakan = tindakan;
+                    patients[patientIndex].obat = obat;
+                    patients[patientIndex].status = status;
+                }
+
+                localStorage.setItem('examinations', JSON.stringify(patients));
+                alert('Data pemeriksaan berhasil disimpan!');
+                resetForm();
+                renderPatientList();
+                renderPatientTable();
+            });
+
+            cancelEditButton.addEventListener('click', resetForm);
+
+            // Initial render
+            renderPatientList();
+            renderPatientTable();
+
+            // Check if there's a selected patient from data_pasien.html (e.g., via localStorage)
+            const selectedPatientData = JSON.parse(localStorage.getItem('selectedPatientData'));
+            if (selectedPatientData) {
+                // Check if this patient already exists in the examinations list
+                const existingPatient = patients.find(p => p.noAntrian === selectedPatientData.noAntrian && p.noRm === selectedPatientData.noRm);
+
+                if (existingPatient) {
+                    // If patient exists, select them for editing
+                    selectPatient(existingPatient.id);
+                } else {
+                    // If patient does not exist, add them to the list
+                    // Find the highest existing queue number to generate the next one
+                    const maxQueueNum = patients.reduce((max, p) => {
+                        const currentNum = parseInt(p.noAntrian.replace('Q-', ''));
+                        return currentNum > max ? currentNum : max;
+                    }, 0);
+                    const nextQueueNum = maxQueueNum + 1;
+                    const newAntrian = 'Q-' + nextQueueNum.toString().padStart(4, '0'); // Format as Q-XXXX
+
+                    const newPatientId = 'p' + (patients.length + 1).toString().padStart(3, '0'); // Simple ID generation
+                    const newPatient = {
+                        id: newPatientId,
+                        noAntrian: newAntrian,
+                        noRm: selectedPatientData.noRm,
+                        namaPasien: selectedPatientData.namaPasien,
+                        jenisPasien: selectedPatientData.jenisPasien,
+                        poli: selectedPatientData.poli,
+                        keluhan: selectedPatientData.keluhan,
+                        status: 'Menunggu', // Default status for new patient
+                        diagnosa: '',
+                        tindakan: '',
+                        obat: ''
+                    };
+                    patients.push(newPatient);
+                    localStorage.setItem('examinations', JSON.stringify(patients));
+
+                    currentEditingPatientId = newPatient.id;
+                    namaPasienPemeriksaan.value = newPatient.namaPasien;
+                    selectedPatientNameDisplay.textContent = `Sedang memeriksa: ${newPatient.namaPasien}`;
+                    selectedPatientIdInput.value = newPatient.id;
+                    statusPemeriksaanSelect.value = newPatient.status; // Set status for new patient
+                    pemeriksaanFormContainer.style.display = 'block';
+                }
+                localStorage.removeItem('selectedPatientData'); // Clear once used
+                renderPatientList(); // Re-render list with new patient if added
+                renderPatientTable(); // Re-render table with new patient if added
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi Pasien</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variabel CSS (dari dashboard_adm.html untuk konsistensi) */
+        :root {
+            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
+            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
+            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
+            --light-color: #f4f4f4; /* Background umum */
+            --danger-color: #f44336; /* Warna merah untuk danger */
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --sidebar-width: 250px;
+            --sidebar-minimized-width: 60px;
+            --border-color: #ddd; /* Added for table borders consistency */
+
+            /* Warna baru untuk tombol laporan sesuai gambar */
+            --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
+            --report-print-bg: #3498DB; /* Biru untuk Cetak */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100;
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar.active ~ .mobile-toggle {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Sidebar/Navigasi Utama */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
+            overflow: hidden;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            overflow: hidden;
+        }
+
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+
+        /* Logout Section */
+        .logout-section {
+            padding: 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg);
+        }
+
+        /* Area Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+            /* Added for centering content */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+        }
+
+        .sidebar.minimized + .main-content {
+            margin-left: var(--sidebar-minimized-width);
+            width: calc(100% - var(--sidebar-minimized-width));
+        }
+
+        /* Content Sections */
+        .content-section {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            width: 100%; /* Ensure it takes full width of main-content */
+            max-width: 1200px; /* Limit width for better readability and centering */
+        }
+
+        .content-section h3 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        /* Styling for the new icon buttons (from jadwal_dokter.html) */
+        .icon-button {
+            color: var(--white);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+        }
+
+        /* Specific colors for PDF and Print buttons */
+        #download-pdf-btn {
+            background-color: var(--report-pdf-bg);
+        }
+
+        #download-pdf-btn:hover {
+            background-color: #C0392B;
+            transform: translateY(-2px);
+        }
+
+        #print-pdf-btn {
+            background-color: var(--report-print-bg);
+        }
+
+        #print-pdf-btn:hover {
+            background-color: #2980B9;
+            transform: translateY(-2px);
+        }
+
+        .icon-button:active {
+            transform: translateY(0);
+        }
+
+        .icon-button svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Container for report buttons */
+        .report-buttons-container {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Styles for tables (from data_obat.html, adapted from jadwal_dokter.html) */
+        .table-responsive { /* Wrapper for scroll */
+            margin-top: 20px;
+            overflow-x: auto; /* Added for horizontal scrollbar */
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        table { /* Applying styles directly to the table element within .table-responsive */
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            min-width: 800px; /* Ensure table is wide enough to scroll if content is long */
+            background-color: var(--white);
+        }
+
+        table th, table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        table thead th { /* Specific for header, from jadwal_dokter.html table header */
+            background-color: #f2f2f2; /* Light gray from jadwal_dokter.html */
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Styles specific to t-pasien.html content - keeping form styles */
+        .card {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn { /* General button style, adjusting to match data_obat.html's .btn */
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .action-buttons .btn { /* Specific styles for action buttons in table */
+            padding: 8px 12px; /* Smaller padding for table action buttons */
+            font-size: 12px; /* Smaller font size for table action buttons */
+            margin-right: 5px;
+        }
+        .action-buttons .btn-edit {
+            background-color: #2196F3;
+            color: #fff;
+        }
+        .action-buttons .btn-edit:hover {
+            background-color: #1976D2;
+        }
+
+        /* Modal Styles (from t-pasien.html) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+        .modal-content .button-group {
+            justify-content: center;
+        }
+        
+        /* New Styles for Search and Add Container */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 15px; /* Space between items when wrapping */
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: var(--primary-dark);
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .search-add-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            justify-content: flex-end; /* Align to the right by default */
+        }
+
+        .search-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-container .search-icon {
+            position: absolute;
+            left: 10px;
+            color: #999;
+        }
+
+        .search-input-container input[type="text"] {
+            padding-left: 35px; /* Make space for the icon */
+            border-radius: 20px;
+            width: 250px; /* Adjust width as needed */
+            max-width: 100%; /* Ensure it doesn't overflow */
+        }
+
+        .btn-add {
+            background-color: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+
+        .btn-add:hover {
+            background-color: var(--primary-dark);
+        }
+
+
+        /* Responsive adjustments (from jadwal_dokter.html, adapted for t-pasien.html) */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+                z-index: 10000;
+            }
+
+            .sidebar {
+                left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                position: relative;
+                z-index: 1;
+                align-items: flex-start; /* Reset centering for smaller screens if needed */
+            }
+
+            .sidebar.minimized + .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-btn {
+                display: none;
+            }
+
+            body {
+                flex-direction: column;
+            }
+            .report-buttons-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .report-buttons-container .icon-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-add-container {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .search-input-container input[type="text"] {
+                width: 100%;
+            }
+
+            .btn-add {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* CSS for printing - hide sidebar and buttons (from jadwal_dokter.html) */
+        @media print {
+            body {
+                display: block;
+            }
+            /* Hide elements that should not be printed */
+            .sidebar, 
+            .mobile-toggle, 
+            .toggle-btn, 
+            .report-buttons-container, 
+            .modal,
+            .card.form-container, /* Hide the form container */
+            .section-header .search-add-container, /* Hide search and add button */
+            #transactionTable th:last-child, /* Hide the 'Aksi' column header */
+            #transactionTable td:last-child /* Hide the 'Aksi' column cells */
+            {
+                display: none !important;
+            }
+            
+            /* Adjust main content for print layout */
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                align-items: flex-start !important; /* Ensure content is aligned to the left */
+            }
+            .content-section {
+                padding: 15px !important;
+                box-shadow: none !important;
+                border: 1px solid #eee;
+                margin-bottom: 10px !important;
+                width: auto !important; /* Allow content to adjust naturally */
+                max-width: none !important; /* Remove max-width restriction */
+            }
+            table {
+                width: 100% !important; /* Ensure table uses full print width */
+                min-width: unset !important; /* Remove min-width for print */
+                page-break-inside: auto; /* Allow table to break across pages */
+            }
+            table th, table td { /* Applied directly to table for print */
+                padding: 5px !important;
+                font-size: 0.8em !important;
+                border: 1px solid #000 !important; /* Ensure borders are visible in print */
+            }
+            table thead {
+                display: table-header-group; /* Ensure header repeats on new pages */
+            }
+            table tr {
+                page-break-inside: avoid; /* Avoid breaking rows across pages */
+                page-break-after: auto;
+            }
+
+            /* Ensure text colors are black for printing */
+            h1, h3, p, span, th, td {
+                color: #000 !important;
+            }
+            /* Remove background colors that might be problematic in print */
+            .sidebar, .main-content, .content-section, table th, table tr:nth-child(even) {
+                background-color: transparent !important;
+            }
+            /* Remove specific action buttons that are hidden by general rule above */
+            .action-buttons {
+                display: none; /* Hide action buttons on print (redundant but good for clarity) */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-toggle" id="mobile-toggle"> ≡ </div>
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-btn" id="sidebar-toggle">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="sidebar-header">
+            <div class="menu-icon">≡</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="dashboard_adm.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Home</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="jadwal_dokter.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 3v6a6 6 0 0 0 12 0V3"></path>
+                            <circle cx="12" cy="14" r="4"></circle>
+                            <line x1="12" y1="18" x2="12" y2="21"></line>
+                            <line x1="9" y1="21" x2="15" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="data_obat.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="9"></line>
+                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                            <line x1="9" y1="19" x2="15" y2="19"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Data Obat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="t-pasien.html" class="nav-link active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="tambah_akun.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="20" y1="8" x2="20" y2="14"></line>
+                            <line x1="17" y1="11" x2="23" y2="11"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Tambah Akun</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="laporan.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Laporan</div>
+                </a>
+            </li>
+        </ul>
+        <div class="logout-section">
+            <a href="/index.html" class="logout-link">
+                <div class="logout-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="17 16 22 11 17 6"></polyline>
+                        <line x1="22" y1="11" x2="10" y2="11"></line>
+                    </svg>
+                </div>
+                <div class="logout-text">Logout</div>
+            </a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="content-section">
+            <div class="section-header">
+                <h2>Kelola Transaksi Pasien</h2>
+                <div class="search-add-container">
+                    <div class="search-input-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" placeholder="Cari Transaksi..." id="searchFilterInput">
+                    </div>
+                    <button class="btn btn-add" id="toggleFormBtn">
+                        <i class="fas fa-plus"></i> Tambah Transaksi Baru
+                    </button>
+                </div>
+            </div>
+
+            <div class="report-buttons-container">
+                <button class="icon-button" id="print-pdf-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Cetak Laporan
+                </button>
+            </div>
+            <div class="card form-container" id="transactionFormContainer">
+                <h3><span id="formTitle">Tambah</span> Transaksi</h3>
+                <form id="transactionForm">
+                    <input type="hidden" id="transactionId">
+                    <div class="form-group">
+                        <label for="tanggalTransaksi">Tanggal Transaksi:</label>
+                        <input type="date" id="tanggalTransaksi" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="namaPasien">Nama Pasien:</label>
+                        <input type="text" id="namaPasien" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jenisLayanan">Jenis Layanan:</label>
+                        <select id="jenisLayanan" required>
+                            <option value="">Pilih Layanan</option>
+                            <option value="Pemeriksaan Umum">Pemeriksaan Umum</option>
+                            <option value="Konsultasi Dokter">Konsultasi Dokter</option>
+                            <option value="Pemeriksaan Mata">Pemeriksaan Mata</option>
+                            <option value="Pemeriksaan Gigi & Mulut">Pemeriksaan Gigi & Mulut</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalBiaya">Total Biaya:</label>
+                        <input type="number" id="totalBiaya" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="statusPembayaran">Status Pembayaran:</label>
+                        <select id="statusPembayaran" required>
+                            <option value="Belum Lunas">Belum Lunas</option>
+                            <option value="Lunas">Lunas</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary" id="saveTransactionBtn">Simpan</button>
+                        <button type="button" class="btn btn-danger" id="cancelFormBtn">Batal</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table id="transactionTable">
+                    <thead>
+                        <tr>
+                            <th>ID Transaksi</th>
+                            <th>Tanggal</th>
+                            <th>Nama Pasien</th>
+                            <th>Jenis Layanan</th>
+                            <th>Total Biaya</th>
+                            <th>Status Pembayaran</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeDeleteModalBtn">&times;</span>
+            <h3>Konfirmasi Hapus</h3>
+            <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
+            <div class="button-group">
+                <button class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
+                <button class="btn btn-primary" id="cancelDeleteBtn">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+           // Function to load user data from sessionStorage and display it
+            function loadUserData() {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    // Update welcome message
+                    const welcomeUserElement = document.getElementById('welcome-user'); // Dapatkan elemen span
+                    if (welcomeUserElement) {
+                        // Tampilkan nama jika ada, jika tidak, tampilkan email
+                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
+                    }
+                } else {
+                    // Redirect jika tidak ada data user di sessionStorage
+                    window.location.href = '/index.html';
+                }
+            }
+
+            // Fungsi untuk memeriksa akses berdasarkan peran
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user); // Parse JSON string
+                    if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
+                        alert('Anda tidak memiliki akses ke halaman ini.');
+                        sessionStorage.clear(); // Hapus sesi jika tidak punya akses
+                        window.location.href = '/index.html'; // Redirect ke login
+                    }
+                } else {
+                    window.location.href = '/index.html'; // Belum login
+                }
+            }
+
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['admin']); // Hanya 'admin' role yang bisa mengakses halaman ini
+
+
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('minimized');
+                });
+            }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active') &&
+                    !sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+
+            // Transaction form and table elements
+            const toggleFormBtn = document.getElementById('toggleFormBtn');
+            const transactionFormContainer = document.getElementById('transactionFormContainer');
+            const transactionForm = document.getElementById('transactionForm');
+            const formTitle = document.getElementById('formTitle');
+            const cancelFormBtn = document.getElementById('cancelFormBtn');
+            const transactionTableBody = document.getElementById('transactionTable').getElementsByTagName('tbody')[0];
+            const searchFilterInput = document.getElementById('searchFilterInput');
+
+            // Form input fields
+            const transactionIdInput = document.getElementById('transactionId');
+            const tanggalTransaksiInput = document.getElementById('tanggalTransaksi');
+            const namaPasienInput = document.getElementById('namaPasien');
+            const jenisLayananInput = document.getElementById('jenisLayanan');
+            const totalBiayaInput = document.getElementById('totalBiaya');
+            const statusPembayaranInput = document.getElementById('statusPembayaran');
+
+            // Delete modal elements
+            const deleteModal = document.getElementById('deleteModal');
+            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+            // Ambil data transaksi yang sudah ada (jangan direset)
+            let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+            // Set lastTransactionNumber ke 0 setiap kali halaman dimuat untuk ID transaksi per sesi
+            let lastTransactionNumber = parseInt(sessionStorage.getItem('lastTransactionNumber')) || 0;
+
+            let currentTransactionIdToDelete = null;
+
+            function generateId() {
+                // Increment the last transaction number for the current session
+                lastTransactionNumber++;
+                // Pad the number with leading zeros to make it 4 digits
+                const paddedNumber = String(lastTransactionNumber).padStart(4, '0');
+                // Save the new last transaction number to sessionStorage (penting untuk konsistensi dalam satu sesi)
+                sessionStorage.setItem('lastTransactionNumber', lastTransactionNumber);
+                // Change prefix to TRX-
+                return `TRX-${paddedNumber}`;
+            }
+
+            function displayTransactions(filter = '') {
+                transactionTableBody.innerHTML = '';
+                const filteredTransactions = transactions.filter(t =>
+                    t.namaPasien.toLowerCase().includes(filter.toLowerCase()) ||
+                    t.jenisLayanan.toLowerCase().includes(filter.toLowerCase()) ||
+                    t.statusPembayaran.toLowerCase().includes(filter.toLowerCase()) ||
+                    t.id.toLowerCase().includes(filter.toLowerCase())
+                );
+
+                filteredTransactions.forEach(transaction => {
+                    const row = transactionTableBody.insertRow();
+                    row.dataset.id = transaction.id;
+
+                    row.insertCell(0).textContent = transaction.id;
+                    row.insertCell(1).textContent = transaction.tanggalTransaksi;
+                    row.insertCell(2).textContent = transaction.namaPasien;
+                    row.insertCell(3).textContent = transaction.jenisLayanan;
+                    row.insertCell(4).textContent = parseFloat(transaction.totalBiaya).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                    row.insertCell(5).textContent = transaction.statusPembayaran;
+
+                    const actionCell = row.insertCell(6);
+                    actionCell.classList.add('action-buttons');
+                    actionCell.innerHTML = `
+                        <button class="btn btn-edit"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-danger delete-btn"><i class="fas fa-trash"></i> Hapus</button>
+                    `;
+
+                    actionCell.querySelector('.btn-edit').addEventListener('click', () => editTransaction(transaction.id));
+                    actionCell.querySelector('.delete-btn').addEventListener('click', () => showDeleteModal(transaction.id));
+                });
+            }
+
+            function saveTransaction(event) {
+                event.preventDefault();
+
+                // If editing, use existing ID. If adding new, generate it.
+                let id = transactionIdInput.value;
+                if (!id) {
+                    // Hanya generate ID baru jika ini adalah transaksi baru
+                    id = generateId();
+                }
+                
+                const tanggalTransaksi = tanggalTransaksiInput.value;
+                const namaPasien = namaPasienInput.value;
+                const jenisLayanan = jenisLayananInput.value;
+                const totalBiaya = parseFloat(totalBiayaInput.value);
+                const statusPembayaran = statusPembayaranInput.value;
+
+                if (!tanggalTransaksi || !namaPasien || !jenisLayanan || isNaN(totalBiaya)) {
+                    alert('Harap isi semua field yang diperlukan!');
+                    return;
+                }
+
+                const newTransaction = { id, tanggalTransaksi, namaPasien, jenisLayanan, totalBiaya, statusPembayaran };
+
+                const existingIndex = transactions.findIndex(t => t.id === id);
+                if (existingIndex > -1) {
+                    transactions[existingIndex] = newTransaction;
+                    alert('Transaksi berhasil diperbarui!');
+                } else {
+                    transactions.push(newTransaction);
+                    alert('Transaksi berhasil ditambahkan!');
+                }
+
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                transactionForm.reset();
+                hideForm();
+                displayTransactions();
+            }
+
+            function editTransaction(id) {
+                const transaction = transactions.find(t => t.id === id);
+                if (transaction) {
+                    showForm(true);
+                    formTitle.textContent = 'Edit';
+                    transactionIdInput.value = transaction.id;
+                    tanggalTransaksiInput.value = transaction.tanggalTransaksi;
+                    namaPasienInput.value = transaction.namaPasien;
+                    jenisLayananInput.value = transaction.jenisLayanan;
+                    totalBiayaInput.value = transaction.totalBiaya;
+                    statusPembayaranInput.value = transaction.statusPembayaran;
+                }
+            }
+
+            function showDeleteModal(id) {
+                currentTransactionIdToDelete = id;
+                deleteModal.style.display = 'flex'; // Use flex to center the modal
+            }
+
+            function deleteTransaction() {
+                transactions = transactions.filter(t => t.id !== currentTransactionIdToDelete);
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                deleteModal.style.display = 'none';
+                alert('Transaksi berhasil dihapus!');
+                displayTransactions();
+            }
+
+            function showForm(isEdit = false) {
+                transactionFormContainer.style.display = 'block';
+                formTitle.textContent = isEdit ? 'Edit' : 'Tambah';
+                if (!isEdit) {
+                    transactionForm.reset();
+                    transactionIdInput.value = ''; // Clear ID for new transactions
+                }
+                // Scroll to form
+                transactionFormContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function hideForm() {
+                transactionFormContainer.style.display = 'none';
+                transactionForm.reset();
+                transactionIdInput.value = '';
+            }
+
+            // Event Listeners
+            toggleFormBtn.addEventListener('click', function() {
+                if (transactionFormContainer.style.display === 'none' || transactionFormContainer.style.display === '') {
+                    showForm(false);
+                } else {
+                    hideForm();
+                }
+            });
+            cancelFormBtn.addEventListener('click', hideForm);
+            transactionForm.addEventListener('submit', saveTransaction);
+
+            closeDeleteModalBtn.addEventListener('click', () => deleteModal.style.display = 'none');
+            cancelDeleteBtn.addEventListener('click', () => deleteModal.style.display = 'none');
+            confirmDeleteBtn.addEventListener('click', deleteTransaction);
+
+            searchFilterInput.addEventListener('keyup', () => displayTransactions(searchFilterInput.value));
+
+            // Close delete modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+            
+            // Event Listeners for Print Buttons
+            const printPdfBtn = document.getElementById('print-pdf-btn');
+
+            // Baris 'if (downloadPdfBtn)' yang bermasalah telah dihapus/dikomentari.
+            // Hanya menyisakan listener untuk printPdfBtn yang benar.
+
+            if (printPdfBtn) {
+                printPdfBtn.addEventListener('click', function() {
+                    window.print();
+                });
+            }
+
+            // Initial display (hide form by default, show it when 'Tambah Transaksi Baru' is clicked)
+            hideForm();
+            displayTransactions();
+        });
+    </script>
+</body>
+</html>
