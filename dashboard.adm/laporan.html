@@ -646,11 +646,11 @@
         <h1>Manajemen Laporan</h1>
 
         <div class="report-buttons-container">
-            <button id="print-pdf-btn" class="icon-button">
+            <button id="download-pdf-btn" class="icon-button">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 9V2H18V9M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18M6 14H18V22H6V14Z"/>
+                    <path d="M12 16L7 11H11V4H13V11H17L12 16ZM5 20H19V18H5V20Z"/>
                 </svg>
-                Cetak
+                Unduh PDF
             </button>
         </div>
 
@@ -871,7 +871,7 @@
 
             // New Buttons
             const downloadPdfBtn = document.getElementById('download-pdf-btn');
-            const printPdfBtn = document.getElementById('print-pdf-btn');
+            // const printPdfBtn = document.getElementById('print-pdf-btn'); // Dihapus karena fungsinya digabung
 
             // Toggle sidebar for desktop
             if (sidebarToggle) {
@@ -988,16 +988,7 @@
                 });
             }
 
-            // "Cetak" button: Simply triggers the browser's native print dialog for the current HTML page.
-            if (printPdfBtn) {
-                printPdfBtn.addEventListener('click', () => {
-                    alert('Membuka dialog cetak browser. Anda bisa mencetak atau "Simpan sebagai PDF" dari sana.');
-                    window.print(); // This will print the HTML content of the current page.
-                });
-            }
-
-
-            // Initialize the app
+            // Inisialisasi aplikasi
             function init() {
                 // Populate HTML tables on load
                 populateReportTables();
