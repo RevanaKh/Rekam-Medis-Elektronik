@@ -717,6 +717,12 @@
                 <strong>Jenis Kelamin:</strong> <span id="summaryJenisKelamin"></span>
             </div>
             <div class="summary-item">
+                <strong>Status Pernikahan:</strong> <span id="summaryStatusPernikahan"></span>
+            </div>
+            <div class="summary-item">
+                <strong>Pekerjaan:</strong> <span id="summaryPekerjaan"></span>
+            </div>
+            <div class="summary-item">
                 <strong>Tempat Lahir:</strong> <span id="summaryTempatLahir"></span>
             </div>
             <div class="summary-item">
@@ -758,6 +764,25 @@
                         <option value="">Pilih Jenis Kelamin</option>
                         <option value="Laki-laki">Laki-laki</option>
                         <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
+                <div class="input-group" style="margin-bottom: 10px; text-align: left;">
+                    <label for="editStatusPernikahan">Status Pernikahan</label>
+                    <select id="editStatusPernikahan" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">Status Pernikahan</option>
+                        <option value="Belum Meniikah">Belum Menikah</option>
+                        <option value="Menikah">Menikah</option>
+                        <option value="Cerai">cerai</option>
+                    </select>
+                </div>
+                <div class="input-group" style="margin-bottom: 10px; text-align: left;">
+                    <label for="editPekerjaan">Pekerjaan</label>
+                    <select id="editPekerjaan" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">Pekerjaan</option>
+                        <option value="Bekerja">Bekerja</option>
+                        <option value="Pelajar">Pelajar</option>
+                        <option value="Mahasiswa">Mahasiswa</option>
+                        <option value="Tidak Bekerja">Tidak Bekerjan</option>
                     </select>
                 </div>
                 <div class="input-group" style="margin-bottom: 10px; text-align: left;">
@@ -918,6 +943,8 @@
                     const confirmPassword = document.getElementById('regConfirmPassword').value;
                     const nik = document.getElementById('regNik').value;
                     const jenisKelamin = document.getElementById('regJenisKelamin').value;
+                    const StatusPernikahan = document.getElementById('regStatusPernikahan').value;
+                    const Pekerjaan = document.getElementById('regPekerjaan').value;
                     const alamat = document.getElementById('regAlamat').value;
                     const tempatLahir = document.getElementById('regTempatLahir').value;
                     const tanggalLahir = document.getElementById('regTanggalLahir').value;
@@ -963,6 +990,8 @@
                         role,
                         nik,
                         jenisKelamin,
+                        StatusPernikahan,
+                        Pekerjaan,
                         alamat,
                         tempatLahir,
                         tanggalLahir,
@@ -1041,6 +1070,8 @@
             const summaryEmail = document.getElementById('summaryEmail');
             const summaryNik = document.getElementById('summaryNik');
             const summaryJenisKelamin = document.getElementById('summaryJenisKelamin');
+            const summaryStatusPernikahan = document.getElementById('summaryStatusPernikahan');
+            const summaryPekerjaan = document.getElementById('summaryPekerjaan');
             const summaryTempatLahir = document.getElementById('summaryTempatLahir');
             const summaryTanggalLahir = document.getElementById('summaryTanggalLahir');
             const summaryTelepon = document.getElementById('summaryTelepon');
@@ -1054,6 +1085,8 @@
             const editEmail = document.getElementById('editEmail');
             const editNik = document.getElementById('editNik');
             const editJenisKelamin = document.getElementById('editJenisKelamin');
+            const editStatusPernikahan = document.getElementById('editStatusPernikahan');
+            const editPekerjaan = document.getElementById('editPekerjaan');
             const editTempatLahir = document.getElementById('editTempatLahir');
             const editTanggalLahir = document.getElementById('editTanggalLahir');
             const editTelepon = document.getElementById('editTelepon');
@@ -1094,6 +1127,8 @@
                     summaryEmail.textContent = loggedInUser.email || 'Tidak ada data';
                     summaryNik.textContent = loggedInUser.nik || 'Tidak ada data';
                     summaryJenisKelamin.textContent = loggedInUser.jenisKelamin || 'Tidak ada data';
+                    summaryStatusPernikahan.textContent = loggedInUser.StatusPernikahan || 'Tidak ada data';
+                    summaryPekerjaan.textContent = loggedInUser.Pekerjaan || 'Tidak ada data';
                     summaryTempatLahir.textContent = loggedInUser.tempatLahir || 'Tidak ada data';
                     summaryTanggalLahir.textContent = loggedInUser.tanggalLahir || 'Tidak ada data';
                     summaryTelepon.textContent = loggedInUser.telepon || 'Tidak ada data';
@@ -1126,6 +1161,8 @@
                     editEmail.value = loggedInUser.email || ''; // Email is read-only
                     editNik.value = loggedInUser.nik || '';
                     editJenisKelamin.value = loggedInUser.jenisKelamin || '';
+                    editStatusPernikahan.value = loggedInUser.StatusPernikahan || '';
+                    editPekerjaan.value = loggedInUser.Pekerjaan || '';
                     editTempatLahir.value = loggedInUser.tempatLahir || '';
                     editTanggalLahir.value = loggedInUser.tanggalLahir || '';
                     editTelepon.value = loggedInUser.telepon || '';
@@ -1162,6 +1199,8 @@
                     nama: editNama.value,
                     nik: editNik.value,
                     jenisKelamin: editJenisKelamin.value,
+                    StatusPernikahan: editStatusPernikahan.value,
+                    Pekerjaan: editPekerjaan.value,
                     alamat: editAlamat.value,
                     tempatLahir: editTempatLahir.value,
                     tanggalLahir: editTanggalLahir.value,
