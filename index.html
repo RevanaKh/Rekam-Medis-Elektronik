@@ -273,6 +273,25 @@
           </select>
         </div>
         <div class="form-group">
+          <label for="regStatusPernikahan">Status Pernikahan:</label>
+          <select id="regStatusPernikahan" required>
+            <option value="">Pilih Status Pernikahan</option>
+            <option value="Belum Menikah">Belum Menikah</option>
+            <option value="Menikah">Menikah</option>
+             <option value="Menikah">Cerai</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="regPekerjaan">Pekerjaan:</label>
+          <select id="regPekerjaan" required>
+            <option value="">Pilih Pekerjaan</option>
+            <option value="Bekerja">Bekerja</option>
+            <option value="Pelajar">Pelajar/option>
+             <option value="Mahasiswa">Mahasiswa</option>
+             <option value="Tidak Bekerja">Tidak Bekerja</option>
+            <option value="Lainnya">lainnya</option>
+          </select>
+        <div class="form-group">
           <label for="regAlamat">Alamat:</label>
           <input type="text" id="regAlamat" required />
         </div>
@@ -450,6 +469,8 @@
             const confirmPassword = document.getElementById('regConfirmPassword').value;
             const nik = document.getElementById('regNik').value;
             const jenisKelamin = document.getElementById('regJenisKelamin').value;
+          const jenisKelamin = document.getElementById('regStatusPernikahan').value;
+          const jenisKelamin = document.getElementById('regPekerjaan').value;
             const alamat = document.getElementById('regAlamat').value;
             const tempatLahir = document.getElementById('regTempatLahir').value;
             const tanggalLahir = document.getElementById('regTanggalLahir').value; // Format YYYY-MM-DD
@@ -515,6 +536,8 @@
                 role,
                 nik,
                 jenisKelamin,
+                statusPekerjaan,
+                pekerjaan,
                 alamat,
                 tempatLahir,
                 tanggalLahir,
