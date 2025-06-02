@@ -23,7 +23,7 @@
 
             /* Warna baru untuk tombol laporan sesuai gambar */
             --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
-            --report-print-bg: #3498DB; /* Biru untuk Cetak */
+            --report-print-bg: #3498DB; /* Biru untuk Cetak (disini tidak dipakai lagi untuk cetak, tapi untuk jaga-jaga) */
         }
 
         * {
@@ -330,11 +330,11 @@
             transform: translateY(-2px);
         }
 
-        #print-pdf-btn {
+        #print-pdf-btn { /* Ini tidak digunakan lagi untuk print, hanya untuk jaga-jaga style */
             background-color: var(--report-print-bg);
         }
 
-        #print-pdf-btn:hover {
+        #print-pdf-btn:hover { /* Ini tidak digunakan lagi untuk print, hanya untuk jaga-jaga style */
             background-color: #2980B9;
             transform: translateY(-2px);
         }
@@ -837,13 +837,15 @@
             </div>
 
             <div class="report-buttons-container">
-                <button class="icon-button" id="print-pdf-btn">
+                <button class="icon-button" id="download-pdf-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                        <rect x="6" y="14" width="12" height="8"></rect>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
-                    Cetak Laporan
+                    Unduh PDF
                 </button>
             </div>
             <div class="card form-container" id="transactionFormContainer">
@@ -917,6 +919,9 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1159,20 +1164,99 @@
                 }
             });
             
-            // Event Listeners for Print Buttons
-            const printPdfBtn = document.getElementById('print-pdf-btn');
+            // Event Listeners for PDF Download Button
+            const downloadPdfBtn = document.getElementById('download-pdf-btn');
 
-            // Baris 'if (downloadPdfBtn)' yang bermasalah telah dihapus/dikomentari.
-            // Hanya menyisakan listener untuk printPdfBtn yang benar.
+            if (downloadPdfBtn) {
+                downloadPdfBtn.addEventListener('click', async function() {
+                    // Hide elements not to be included in PDF
+                    const sidebar = document.querySelector('.sidebar');
+                    const mobileToggle = document.querySelector('.mobile-toggle');
+                    const toggleBtn = document.querySelector('.toggle-btn');
+                    const reportButtonsContainer = document.querySelector('.report-buttons-container');
+                    const modal = document.querySelector('.modal');
+                    const formContainer = document.querySelector('.card.form-container');
+                    const searchAddContainer = document.querySelector('.section-header .search-add-container');
+                    const actionCells = document.querySelectorAll('#transactionTable th:last-child, #transactionTable td:last-child');
 
-            if (printPdfBtn) {
-                printPdfBtn.addEventListener('click', function() {
-                    window.print();
+                    sidebar.style.display = 'none';
+                    mobileToggle.style.display = 'none';
+                    toggleBtn.style.display = 'none';
+                    reportButtonsContainer.style.display = 'none';
+                    if (modal) modal.style.display = 'none'; // Check if modal exists
+                    formContainer.style.display = 'none';
+                    searchAddContainer.style.display = 'none';
+                    actionCells.forEach(cell => cell.style.display = 'none');
+
+                    // Set table and content section width for PDF generation
+                    const mainContent = document.querySelector('.main-content');
+                    const contentSection = document.querySelector('.content-section');
+                    const transactionTable = document.getElementById('transactionTable');
+
+                    const originalMainContentMargin = mainContent.style.marginLeft;
+                    const originalMainContentWidth = mainContent.style.width;
+                    const originalContentSectionMaxWidth = contentSection.style.maxWidth;
+                    const originalTableMinWidth = transactionTable.style.minWidth;
+                    
+                    mainContent.style.marginLeft = '0';
+                    mainContent.style.width = '100%';
+                    mainContent.style.alignItems = 'flex-start';
+                    contentSection.style.maxWidth = 'none';
+                    transactionTable.style.minWidth = 'unset';
+
+                    // Use html2canvas to capture the content of the main-content
+                    const canvas = await html2canvas(document.querySelector('.content-section'), {
+                        scale: 2, // Increase scale for better resolution
+                        useCORS: true, // If you have external images/resources
+                        windowWidth: document.querySelector('.content-section').scrollWidth,
+                        windowHeight: document.querySelector('.content-section').scrollHeight,
+                        x: 0,
+                        y: 0
+                    });
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
+
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 297; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+
+                    pdf.save('Laporan_Transaksi_Pasien.pdf');
+
+                    // Restore original display styles
+                    sidebar.style.display = '';
+                    mobileToggle.style.display = '';
+                    toggleBtn.style.display = '';
+                    reportButtonsContainer.style.display = '';
+                    if (modal) modal.style.display = '';
+                    formContainer.style.display = '';
+                    searchAddContainer.style.display = '';
+                    actionCells.forEach(cell => cell.style.display = '');
+
+                    mainContent.style.marginLeft = originalMainContentMargin;
+                    mainContent.style.width = originalMainContentWidth;
+                    mainContent.style.alignItems = '';
+                    contentSection.style.maxWidth = originalContentSectionMaxWidth;
+                    transactionTable.style.minWidth = originalTableMinWidth;
                 });
             }
 
             // Initial display (hide form by default, show it when 'Tambah Transaksi Baru' is clicked)
-            hideForm();
+            transactionFormContainer.style.display = 'none'; // Tambahkan baris ini
+            hideForm(); 
             displayTransactions();
         });
     </script>
