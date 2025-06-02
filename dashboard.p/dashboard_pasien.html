@@ -952,8 +952,8 @@
                     const confirmPassword = document.getElementById('regConfirmPassword').value;
                     const nik = document.getElementById('regNik').value;
                     const jenisKelamin = document.getElementById('regJenisKelamin').value;
-                    const StatusPernikahan = document.getElementById('regStatusPernikahan').value;
-                    const Pekerjaan = document.getElementById('regPekerjaan').value;
+                    const statusPernikahan = document.getElementById('regStatusPernikahan').value;
+                    const pekerjaan = document.getElementById('regPekerjaan').value;
                     const alamat = document.getElementById('regAlamat').value;
                     const tempatLahir = document.getElementById('regTempatLahir').value;
                     const tanggalLahir = document.getElementById('regTanggalLahir').value;
@@ -999,8 +999,8 @@
                         role,
                         nik,
                         jenisKelamin,
-                        StatusPernikahan,
-                        Pekerjaan,
+                        statusPernikahan,
+                        pekerjaan,
                         alamat,
                         tempatLahir,
                         tanggalLahir,
@@ -1079,8 +1079,8 @@
             const summaryEmail = document.getElementById('summaryEmail');
             const summaryNik = document.getElementById('summaryNik');
             const summaryJenisKelamin = document.getElementById('summaryJenisKelamin');
-            const summaryStatusPernikahan = document.getElementById('summaryStatusPernikahan');
-            const summaryPekerjaan = document.getElementById('summaryPekerjaan');
+            const summarystatusPernikahan = document.getElementById('summaryStatusPernikahan');
+            const summarypekerjaan = document.getElementById('summaryPekerjaan');
             const summaryTempatLahir = document.getElementById('summaryTempatLahir');
             const summaryTanggalLahir = document.getElementById('summaryTanggalLahir');
             const summaryTelepon = document.getElementById('summaryTelepon');
@@ -1094,8 +1094,8 @@
             const editEmail = document.getElementById('editEmail');
             const editNik = document.getElementById('editNik');
             const editJenisKelamin = document.getElementById('editJenisKelamin');
-            const editStatusPernikahan = document.getElementById('editStatusPernikahan');
-            const editPekerjaan = document.getElementById('editPekerjaan');
+            const editstatusPernikahan = document.getElementById('editStatusPernikahan');
+            const editpekerjaan = document.getElementById('editPekerjaan');
             const editTempatLahir = document.getElementById('editTempatLahir');
             const editTanggalLahir = document.getElementById('editTanggalLahir');
             const editTelepon = document.getElementById('editTelepon');
@@ -1136,8 +1136,8 @@
                     summaryEmail.textContent = loggedInUser.email || 'Tidak ada data';
                     summaryNik.textContent = loggedInUser.nik || 'Tidak ada data';
                     summaryJenisKelamin.textContent = loggedInUser.jenisKelamin || 'Tidak ada data';
-                    summaryStatusPernikahan.textContent = loggedInUser.StatusPernikahan || 'Tidak ada data';
-                    summaryPekerjaan.textContent = loggedInUser.Pekerjaan || 'Tidak ada data';
+                    summarystatusPernikahan.textContent = loggedInUser.StatusPernikahan || 'Tidak ada data';
+                    summarypekerjaan.textContent = loggedInUser.Pekerjaan || 'Tidak ada data';
                     summaryTempatLahir.textContent = loggedInUser.tempatLahir || 'Tidak ada data';
                     summaryTanggalLahir.textContent = loggedInUser.tanggalLahir || 'Tidak ada data';
                     summaryTelepon.textContent = loggedInUser.telepon || 'Tidak ada data';
@@ -1170,8 +1170,8 @@
                     editEmail.value = loggedInUser.email || ''; // Email is read-only
                     editNik.value = loggedInUser.nik || '';
                     editJenisKelamin.value = loggedInUser.jenisKelamin || '';
-                    editStatusPernikahan.value = loggedInUser.StatusPernikahan || '';
-                    editPekerjaan.value = loggedInUser.Pekerjaan || '';
+                    editstatusPernikahan.value = loggedInUser.StatusPernikahan || '';
+                    editpekerjaan.value = loggedInUser.Pekerjaan || '';
                     editTempatLahir.value = loggedInUser.tempatLahir || '';
                     editTanggalLahir.value = loggedInUser.tanggalLahir || '';
                     editTelepon.value = loggedInUser.telepon || '';
@@ -1208,8 +1208,8 @@
                     nama: editNama.value,
                     nik: editNik.value,
                     jenisKelamin: editJenisKelamin.value,
-                    StatusPernikahan: editStatusPernikahan.value,
-                    Pekerjaan: editPekerjaan.value,
+                    statusPernikahan: editStatusPernikahan.value,
+                    pekerjaan: editPekerjaan.value,
                     alamat: editAlamat.value,
                     tempatLahir: editTempatLahir.value,
                     tanggalLahir: editTanggalLahir.value,
