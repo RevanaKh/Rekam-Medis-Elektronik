@@ -214,7 +214,7 @@
             text-decoration: none;
             transition: background-color 0.2s ease;
             gap: 8px;
-            width: 100%; /* Ensure full width */
+            width: 100%;
             border-top: 1px solid var(--secondary-color); /* Black border on top */
             border-bottom: 1px solid var(--secondary-color); /* Black border on bottom */
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
@@ -838,28 +838,28 @@
                     return sum + (currentYear - birthYear);
                 }, 0);
                 const averageAge = pasienData.length > 0 ? (totalAge / pasienData.length).toFixed(0) : 0;
-                document.getElementById('rata-rata-usia').textContent = `${averageAge} Tahun`;
+                // document.getElementById('rata-rata-usia').textContent = `${averageAge} Tahun`; // This element doesn't exist in laporan.html
 
 
                 document.getElementById('dokter-hadir').textContent = dokterData.filter(d => d.hadir).length;
-                document.getElementById('dokter-cuti').textContent = dokterData.filter(d => d.jamKerja === "Cuti").length;
+                // document.getElementById('dokter-cuti').textContent = dokterData.filter(d => d.jamKerja === "Cuti").length; // This element doesn't exist in laporan.html
                 
                 // Calculate total work hours for doctors (simple example)
                 const totalDoctorHours = dokterData.filter(d => d.hadir && d.jamKerja.includes('-')).reduce((sum, d) => {
                     const [start, end] = d.jamKerja.split('-').map(time => parseInt(time.split(':')[0]));
                     return sum + (end - start);
                 }, 0);
-                document.getElementById('total-jam-kerja').textContent = `${totalDoctorHours} Jam`;
+                // document.getElementById('total-jam-kerja').textContent = `${totalDoctorHours} Jam`; // This element doesn't exist in laporan.html
 
                 document.getElementById('apoteker-hadir').textContent = apotekerData.filter(a => a.status === "Hadir").length;
-                document.getElementById('apoteker-izin').textContent = apotekerData.filter(a => a.status === "Izin").length;
+                // document.getElementById('apoteker-izin').textContent = apotekerData.filter(a => a.status === "Izin").length; // This element doesn't exist in laporan.html
 
                 // Calculate total work hours for apothecaries (simple example)
                 const totalApotekerHours = apotekerData.filter(a => a.status === "Hadir" && a.jamKerja.includes('-')).reduce((sum, a) => {
                     const [start, end] = a.jamKerja.split('-').map(time => parseInt(time.split(':')[0]));
                     return sum + (end - start);
                 }, 0);
-                document.getElementById('total-jam-kerja-apoteker').textContent = `${totalApotekerHours} Jam`;
+                // document.getElementById('total-jam-kerja-apoteker').textContent = `${totalApotekerHours} Jam`; // This element doesn't exist in laporan.html
             }
 
             // Sidebar and Mobile Menu Toggle
