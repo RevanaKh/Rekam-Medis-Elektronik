@@ -278,7 +278,7 @@
             <option value="">Pilih Status Pernikahan</option>
             <option value="Belum Menikah">Belum Menikah</option>
             <option value="Menikah">Menikah</option>
-             <option value="Menikah">Cerai</option>
+            <option value="Cerai">Cerai</option>
           </select>
         </div>
         <div class="form-group">
@@ -287,8 +287,8 @@
             <option value="">Pilih Pekerjaan</option>
             <option value="Bekerja">Bekerja</option>
             <option value="Pelajar">Pelajar</option>
-             <option value="Mahasiswa">Mahasiswa</option>
-             <option value="Tidak Bekerja">Tidak Bekerja</option>
+            <option value="Mahasiswa">Mahasiswa</option>
+            <option value="Tidak Bekerja">Tidak Bekerja</option>
           </select>
         </div>
         <div class="form-group">
@@ -469,8 +469,8 @@
             const confirmPassword = document.getElementById('regConfirmPassword').value;
             const nik = document.getElementById('regNik').value;
             const jenisKelamin = document.getElementById('regJenisKelamin').value;
-            const StatusPernikahan = document.getElementById('regStatusPernikahan').value;
-            const Pekerjaan = document.getElementById('regPekerjaan').value;
+            const statusPernikahan = document.getElementById('regStatusPernikahan').value; // Corrected variable name
+            const pekerjaan = document.getElementById('regPekerjaan').value; // Corrected variable name
             const alamat = document.getElementById('regAlamat').value;
             const tempatLahir = document.getElementById('regTempatLahir').value;
             const tanggalLahir = document.getElementById('regTanggalLahir').value; // Format YYYY-MM-DD
@@ -506,8 +506,8 @@
                     return;
                 }
             } else {
-                 errorRegTanggalLahir.textContent = 'Tanggal lahir harus diisi.';
-                 return;
+                errorRegTanggalLahir.textContent = 'Tanggal lahir harus diisi.';
+                return;
             }
 
 
@@ -536,8 +536,8 @@
                 role,
                 nik,
                 jenisKelamin,
-                StatusPekerjaan,
-                Pekerjaan,
+                statusPernikahan, // Corrected to match the input ID
+                pekerjaan, // Corrected to match the input ID
                 alamat,
                 tempatLahir,
                 tanggalLahir,
