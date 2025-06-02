@@ -1,599 +1,619 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>E-Rekam Medis</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* Global Styles */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>E-Rekam Medis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
 
-    body {
-      background: url('assets/bg.jpg') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
+        body {
+            background: url('assets/bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    /* Container for Login/Register Forms */
-    .container {
-      text-align: center;
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 30px 20px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 25px;
-      font-size: 2em;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
-      position: relative;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: #555;
-      font-weight: bold;
-    }
-
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 1em;
-      box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
-      transition: border-color 0.3s ease;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-      border-color: #1de9b6;
-      outline: none;
-      box-shadow: 0 0 5px rgba(29, 233, 182, 0.5);
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 15px;
-      top: 50%; /* Adjusted for better vertical alignment within input */
-      transform: translateY(calc(50% + 5px)); /* Fine-tune position */
-      cursor: pointer;
-      color: #888;
-    }
-
-    .btn-primary {
-      background-color: #1de9b6;
-      color: white;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1.1em;
-      font-weight: bold;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .btn-primary:hover {
-      background-color: #00b686;
-      transform: translateY(-2px);
-    }
-
-    .form-switch {
-      margin-top: 20px;
-      font-size: 0.95em;
-      color: #666;
-    }
-
-    .form-switch a {
-      color: #1de9b6;
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s ease;
-    }
-
-    .form-switch a:hover {
-      color: #00b686;
-      text-decoration: underline;
-    }
-
-    /* Modal Styles */
-    .modal {
-      display: none; /* Hidden by default */
-      position: fixed; /* Stay in place */
-      z-index: 1000; /* Sit on top */
-      left: 0;
-      top: 0;
-      width: 100%; /* Full width */
-      height: 100%; /* Full height */
-      overflow: auto; /* Enable scroll if needed */
-      background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background-color: #fefefe;
-      margin: auto;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      width: 90%;
-      max-width: 500px;
-      position: relative;
-    }
-
-    .close-button {
-      color: #aaa;
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .close-button:hover,
-    .close-button:focus {
-      color: #333;
-      text-decoration: none;
-    }
-
-    .modal-content h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      color: #333;
-      text-align: center;
-    }
-
-    .modal-content .btn-primary {
-        margin-top: 20px;
-    }
-
-    .success-message {
-      text-align: center;
-      padding: 20px;
-      font-size: 1.1em;
-      color: #333;
-    }
-
-    .success-message i {
-        color: #4CAF50;
-        font-size: 3em;
-        margin-bottom: 15px;
-    }
-
-    .error-message {
-        color: #f44336;
-        font-size: 0.85em;
-        margin-top: 5px;
-        display: block;
-        text-align: left;
-    }
-
-    @media (max-width: 768px) {
+        /* Container for Login/Register Forms */
         .container {
-            padding: 25px 15px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
         }
+
         h1 {
-            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 2em;
         }
-        .btn-primary {
-            padding: 10px 20px;
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             font-size: 1em;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+            transition: border-color 0.3s ease;
         }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #1de9b6;
+            outline: none;
+            box-shadow: 0 0 5px rgba(29, 233, 182, 0.5);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%; /* Adjusted for better vertical alignment within input */
+            transform: translateY(calc(50% + 5px)); /* Fine-tune position */
+            cursor: pointer;
+            color: #888;
+        }
+
+        .btn-primary {
+            background-color: #1de9b6;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #00b686;
+            transform: translateY(-2px);
+        }
+
+        .form-switch {
+            margin-top: 20px;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .form-switch a {
+            color: #1de9b6;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .form-switch a:hover {
+            color: #00b686;
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+
         .modal-content {
-            padding: 25px;
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
         }
-    }
-  </style>
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .modal-content .btn-primary {
+            margin-top: 20px;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .success-message i {
+            color: #4CAF50;
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: block;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .btn-primary {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            .modal-content {
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>E-Rekam Medis</h1>
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="loginEmail">Email:</label>
-        <input type="email" id="loginEmail" required />
-      </div>
-      <div class="form-group">
-        <label for="loginPassword">Password:</label>
-        <input type="password" id="loginPassword" required />
-        <span class="toggle-password" data-target="loginPassword">
-          <i class="fa fa-eye-slash"></i>
-        </span>
-      </div>
-      <button type="submit" class="btn-primary">Login</button>
-    </form>
-    <div class="form-switch">
-      Belum punya akun? <a href="#" id="showRegisterModal">Daftar Sekarang</a><br>
-      <a href="#" id="forgotLink" style="font-size: 0.9em; margin-top: 10px; display: inline-block;">Lupa Akun?</a>
+    <div class="container">
+        <h1>E-Rekam Medis</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" required />
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" required />
+                <span class="toggle-password" data-target="loginPassword">
+                    <i class="fa fa-eye-slash"></i>
+                </span>
+            </div>
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <div class="form-switch">
+            Belum punya akun? <a href="#" id="showRegisterModal">Daftar Sekarang</a><br>
+            <a href="#" id="forgotLink" style="font-size: 0.9em; margin-top: 10px; display: inline-block;">Lupa Akun?</a>
+        </div>
     </div>
-  </div>
 
-  <div id="registerModal" class="modal">
-    <div class="modal-content">
-      <span class="close-button" id="closeRegisterModal">&times;</span>
-      <h2>Daftar Akun Baru</h2>
-      <form id="registerForm">
-        <div class="form-group">
-          <label for="regNama">Nama Lengkap:</label>
-          <input type="text" id="regNama" required />
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeRegisterModal">&times;</span>
+            <h2>Daftar Akun Baru</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regNama">Nama Lengkap:</label>
+                    <input type="text" id="regNama" required />
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" required />
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password:</label>
+                    <input type="password" id="regPassword" required />
+                    <span class="toggle-password" data-target="regPassword">
+                        <i class="fa fa-eye-slash"></i>
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Konfirmasi Password:</label>
+                    <input type="password" id="regConfirmPassword" required />
+                    <span class="toggle-password" data-target="regConfirmPassword">
+                        <i class="fa fa-eye-slash"></i>
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label for="regNik">NIK:</label>
+                    <input type="text" id="regNik" required pattern="[0-9]{16}" title="NIK harus 16 digit angka" maxlength="16"/>
+                    <span class="error-message" id="errorRegNik"></span>
+                </div>
+                <div class="form-group">
+                    <label for="regJenisKelamin">Jenis Kelamin:</label>
+                    <select id="regJenisKelamin" required>
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="regStatusPernikahan">Status Pernikahan:</label>
+                    <select id="regStatusPernikahan" required>
+                        <option value="">Pilih Status Pernikahan</option>
+                        <option value="Belum Menikah">Belum Menikah</option>
+                        <option value="Menikah">Menikah</option>
+                        <option value="Cerai">Cerai</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="regPekerjaan">Pekerjaan:</label>
+                    <select id="regPekerjaan" required>
+                        <option value="">Pilih Pekerjaan</option>
+                        <option value="Bekerja">Bekerja</option>
+                        <option value="Pelajar">Pelajar</option>
+                        <option value="Mahasiswa">Mahasiswa</option>
+                        <option value="Tidak Bekerja">Tidak Bekerja</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="regAlamat">Alamat:</label>
+                    <input type="text" id="regAlamat" required />
+                </div>
+                <div class="form-group">
+                    <label for="regTempatLahir">Tempat Lahir:</label>
+                    <input type="text" id="regTempatLahir" required />
+                </div>
+                <div class="form-group">
+                    <label for="regTanggalLahir">Tanggal Lahir:</label>
+                    <input type="date" id="regTanggalLahir" required />
+                    <span class="error-message" id="errorRegTanggalLahir"></span>
+                </div>
+                <div class="form-group">
+                    <label for="regTelepon">No. Telepon:</label>
+                    <input type="tel" id="regTelepon" required pattern="^08[0-9]{10}$" title="Contoh: 081234567890 (harus 12 digit)" maxlength="12"/>
+                    <span class="error-message" id="errorRegTelepon"></span>
+                </div>
+                <div class="form-group">
+                    <label for="regGolDarah">Golongan Darah:</label>
+                    <select id="regGolDarah">
+                        <option value="">Tidak Tahu</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Daftar</button>
+            </form>
         </div>
-        <div class="form-group">
-          <label for="regEmail">Email:</label>
-          <input type="email" id="regEmail" required />
-        </div>
-        <div class="form-group">
-          <label for="regPassword">Password:</label>
-          <input type="password" id="regPassword" required />
-          <span class="toggle-password" data-target="regPassword">
-            <i class="fa fa-eye-slash"></i>
-          </span>
-        </div>
-        <div class="form-group">
-          <label for="regConfirmPassword">Konfirmasi Password:</label>
-          <input type="password" id="regConfirmPassword" required />
-          <span class="toggle-password" data-target="regConfirmPassword">
-            <i class="fa fa-eye-slash"></i>
-          </span>
-        </div>
-        <div class="form-group">
-          <label for="regNik">NIK:</label>
-          <input type="text" id="regNik" required pattern="[0-9]{16}" title="NIK harus 16 digit angka" maxlength="16"/>
-          <span class="error-message" id="errorRegNik"></span>
-        </div>
-        <div class="form-group">
-          <label for="regJenisKelamin">Jenis Kelamin:</label>
-          <select id="regJenisKelamin" required>
-            <option value="">Pilih Jenis Kelamin</option>
-            <option value="Laki-laki">Laki-laki</option>
-            <option value="Perempuan">Perempuan</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="regStatusPernikahan">Status Pernikahan:</label>
-          <select id="regStatusPernikahan" required>
-            <option value="">Pilih Status Pernikahan</option>
-            <option value="Belum Menikah">Belum Menikah</option>
-            <option value="Menikah">Menikah</option>
-            <option value="Cerai">Cerai</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="regPekerjaan">Pekerjaan:</label>
-          <select id="regPekerjaan" required>
-            <option value="">Pilih Pekerjaan</option>
-            <option value="Bekerja">Bekerja</option>
-            <option value="Pelajar">Pelajar</option>
-            <option value="Mahasiswa">Mahasiswa</option>
-            <option value="Tidak Bekerja">Tidak Bekerja</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="regAlamat">Alamat:</label>
-          <input type="text" id="regAlamat" required />
-        </div>
-        <div class="form-group">
-          <label for="regTempatLahir">Tempat Lahir:</label>
-          <input type="text" id="regTempatLahir" required />
-        </div>
-        <div class="form-group">
-          <label for="regTanggalLahir">Tanggal Lahir:</label>
-          <input type="date" id="regTanggalLahir" required />
-          <span class="error-message" id="errorRegTanggalLahir"></span>
-        </div>
-        <div class="form-group">
-          <label for="regTelepon">No. Telepon:</label>
-          <input type="tel" id="regTelepon" required pattern="^08[0-9]{10}$" title="Contoh: 081234567890 (harus 12 digit)" maxlength="12"/>
-          <span class="error-message" id="errorRegTelepon"></span>
-        </div>
-        <div class="form-group">
-          <label for="regGolDarah">Golongan Darah:</label>
-          <select id="regGolDarah">
-            <option value="">Tidak Tahu</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="AB">AB</option>
-            <option value="O">O</option>
-          </select>
-        </div>
-        <button type="submit" class="btn-primary">Daftar</button>
-      </form>
     </div>
-  </div>
 
-  <div id="successModal" class="modal">
-    <div class="modal-content">
-      <span class="close-button" id="successModalCloseButton">&times;</span>
-      <div class="success-message">
-        <i class="fas fa-check-circle"></i>
-        <h2>Pendaftaran Berhasil!</h2>
-        <p>Akun Anda telah berhasil terdaftar. Silakan login.</p>
-      </div>
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="successModalCloseButton">&times;</span>
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i>
+                <h2>Pendaftaran Berhasil!</h2>
+                <p>Akun Anda telah berhasil terdaftar. Silakan login.</p>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    // --- Function to initialize or update default accounts ---
-    function initializeDefaultAccounts() {
-        let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-        let usersModified = false;
+    <script>
+        // --- Function to initialize or update default accounts ---
+        function initializeDefaultAccounts() {
+            let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+            let usersModified = false;
 
-        const defaultAccounts = [
-            { email: 'admin@gmail.com', password: 'admin123', role: 'admin' },
-            { email: 'dokter@gmail.com', password: 'dokter123', role: 'dokter' },
-            { email: 'apoteker@gmail.com', password: 'apoteker123', role: 'apoteker' },
-            { email: 'pasien@gmail.com', password: 'pasien123', role: 'pasien' }
-        ];
+            const defaultAccounts = [
+                { email: 'admin@gmail.com', password: 'admin123', role: 'admin' },
+                { email: 'dokter@gmail.com', password: 'dokter123', role: 'dokter' },
+                { email: 'apoteker@gmail.com', password: 'apoteker123', role: 'apoteker' },
+                { email: 'pasien@gmail.com', password: 'pasien123', role: 'pasien' }
+            ];
 
-        defaultAccounts.forEach(defaultUser => {
-            const existingUserIndex = users.findIndex(u => u.email === defaultUser.email);
+            defaultAccounts.forEach(defaultUser => {
+                const existingUserIndex = users.findIndex(u => u.email === defaultUser.email);
 
-            if (existingUserIndex !== -1) {
-                // If user exists, check if password or role needs updating
-                if (users[existingUserIndex].password !== defaultUser.password || users[existingUserIndex].role !== defaultUser.role) {
-                    console.log(`Updating password/role for existing user: ${defaultUser.email}`);
-                    users[existingUserIndex].password = defaultUser.password;
-                    users[existingUserIndex].role = defaultUser.role;
+                if (existingUserIndex !== -1) {
+                    // If user exists, check if password or role needs updating
+                    if (users[existingUserIndex].password !== defaultUser.password || users[existingUserIndex].role !== defaultUser.role) {
+                        console.log(`Updating password/role for existing user: ${defaultUser.email}`);
+                        users[existingUserIndex].password = defaultUser.password;
+                        users[existingUserIndex].role = defaultUser.role;
+                        usersModified = true;
+                    }
+                    // Juga perbarui properti StatusPernikahan dan Pekerjaan jika user_pasien sudah ada tapi datanya belum lengkap
+                    if (defaultUser.email === 'pasien@gmail.com' && (!users[existingUserIndex].StatusPernikahan || !users[existingUserIndex].Pekerjaan)) {
+                        users[existingUserIndex].nama = users[existingUserIndex].nama || 'Pasien Default';
+                        users[existingUserIndex].nik = users[existingUserIndex].nik || '1234567890123456';
+                        users[existingUserIndex].jenisKelamin = users[existingUserIndex].jenisKelamin || 'Laki-laki';
+                        users[existingUserIndex].StatusPernikahan = users[existingUserIndex].StatusPernikahan || 'Belum Menikah';
+                        users[existingUserIndex].Pekerjaan = users[existingUserIndex].Pekerjaan || 'Pelajar';
+                        users[existingUserIndex].alamat = users[existingUserIndex].alamat || 'Jl. Contoh No.1';
+                        users[existingUserIndex].tempatLahir = users[existingUserIndex].tempatLahir || 'Jakarta';
+                        users[existingUserIndex].tanggalLahir = users[existingUserIndex].tanggalLahir || '2000-01-01';
+                        users[existingUserIndex].telepon = users[existingUserIndex].telepon || '081234567890';
+                        users[existingUserIndex].golonganDarah = users[existingUserIndex].golonganDarah || 'O';
+                        usersModified = true;
+                    }
+
+                } else {
+                    // Add new default user if not exists
+                    console.log(`Adding new default user: ${defaultUser.email}`);
+                    // Untuk user pasien default, tambahkan data profil lengkap agar bisa diuji
+                    if (defaultUser.role === 'pasien') {
+                         users.push({
+                            ...defaultUser,
+                            nama: 'Pasien Default',
+                            nik: '1234567890123456',
+                            jenisKelamin: 'Laki-laki',
+                            StatusPernikahan: 'Belum Menikah',
+                            Pekerjaan: 'Pelajar',
+                            alamat: 'Jl. Contoh No.1',
+                            tempatLahir: 'Jakarta',
+                            tanggalLahir: '2000-01-01',
+                            telepon: '081234567890',
+                            golonganDarah: 'O'
+                        });
+                    } else {
+                        users.push(defaultUser);
+                    }
                     usersModified = true;
                 }
-            } else {
-                // Add new default user if not exists
-                console.log(`Adding new default user: ${defaultUser.email}`);
-                users.push(defaultUser);
-                usersModified = true;
-            }
-        });
-
-        if (usersModified) {
-            localStorage.setItem('registeredUsers', JSON.stringify(users));
-            console.log('localStorage updated with default accounts.');
-        } else {
-            console.log('Default accounts are already up-to-date in localStorage.');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', initializeDefaultAccounts);
-
-    // --- Main DOMContentLoaded Listener for all other scripts ---
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get elements
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const showRegisterModalBtn = document.getElementById('showRegisterModal');
-        const registerModal = document.getElementById('registerModal');
-        const successModal = document.getElementById('successModal');
-        const closeButtons = document.querySelectorAll('.close-button');
-        const togglePasswordIcons = document.querySelectorAll('.toggle-password');
-        const successModalCloseButton = document.getElementById('successModalCloseButton');
-
-        // Error message elements for registration
-        const errorRegNik = document.getElementById('errorRegNik');
-        const errorRegTelepon = document.getElementById('errorRegTelepon');
-        const errorRegTanggalLahir = document.getElementById('errorRegTanggalLahir'); // Menambahkan elemen error untuk tanggal lahir
-
-        // Function to open modal
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-
-        // Function to close modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Event Listeners for Modals
-        showRegisterModalBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            openModal('registerModal');
-        });
-
-        successModalCloseButton.addEventListener('click', function() {
-            closeModal('successModal');
-        });
-
-        closeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                closeModal(this.closest('.modal').id);
-                // Clear all error messages and reset form on close
-                if (errorRegNik) errorRegNik.textContent = '';
-                if (errorRegTelepon) errorRegTelepon.textContent = '';
-                if (errorRegTanggalLahir) errorRegTanggalLahir.textContent = '';
-                if (registerForm) registerForm.reset();
             });
-        });
 
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            if (event.target == registerModal) {
-                closeModal('registerModal');
-                // Clear all error messages and reset form on close
-                if (errorRegNik) errorRegNik.textContent = '';
-                if (errorRegTelepon) errorRegTelepon.textContent = '';
-                if (errorRegTanggalLahir) errorRegTanggalLahir.textContent = '';
-                if (registerForm) registerForm.reset();
+            if (usersModified) {
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+                console.log('localStorage updated with default accounts.');
+            } else {
+                console.log('Default accounts are already up-to-date in localStorage.');
             }
-            if (event.target == successModal) {
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeDefaultAccounts);
+
+        // --- Main DOMContentLoaded Listener for all other scripts ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const showRegisterModalBtn = document.getElementById('showRegisterModal');
+            const registerModal = document.getElementById('registerModal');
+            const successModal = document.getElementById('successModal');
+            const closeButtons = document.querySelectorAll('.close-button');
+            const togglePasswordIcons = document.querySelectorAll('.toggle-password');
+            const successModalCloseButton = document.getElementById('successModalCloseButton');
+
+            // Error message elements for registration
+            const errorRegNik = document.getElementById('errorRegNik');
+            const errorRegTelepon = document.getElementById('errorRegTelepon');
+            const errorRegTanggalLahir = document.getElementById('errorRegTanggalLahir');
+
+            // Function to open modal
+            function openModal(modalId) {
+                document.getElementById(modalId).style.display = 'flex';
+            }
+
+            // Function to close modal
+            function closeModal(modalId) {
+                document.getElementById(modalId).style.display = 'none';
+            }
+
+            // Event Listeners for Modals
+            showRegisterModalBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                openModal('registerModal');
+            });
+
+            successModalCloseButton.addEventListener('click', function() {
                 closeModal('successModal');
-            }
-        });
+            });
 
-        // Toggle Password Visibility
-        togglePasswordIcons.forEach(icon => {
-            icon.addEventListener('click', function() {
-                const targetId = this.dataset.target;
-                const passwordInput = document.getElementById(targetId);
-                const iconElement = this.querySelector('i');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    closeModal(this.closest('.modal').id);
+                    // Clear all error messages and reset form on close
+                    if (errorRegNik) errorRegNik.textContent = '';
+                    if (errorRegTelepon) errorRegTelepon.textContent = '';
+                    if (errorRegTanggalLahir) errorRegTanggalLahir.textContent = '';
+                    if (registerForm) registerForm.reset();
+                });
+            });
 
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    iconElement.classList.remove('fa-eye-slash');
-                    iconElement.classList.add('fa-eye');
-                } else {
-                    passwordInput.type = 'password';
-                    iconElement.classList.remove('fa-eye');
-                    iconElement.classList.add('fa-eye-slash');
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target == registerModal) {
+                    closeModal('registerModal');
+                    // Clear all error messages and reset form on close
+                    if (errorRegNik) errorRegNik.textContent = '';
+                    if (errorRegTelepon) errorRegTelepon.textContent = '';
+                    if (errorRegTanggalLahir) errorRegTanggalLahir.textContent = '';
+                    if (registerForm) registerForm.reset();
+                }
+                if (event.target == successModal) {
+                    closeModal('successModal');
                 }
             });
-        });
 
-        // Registration Logic
-        registerForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Mencegah submit default HTML5 untuk mengambil alih validasi penuh dengan JS
+            // Toggle Password Visibility
+            togglePasswordIcons.forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    const passwordInput = document.getElementById(targetId);
+                    const iconElement = this.querySelector('i');
 
-            const nama = document.getElementById('regNama').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('regConfirmPassword').value;
-            const nik = document.getElementById('regNik').value;
-            const jenisKelamin = document.getElementById('regJenisKelamin').value;
-            const statusPernikahan = document.getElementById('regStatusPernikahan').value; // Corrected variable name
-            const pekerjaan = document.getElementById('regPekerjaan').value; // Corrected variable name
-            const alamat = document.getElementById('regAlamat').value;
-            const tempatLahir = document.getElementById('regTempatLahir').value;
-            const tanggalLahir = document.getElementById('regTanggalLahir').value; // Format YYYY-MM-DD
-            const telepon = document.getElementById('regTelepon').value;
-            const golDarah = document.getElementById('regGolDarah').value;
-            const role = 'pasien'; // Default role for new registrations
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        iconElement.classList.remove('fa-eye-slash');
+                        iconElement.classList.add('fa-eye');
+                    } else {
+                        passwordInput.type = 'password';
+                        iconElement.classList.remove('fa-eye');
+                        iconElement.classList.add('fa-eye-slash');
+                    }
+                });
+            });
 
-            // Reset error messages sebelum validasi baru
-            errorRegNik.textContent = '';
-            errorRegTelepon.textContent = '';
-            errorRegTanggalLahir.textContent = '';
+            // Registration Logic
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Mencegah submit default HTML5 untuk mengambil alih validasi penuh dengan JS
 
-            // Password confirmation
-            if (password !== confirmPassword) {
-                alert('Password dan konfirmasi password tidak cocok!');
-                return;
-            }
+                const nama = document.getElementById('regNama').value;
+                const email = document.getElementById('regEmail').value;
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                const nik = document.getElementById('regNik').value;
+                const jenisKelamin = document.getElementById('regJenisKelamin').value;
+                const statusPernikahan = document.getElementById('regStatusPernikahan').value;
+                const pekerjaan = document.getElementById('regPekerjaan').value;
+                const alamat = document.getElementById('regAlamat').value;
+                const tempatLahir = document.getElementById('regTempatLahir').value;
+                const tanggalLahir = document.getElementById('regTanggalLahir').value; // Format YYYY-MM-DD
+                const telepon = document.getElementById('regTelepon').value;
+                const golDarah = document.getElementById('regGolDarah').value;
+                const role = 'pasien'; // Default role for new registrations
 
-            // NIK Validation (16 digits, numeric)
-            // Memastikan NIK adalah angka dan tepat 16 digit.
-            // .trim() untuk menghapus spasi di awal/akhir
-            if (!/^[0-9]{16}$/.test(nik.trim())) {
-                errorRegNik.textContent = 'NIK harus 16 digit angka.';
-                return;
-            }
+                // Reset error messages sebelum validasi baru
+                errorRegNik.textContent = '';
+                errorRegTelepon.textContent = '';
+                errorRegTanggalLahir.textContent = '';
 
-            // Tanggal Lahir Validation (tahun 4 digit)
-            // Mengekstrak tahun dari format YYYY-MM-DD dan memastikan 4 digit
-            if (tanggalLahir) { // Pastikan tanggal tidak kosong
-                const yearPart = tanggalLahir.substring(0, 4); // Ambil 4 karakter pertama (tahun)
-                if (!/^\d{4}$/.test(yearPart)) { // Pastikan itu 4 digit angka
-                    errorRegTanggalLahir.textContent = 'Format tahun tanggal lahir tidak valid (harus 4 digit).';
+                // Password confirmation
+                if (password !== confirmPassword) {
+                    alert('Password dan konfirmasi password tidak cocok!');
                     return;
                 }
-            } else {
-                errorRegTanggalLahir.textContent = 'Tanggal lahir harus diisi.';
-                return;
-            }
 
-
-            // Phone Number Validation (starts with 08, exactly 12 digits, all numbers)
-            // Memastikan nomor telepon dimulai dengan '08' dan total 12 digit angka.
-            // .trim() untuk menghapus spasi di awal/akhir
-            if (!/^08[0-9]{10}$/.test(telepon.trim())) {
-                errorRegTelepon.textContent = 'Nomor telepon harus diawali 08 dan terdiri dari 12 digit angka.';
-                return;
-            }
-
-
-            let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-
-            // Check if email already exists
-            const emailExists = users.some(user => user.email === email);
-            if (emailExists) {
-                alert('Email ini sudah terdaftar. Silakan gunakan email lain atau login.');
-                return;
-            }
-
-            const newUser = {
-                nama,
-                email,
-                password,
-                role,
-                nik,
-                jenisKelamin,
-                statusPernikahan, // Corrected to match the input ID
-                pekerjaan, // Corrected to match the input ID
-                alamat,
-                tempatLahir,
-                tanggalLahir,
-                telepon,
-                golonganDarah: golDarah
-            };
-            users.push(newUser);
-            localStorage.setItem('registeredUsers', JSON.stringify(users));
-
-            closeModal('registerModal');
-            openModal('successModal');
-
-            // Pre-fill login email after successful registration
-            document.getElementById('loginEmail').value = email;
-            document.getElementById('loginPassword').value = ''; // Clear password field
-        });
-
-        // Login Logic
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
-
-            const user = users.find(u => u.email === email && u.password === password);
-
-            if (user) {
-                sessionStorage.setItem('loggedInUser', JSON.stringify(user));
-
-                // Redirect based on role
-                if (user.role === 'admin') {
-                    window.location.href = 'dashboard.adm/dashboard_adm.html';
-                } else if (user.role === 'dokter') {
-                    window.location.href = 'dashboard.d/dashboard.dokter.html';
-                } else if (user.role === 'apoteker') {
-                    window.location.href = 'dashboard.apt/dashboard_apt.html';
-                } else if (user.role === 'pasien') {
-                    window.location.href = 'dashboard.p/dashboard_pasien.html';
-                } else {
-                    alert('Role pengguna tidak dikenali.');
-                    sessionStorage.clear();
-                    window.location.href = 'index.html';
+                // NIK Validation (16 digits, numeric)
+                if (!/^[0-9]{16}$/.test(nik.trim())) {
+                    errorRegNik.textContent = 'NIK harus 16 digit angka.';
+                    return;
                 }
-            } else {
-                alert('Email atau password salah!');
-            }
-        });
 
-        // "Lupa Akun" button
-        document.getElementById('forgotLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Silakan hubungi admin untuk bantuan reset akun.');
+                // Tanggal Lahir Validation (only check if empty, type="date" handles format)
+                if (!tanggalLahir) {
+                    errorRegTanggalLahir.textContent = 'Tanggal lahir harus diisi.';
+                    return;
+                }
+
+                // Phone Number Validation (starts with 08, exactly 12 digits, all numbers)
+                if (!/^08[0-9]{10}$/.test(telepon.trim())) {
+                    errorRegTelepon.textContent = 'Nomor telepon harus diawali 08 dan terdiri dari 12 digit angka.';
+                    return;
+                }
+
+
+                let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+                // Check if email already exists
+                const emailExists = users.some(user => user.email === email);
+                if (emailExists) {
+                    alert('Email ini sudah terdaftar. Silakan gunakan email lain atau login.');
+                    return;
+                }
+
+                const newUser = {
+                    nama,
+                    email,
+                    password,
+                    role,
+                    nik,
+                    jenisKelamin,
+                    StatusPernikahan: statusPernikahan,
+                    Pekerjaan: pekerjaan,
+                    alamat,
+                    tempatLahir,
+                    tanggalLahir,
+                    telepon,
+                    golonganDarah: golDarah
+                };
+                users.push(newUser);
+                localStorage.setItem('registeredUsers', JSON.stringify(users));
+
+                closeModal('registerModal');
+                openModal('successModal');
+
+                // Pre-fill login email after successful registration
+                document.getElementById('loginEmail').value = email;
+                document.getElementById('loginPassword').value = ''; // Clear password field
+            });
+
+            // Login Logic
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                let users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+                const user = users.find(u => u.email === email && u.password === password);
+
+                if (user) {
+                    sessionStorage.setItem('loggedInUser', JSON.stringify(user));
+
+                    // Redirect based on role
+                    if (user.role === 'admin') {
+                        window.location.href = 'dashboard.adm/dashboard_adm.html';
+                    } else if (user.role === 'dokter') {
+                        window.location.href = 'dashboard.d/dashboard.dokter.html';
+                    } else if (user.role === 'apoteker') {
+                        window.location.href = 'dashboard.apt/dashboard_apt.html';
+                    } else if (user.role === 'pasien') {
+                        window.location.href = 'dashboard.p/dashboard_pasien.html';
+                    } else {
+                        alert('Role pengguna tidak dikenali.');
+                        sessionStorage.clear();
+                        window.location.href = 'index.html';
+                    }
+                } else {
+                    alert('Email atau password salah!');
+                }
+            });
+
+            // "Lupa Akun" button
+            document.getElementById('forgotLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Silakan hubungi admin untuk bantuan reset akun.');
+            });
         });
-    });
-  </script>
+    </script>
 </body>
 </html>
