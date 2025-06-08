@@ -811,13 +811,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Data obat akan dimuat di sini secara dinamis -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
 
                 <div class="pagination">
-                    <!-- Pagination (demo only - not functional) -->
                     <button class="pagination-btn active">1</button>
                 </div>
             </div>
@@ -866,7 +864,6 @@
         </div>
     </div>
 
-    <!-- Modals -->
     <div id="viewObatModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -1024,7 +1021,13 @@
             let obatIdToDelete = null;
 
             // Load obat from localStorage, or use dummy data if none exists
-            
+            // Dummy data (REMOVE IN PRODUCTION)
+            let obats = JSON.parse(localStorage.getItem('obat')) || [
+                { id: "OBT-240101-1234", namaObat: "Paracetamol", jenis: "Tablet", stok: 150, harga: 5000, deskripsi: "Obat demam dan nyeri" },
+                { id: "OBT-240101-5678", namaObat: "Amoxicillin", jenis: "Kapsul", stok: 80, harga: 12000, deskripsi: "Antibiotik" },
+                { id: "OBT-240102-9012", namaObat: "Tolak Angin", jenis: "Cair", stok: 200, harga: 3500, deskripsi: "Obat masuk angin" },
+                { id: "OBT-240102-3456", namaObat: "Vitamin C", jenis: "Tablet", stok: 300, harga: 2000, deskripsi: "Suplemen daya tahan tubuh" }
+            ];
 
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('obat') === null || JSON.parse(localStorage.getItem('obat')).length === 0) {
@@ -1051,7 +1054,9 @@
             function displayObats(searchTerm = '') {
                 tableBody.innerHTML = ''; // Clear existing rows
                 const filteredObats = obats.filter(obat =>
-                    obat.namaObat.toLowerCase().includes(searchTerm.toLowerCase())
+                    obat.namaObat.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    obat.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    obat.jenis.toLowerCase().includes(searchTerm.toLowerCase())
                 );
 
                 filteredObats.forEach((obat, index) => {
@@ -1161,11 +1166,30 @@
                 obatIdInput.value = ''; // Clear ID
             }
 
+            // Toggle Add/Edit Obat Form visibility
+            toggleFormBtn.addEventListener('click', () => {
+                if (obatFormContainer.style.display === 'none' || obatFormContainer.style.display === '') {
+                    showForm();
+                } else {
+                    hideForm();
+                }
+            });
+
+            // Cancel Form button
+            cancelFormBtn.addEventListener('click', () => {
+                hideForm();
+            });
+
+            // Search Filter
+            searchFilterInput.addEventListener('keyup', function() {
+                displayObats(this.value);
+            });
+
             // Save Obat (Add/Edit)
             obatForm.addEventListener('submit', function(event) {
                 event.preventDefault();
 
-                const id = obatIdInput.value || generateObatId(); // Use existing ID or generate new
+                const id = obatIdInput.value; // Use existing ID if present
                 const newObat = {
                     id: id,
                     namaObat: namaObatInput.value,
@@ -1181,7 +1205,8 @@
                     obats[existingIndex] = newObat;
                     alert('Data obat berhasil diperbarui!');
                 } else {
-                    // Add new obat
+                    // This should not happen if ID is always generated or existing
+                    // For safety, add new if not found (though logic should ensure ID is always present)
                     obats.push(newObat);
                     alert('Obat baru berhasil ditambahkan!');
                 }
@@ -1276,6 +1301,10 @@
                 }
                 if (event.target === deleteConfirmationModal) {
                     deleteConfirmationModal.style.display = 'none';
+                }
+                // FIX: Add check for obatFormContainer to close it when clicking outside
+                if (event.target === obatFormContainer && obatFormContainer.classList.contains('modal')) {
+                    obatFormContainer.style.display = 'none';
                 }
             });
 
