@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Obat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Variabel CSS (dari t-pasien.html untuk konsistensi) */
         :root {
@@ -21,6 +22,7 @@
 
             /* Warna baru untuk tombol laporan sesuai gambar */
             --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
+            --report-excel-bg: #27AE60; /* Hijau untuk Excel */ /* Tambahan untuk konsistensi */
             --report-print-bg: #3498DB; /* Biru untuk Cetak */
         }
 
@@ -144,7 +146,7 @@
         .nav-icon svg {
             width: 100%;
             height: 100%;
-            stroke: currentColor; /* Inherit color from parent */
+            stroke: currentColor;
         }
 
         .sidebar.minimized .nav-icon {
@@ -888,7 +890,8 @@
             initSidebar(); // Call initSidebar on page load
 
             // --- Obat Management Logic ---
-            let obats = JSON.parse(localStorage.getItem('obats')) || [];
+            // PERBAIKAN: Mengubah kunci localStorage dari 'obats' menjadi 'obat'
+            let obats = JSON.parse(localStorage.getItem('obat')) || [];
             let currentEditKodeObat = null; // To store the Kode Obat of the obat being edited
 
             // Function to generate a new unique Kode Obat
@@ -975,7 +978,8 @@
                     obats.push(newObat);
                     alert('Data obat berhasil ditambahkan!');
                 }
-                localStorage.setItem('obats', JSON.stringify(obats));
+                // PERBAIKAN: Mengubah kunci localStorage dari 'obats' menjadi 'obat'
+                localStorage.setItem('obat', JSON.stringify(obats));
                 displayObats();
                 hideObatModal();
             });
@@ -1008,7 +1012,8 @@
             confirmDeleteBtn.addEventListener('click', () => {
                 if (obatToDeleteKode) {
                     obats = obats.filter(o => o.kodeObat !== obatToDeleteKode);
-                    localStorage.setItem('obats', JSON.stringify(obats));
+                    // PERBAIKAN: Mengubah kunci localStorage dari 'obats' menjadi 'obat'
+                    localStorage.setItem('obat', JSON.stringify(obats));
                     displayObats();
                     alert('Data obat berhasil dihapus!');
                     obatToDeleteKode = null;
