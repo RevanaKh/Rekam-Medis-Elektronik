@@ -320,14 +320,16 @@
             max-width: 1200px; /* Batasi lebar maksimum */
         }
 
+        /* Enhanced Card Styles - Start */
         .card {
             background-color: var(--white);
-            border-radius: 5px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
+            border-radius: 8px; /* Lebih rounded */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Bayangan lebih dalam */
+            margin-bottom: 30px; /* Spasi antar card */
             overflow: hidden;
-            width: 100%; /* Pastikan card mengisi lebar parent */
-            max-width: 1200px; /* Batasi lebar maksimum */
+            width: 100%;
+            max-width: 1200px;
+            border: 1px solid #e0e0e0; /* Border tipis */
         }
 
         .card-header {
@@ -337,8 +339,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; /* Izinkan wrap pada item header jika ruang tidak cukup */
-            gap: 10px; /* Spasi antar item header */
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .card-header h2 {
@@ -346,11 +349,50 @@
             border-bottom: none;
             padding-bottom: 0;
             margin-bottom: 0;
+            font-size: 1.4rem; /* Ukuran font lebih besar */
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .card-body {
             padding: 20px;
         }
+
+        .card-summary {
+            background-color: #f0fdf9; /* Latar belakang untuk summary */
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px; /* Spasi antara summary dan tabel */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 1.1em;
+            color: var(--text-color);
+        }
+
+        .card-summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .card-summary-label {
+            font-weight: normal;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .card-summary-value {
+            font-weight: bold;
+            color: var(--primary-dark);
+            font-size: 1.3em;
+        }
+        /* Enhanced Card Styles - End */
+
 
         .form-group {
             margin-bottom: 15px;
@@ -674,6 +716,12 @@
                 <h2><i class="fas fa-chart-bar"></i> Laporan Data Pasien</h2>
             </div>
             <div class="card-body">
+                <div class="card-summary">
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Jumlah Pasien Terdaftar:</span>
+                        <span class="card-summary-value" id="total-patients">0</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="report-table" id="patient-report-table">
                         <thead>
@@ -699,6 +747,12 @@
                 <h2><i class="fas fa-user-md"></i> Laporan Data Dokter</h2>
             </div>
             <div class="card-body">
+                <div class="card-summary">
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Jumlah Dokter Terdaftar:</span>
+                        <span class="card-summary-value" id="total-doctors">0</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="report-table" id="doctor-report-table">
                         <thead>
@@ -722,6 +776,16 @@
                 <h2><i class="fas fa-receipt"></i> Laporan Transaksi Pasien</h2>
             </div>
             <div class="card-body">
+                <div class="card-summary">
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Jumlah Transaksi:</span>
+                        <span class="card-summary-value" id="total-transactions">0</span>
+                    </div>
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Total Pendapatan Transaksi:</span>
+                        <span class="card-summary-value" id="total-revenue">Rp 0</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="report-table" id="transaction-report-table">
                         <thead>
@@ -748,6 +812,20 @@
                 <h2><i class="fas fa-pills"></i> Laporan Data Obat</h2>
             </div>
             <div class="card-body">
+                <div class="card-summary">
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Jumlah Jenis Obat:</span>
+                        <span class="card-summary-value" id="total-obats">0</span>
+                    </div>
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Total Stok Obat:</span>
+                        <span class="card-summary-value" id="total-stock-obats">0</span>
+                    </div>
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Total Nilai Stok (estimasi):</span>
+                        <span class="card-summary-value" id="total-value-obats">Rp 0</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="report-table" id="obat-report-table">
                         <thead>
@@ -772,6 +850,12 @@
                 <h2><i class="fas fa-users-cog"></i> Laporan Pengguna Sistem</h2>
             </div>
             <div class="card-body">
+                <div class="card-summary">
+                    <div class="card-summary-item">
+                        <span class="card-summary-label">Jumlah Pengguna Terdaftar:</span>
+                        <span class="card-summary-value" id="total-users">0</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="report-table" id="users-report-table">
                         <thead>
@@ -897,6 +981,17 @@
             const obatTableBody = document.querySelector('#obat-report-table tbody');
             const usersTableBody = document.querySelector('#users-report-table tbody');
 
+            // Elements for summary
+            const totalPatientsElement = document.getElementById('total-patients');
+            const totalDoctorsElement = document.getElementById('total-doctors');
+            const totalTransactionsElement = document.getElementById('total-transactions');
+            const totalRevenueElement = document.getElementById('total-revenue');
+            const totalObatsElement = document.getElementById('total-obats');
+            const totalStockObatsElement = document.getElementById('total-stock-obats');
+            const totalValueObatsElement = document.getElementById('total-value-obats');
+            const totalUsersElement = document.getElementById('total-users');
+
+
             // Load data from localStorage (or provide dummy if not found)
             let patients = JSON.parse(localStorage.getItem('patients')) || [];
             let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -929,6 +1024,7 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                    totalPatientsElement.textContent = "0"; // Update summary
                 } else {
                     patients.forEach((patient, index) => {
                         const row = patientTableBody.insertRow();
@@ -940,6 +1036,7 @@
                         row.insertCell().textContent = patient.alamat;
                         row.insertCell().textContent = patient.telepon;
                     });
+                    totalPatientsElement.textContent = patients.length; // Update summary
                 }
 
                 // Populate Doctor Report Table
@@ -953,6 +1050,7 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                    totalDoctorsElement.textContent = "0"; // Update summary
                 } else {
                     doctors.forEach((doctor, index) => {
                         const row = doctorTableBody.insertRow();
@@ -962,10 +1060,12 @@
                         row.insertCell().textContent = doctor.spesialisasi;
                         row.insertCell().textContent = doctor.telepon;
                     });
+                    totalDoctorsElement.textContent = doctors.length; // Update summary
                 }
 
                 // Populate Transaction Report Table
                 transactionTableBody.innerHTML = '';
+                let totalRevenue = 0;
                 if (transactions.length === 0) {
                     const noDataRow = transactionTableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
@@ -975,6 +1075,8 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                    totalTransactionsElement.textContent = "0"; // Update summary
+                    totalRevenueElement.textContent = formatCurrency(0); // Update summary
                 } else {
                     transactions.forEach((transaction, index) => {
                         const patient = patients.find(p => p.id === transaction.idPasien);
@@ -989,11 +1091,16 @@
                         row.insertCell().textContent = transaction.penyakit;
                         row.insertCell().textContent = transaction.tindakanMedis;
                         row.insertCell().textContent = formatCurrency(transaction.totalBiaya);
+                        totalRevenue += parseFloat(transaction.totalBiaya || 0); // Accumulate total revenue
                     });
+                    totalTransactionsElement.textContent = transactions.length; // Update summary
+                    totalRevenueElement.textContent = formatCurrency(totalRevenue); // Update summary
                 }
 
                 // Populate Obat Report Table
                 obatTableBody.innerHTML = '';
+                let totalStockObats = 0;
+                let totalValueObats = 0;
                 if (obats.length === 0) {
                     const noDataRow = obatTableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
@@ -1003,6 +1110,9 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                    totalObatsElement.textContent = "0"; // Update summary
+                    totalStockObatsElement.textContent = "0"; // Update summary
+                    totalValueObatsElement.textContent = formatCurrency(0); // Update summary
                 } else {
                     obats.forEach((obat, index) => {
                         const row = obatTableBody.insertRow();
@@ -1012,7 +1122,12 @@
                         row.insertCell().textContent = obat.satuan;
                         row.insertCell().textContent = formatCurrency(obat.harga);
                         row.insertCell().textContent = obat.stok;
+                        totalStockObats += parseInt(obat.stok || 0); // Accumulate total stock
+                        totalValueObats += parseFloat(obat.harga || 0) * parseInt(obat.stok || 0); // Accumulate total value
                     });
+                    totalObatsElement.textContent = obats.length; // Update summary
+                    totalStockObatsElement.textContent = totalStockObats; // Update summary
+                    totalValueObatsElement.textContent = formatCurrency(totalValueObats); // Update summary
                 }
 
                 // Populate Users Report Table
@@ -1026,6 +1141,7 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                    totalUsersElement.textContent = "0"; // Update summary
                 } else {
                     users.forEach((user, index) => {
                         const row = usersTableBody.insertRow();
@@ -1035,6 +1151,7 @@
                         row.insertCell().textContent = user.email;
                         row.insertCell().textContent = user.role;
                     });
+                    totalUsersElement.textContent = users.length; // Update summary
                 }
             }
 
@@ -1055,13 +1172,22 @@
                 const doc = new window.jspdf.jsPDF();
                 let yOffset = 10; // Initial y offset for content
 
-                function addTableToPdf(tableId, title) {
+                function addTableToPdf(tableId, title, summaryElements) {
                     const table = document.getElementById(tableId);
                     if (!table) return;
 
+                    // Calculate content height for the current card (summary + table)
+                    let contentHeightEstimate = 0;
+                    if (summaryElements) {
+                        // Estimate summary height based on number of items and font size
+                        contentHeightEstimate += (Object.keys(summaryElements).length * 15) + 20; // 15px per line + padding
+                    }
+                    // Estimate table height (rough estimate: rows * rowHeight)
+                    const tableRows = table.querySelectorAll('tbody tr').length;
+                    contentHeightEstimate += (tableRows > 0 ? (tableRows * 10) + 30 : 50); // 10px per row, 30 for header, 50 if no data
+
                     // Check if there's enough space for the new table, if not, add a new page
-                    const requiredHeight = doc.autoTable.previous.height || 0; // Height of previous table
-                    if (yOffset + requiredHeight > doc.internal.pageSize.height - 20) { // 20 for bottom margin
+                    if (yOffset + contentHeightEstimate > doc.internal.pageSize.height - 20) { // 20 for bottom margin
                         doc.addPage();
                         yOffset = 10;
                     }
@@ -1069,7 +1195,17 @@
                     // Add title
                     doc.setFontSize(14);
                     doc.text(title, 14, yOffset);
-                    yOffset += 5; // Space after title
+                    yOffset += 7; // Space after title
+
+                    // Add summary
+                    if (summaryElements) {
+                        doc.setFontSize(10);
+                        for (const label in summaryElements) {
+                            doc.text(`${label}: ${summaryElements[label]}`, 14, yOffset);
+                            yOffset += 5; // Space for each summary item
+                        }
+                        yOffset += 5; // Extra space after summary block
+                    }
 
                     // Get table data
                     const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
@@ -1095,12 +1231,32 @@
                     yOffset = doc.autoTable.previous.finalY + 15; // Add space between tables
                 }
 
+                // Prepare summary data for PDF export
+                const patientSummary = {
+                    "Jumlah Pasien Terdaftar": totalPatientsElement.textContent
+                };
+                const doctorSummary = {
+                    "Jumlah Dokter Terdaftar": totalDoctorsElement.textContent
+                };
+                const transactionSummary = {
+                    "Jumlah Transaksi": totalTransactionsElement.textContent,
+                    "Total Pendapatan Transaksi": totalRevenueElement.textContent
+                };
+                const obatSummary = {
+                    "Jumlah Jenis Obat": totalObatsElement.textContent,
+                    "Total Stok Obat": totalStockObatsElement.textContent,
+                    "Total Nilai Stok (estimasi)": totalValueObatsElement.textContent
+                };
+                const usersSummary = {
+                    "Jumlah Pengguna Terdaftar": totalUsersElement.textContent
+                };
+
                 // Add each report table
-                addTableToPdf('patient-report-table', 'Laporan Data Pasien');
-                addTableToPdf('doctor-report-table', 'Laporan Data Dokter');
-                addTableToPdf('transaction-report-table', 'Laporan Transaksi Pasien');
-                addTableToPdf('obat-report-table', 'Laporan Data Obat');
-                addTableToPdf('users-report-table', 'Laporan Pengguna Sistem');
+                addTableToPdf('patient-report-table', 'Laporan Data Pasien', patientSummary);
+                addTableToPdf('doctor-report-table', 'Laporan Data Dokter', doctorSummary);
+                addTableToPdf('transaction-report-table', 'Laporan Transaksi Pasien', transactionSummary);
+                addTableToPdf('obat-report-table', 'Laporan Data Obat', obatSummary);
+                addTableToPdf('users-report-table', 'Laporan Pengguna Sistem', usersSummary);
 
                 doc.save('Laporan_Seluruh_Sistem.pdf');
             });
@@ -1109,22 +1265,67 @@
             document.getElementById('export-all-excel-btn').addEventListener('click', function() {
                 const wb = XLSX.utils.book_new();
 
-                function addTableToExcel(tableId, sheetName) {
+                function addTableToExcel(tableId, sheetName, summaryData = {}) {
                     const table = document.getElementById(tableId);
                     if (!table) return;
 
-                    // Convert table to worksheet
-                    const ws = XLSX.utils.table_to_sheet(table);
+                    let ws_data = [];
                     
+                    // Add summary data as rows before the table headers
+                    if (Object.keys(summaryData).length > 0) {
+                        for (const label in summaryData) {
+                            ws_data.push([`${label}:`, summaryData[label]]);
+                        }
+                        ws_data.push([]); // Add an empty row for separation
+                    }
+
+                    // Convert table to worksheet, starting from where summary left off
+                    const table_headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+                    const table_data = [];
+                    table.querySelectorAll('tbody tr').forEach(row => {
+                        const rowData = Array.from(row.cells).map(cell => cell.textContent);
+                        table_data.push(rowData);
+                    });
+
+                    ws_data.push(table_headers);
+                    table_data.forEach(row => ws_data.push(row));
+
+                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+
+                    // Set column widths for better readability in Excel
+                    const colWidths = headers.map(() => ({ wch: 20 })); // Default width 20
+                    ws['!cols'] = colWidths;
+
                     // Append worksheet to workbook
                     XLSX.utils.book_append_sheet(wb, ws, sheetName);
                 }
 
-                addTableToExcel('patient-report-table', 'Data Pasien');
-                addTableToExcel('doctor-report-table', 'Data Dokter');
-                addTableToExcel('transaction-report-table', 'Data Transaksi');
-                addTableToExcel('obat-report-table', 'Data Obat');
-                addTableToExcel('users-report-table', 'Data Pengguna');
+                // Prepare summary data for Excel export
+                const patientSummary = {
+                    "Jumlah Pasien Terdaftar": totalPatientsElement.textContent
+                };
+                const doctorSummary = {
+                    "Jumlah Dokter Terdaftar": totalDoctorsElement.textContent
+                };
+                const transactionSummary = {
+                    "Jumlah Transaksi": totalTransactionsElement.textContent,
+                    "Total Pendapatan Transaksi": totalRevenueElement.textContent
+                };
+                const obatSummary = {
+                    "Jumlah Jenis Obat": totalObatsElement.textContent,
+                    "Total Stok Obat": totalStockObatsElement.textContent,
+                    "Total Nilai Stok (estimasi)": totalValueObatsElement.textContent
+                };
+                const usersSummary = {
+                    "Jumlah Pengguna Terdaftar": totalUsersElement.textContent
+                };
+
+
+                addTableToExcel('patient-report-table', 'Data Pasien', patientSummary);
+                addTableToExcel('doctor-report-table', 'Data Dokter', doctorSummary);
+                addTableToExcel('transaction-report-table', 'Data Transaksi', transactionSummary);
+                addTableToExcel('obat-report-table', 'Data Obat', obatSummary);
+                addTableToExcel('users-report-table', 'Data Pengguna', usersSummary);
 
                 XLSX.writeFile(wb, 'Laporan_Seluruh_Sistem.xlsx');
             });
