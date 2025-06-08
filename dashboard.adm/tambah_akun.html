@@ -723,7 +723,7 @@
                         <line x1="22" y1="11" x2="10" y2="11"></line>
                     </svg>
                 </div>
-                <div class="logout-text">Logout</div>
+                <div class="nav-text">Logout</div>
             </a>
         </div>
     </div>
@@ -885,8 +885,19 @@
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-            // PERBAIKAN: Mengubah kunci localStorage dari 'accounts' menjadi 'users'
-            let accounts = JSON.parse(localStorage.getItem('users')) || [];
+            // Load accounts from localStorage, or use dummy data if none exists
+            let accounts = JSON.parse(localStorage.getItem('accounts')) || [
+                { id: 'ADM-001', email: 'admin@example.com', password: 'adminpassword', role: 'Admin' },
+                { id: 'DKT-001', email: 'dokter@example.com', password: 'dokterpassword', role: 'Dokter' },
+                { id: 'PRW-001', email: 'perawat@example.com', password: 'perawatpassword', role: 'Perawat' },
+                { id: 'APT-001', email: 'apoteker@example.com', password: 'apotekerpassword', role: 'Apoteker' }
+            ];
+
+            // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
+            if (localStorage.getItem('accounts') === null || JSON.parse(localStorage.getItem('accounts')).length === 0) {
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+            }
+
             let currentAccountIdToDelete = null;
 
             function generateId() {
@@ -895,6 +906,9 @@
 
             function displayAccounts(filter = '') {
                 accountTableBody.innerHTML = '';
+                // Pastikan untuk memuat ulang data dari localStorage setiap kali menampilkan
+                accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+
                 const filteredAccounts = accounts.filter(account =>
                     account.email.toLowerCase().includes(filter.toLowerCase()) ||
                     account.role.toLowerCase().includes(filter.toLowerCase())
@@ -922,7 +936,7 @@
             function saveAccount(event) {
                 event.preventDefault();
 
-                const id = userIdInput.value || generateId();
+                const id = userIdInput.value; // Use existing ID if in edit mode
                 const email = emailInput.value;
                 const password = passwordInput.value;
                 const role = roleInput.value;
@@ -936,6 +950,7 @@
 
                 const existingIndex = accounts.findIndex(acc => acc.id === id);
                 if (existingIndex > -1) {
+                    // Update existing account
                     accounts[existingIndex] = newAccount;
                     showAlert(successAlert, 'Akun berhasil diperbarui!');
                 } else {
@@ -944,15 +959,16 @@
                         showAlert(errorAlert, 'Email sudah ada. Harap gunakan email lain.');
                         return;
                     }
+                    // Generate new ID for a new account
+                    newAccount.id = generateId();
                     accounts.push(newAccount);
                     showAlert(successAlert, 'Akun berhasil ditambahkan!');
                 }
 
-                // PERBAIKAN: Mengubah kunci localStorage dari 'accounts' menjadi 'users'
-                localStorage.setItem('users', JSON.stringify(accounts));
+                localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
                 userForm.reset();
                 hideForm();
-                displayAccounts();
+                displayAccounts(); // Refresh table
             }
 
             function editAccount(id) {
@@ -974,11 +990,10 @@
 
             function deleteAccount() {
                 accounts = accounts.filter(acc => acc.id !== currentAccountIdToDelete);
-                // PERBAIKAN: Mengubah kunci localStorage dari 'accounts' menjadi 'users'
-                localStorage.setItem('users', JSON.stringify(accounts));
+                localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
                 deleteModal.style.display = 'none';
                 showAlert(successAlert, 'Akun berhasil dihapus!');
-                displayAccounts();
+                displayAccounts(); // Refresh table
             }
 
             function showForm(isEdit = false) {
