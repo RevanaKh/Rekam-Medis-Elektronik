@@ -21,9 +21,10 @@
             --sidebar-minimized-width: 60px;
             --border-color: #ddd; /* Added for table borders consistency */
 
-            /* Warna baru untuk tombol laporan sesuai gambar */
+            /* Warna baru untuk tombol laporan sesuai gambar (disalin dari data_pasien.html) */
             --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
-            --report-print-bg: #3498DB; /* Biru untuk Cetak (disini tidak dipakai lagi untuk cetak, tapi untuk jaga-jaga) */
+            --report-excel-bg: #27AE60; /* Hijau untuk Excel */
+            --report-print-bg: #3498DB; /* Biru untuk Print */
         }
 
         * {
@@ -304,7 +305,7 @@
             padding-bottom: 10px;
         }
 
-        /* Styling for the new icon buttons (from jadwal_dokter.html) */
+        /* Styling for the new icon buttons (dari jadwal_dokter.html & disesuaikan) */
         .icon-button {
             color: var(--white);
             border: none;
@@ -321,23 +322,33 @@
         }
 
         /* Specific colors for PDF and Print buttons */
-        #download-pdf-btn {
-            background-color: var(--report-pdf-bg);
+        /* Menggunakan ID yang benar dan warna dari variabel baru */
+        #export-pdf-btn { /* PERBAIKAN: Menggunakan ID yang sesuai dengan HTML */
+            background-color: var(--report-pdf-bg); /* Menggunakan variabel warna merah */
         }
 
-        #download-pdf-btn:hover {
-            background-color: #C0392B;
+        #export-pdf-btn:hover {
+            background-color: #C0392B; /* Warna merah yang sedikit lebih gelap saat hover */
             transform: translateY(-2px);
         }
 
-        #print-pdf-btn { /* Ini tidak digunakan lagi untuk print, hanya untuk jaga-jaga style */
+        /* Jika ada tombol Excel atau Print, tambahkan gaya mereka di sini */
+        /* Contoh (sesuai data_pasien.html): */
+        #export-excel-btn {
+            background-color: var(--report-excel-bg);
+        }
+        #export-excel-btn:hover {
+            background-color: #229954; /* Darker green */
+            transform: translateY(-2px);
+        }
+        #print-table-btn {
             background-color: var(--report-print-bg);
         }
-
-        #print-pdf-btn:hover { /* Ini tidak digunakan lagi untuk print, hanya untuk jaga-jaga style */
-            background-color: #2980B9;
+        #print-table-btn:hover {
+            background-color: #2980b9; /* Darker blue */
             transform: translateY(-2px);
         }
+
 
         .icon-button:active {
             transform: translateY(0);
@@ -618,7 +629,7 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            .report-buttons-container .icon-button {
+            .report-buttons-container .icon-button { /* Menerapkan ini untuk semua tombol laporan */
                 width: 100%;
                 justify-content: center;
             }
@@ -837,9 +848,18 @@
             </div>
 
             <div class="report-buttons-container">
-                <button class="btn-pdf" id="export-pdf-btn">
-    <i class="fas fa-file-pdf"></i> Unduh PDF
-</button>
+                <!-- PERBAIKAN: Mengganti kelas 'btn-pdf' menjadi 'icon-button' untuk konsistensi gaya -->
+                <button class="icon-button" id="export-pdf-btn">
+                    <i class="fas fa-file-pdf"></i> Unduh PDF
+                </button>
+                <!-- Tambahkan tombol Excel dan Print jika diperlukan, sesuaikan dengan data_pasien.html -->
+                <!-- Contoh: -->
+                <!-- <button class="icon-button" id="export-excel-btn">
+                    <i class="fas fa-file-excel"></i> Unduh Excel
+                </button>
+                <button class="icon-button" id="print-table-btn">
+                    <i class="fas fa-print"></i> Cetak
+                </button> -->
             </div>
             <div class="card form-container" id="transactionFormContainer">
                 <h3><span id="formTitle">Tambah</span> Transaksi</h3>
@@ -1158,7 +1178,7 @@
             });
             
             // Event Listeners for PDF Download Button
-            const downloadPdfBtn = document.getElementById('download-pdf-btn');
+            const downloadPdfBtn = document.getElementById('export-pdf-btn'); // Menggunakan ID yang benar
 
             if (downloadPdfBtn) {
                 downloadPdfBtn.addEventListener('click', async function() {
