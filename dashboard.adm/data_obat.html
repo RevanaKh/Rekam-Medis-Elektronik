@@ -495,7 +495,7 @@
 
         /* Modal Styles - PERBAIKAN PENTING DI SINI */
         .modal {
-            display: none; /* Hidden by default */
+            display: none; /* Hidden by default - PERBAIKAN DI SINI */
             position: fixed; /* Stay in place */
             z-index: 10000; /* Sit on top */
             left: 0;
@@ -505,11 +505,15 @@
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
             
             /* Ini yang penting untuk centering! */
-            display: flex; /* Mengaktifkan flexbox */
             align-items: center; /* Centering vertikal */
             justify-content: center; /* Centering horizontal */
             
             /* Untuk memastikan modal tidak membuat scroll di background saat terbuka */
+            overflow: hidden;
+        }
+
+        /* Saat modal terbuka, sembunyikan overflow pada body untuk mencegah scrolling latar belakang */
+        body.modal-open {
             overflow: hidden;
         }
 
@@ -523,11 +527,6 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             position: relative; /* Untuk posisi tombol close */
             
-            /* Menghapus transform karena sudah menggunakan flexbox untuk centering */
-            /* top: 50%; */
-            /* left: 50%; */
-            /* transform: translate(-50%, -50%); */
-
             /* Memastikan konten modal bisa discroll jika terlalu panjang */
             max-height: 90vh; /* Maksimum tinggi modal, agar tidak melebihi viewport */
             overflow-y: auto; /* Aktifkan scroll jika konten modal melebihi max-height */
@@ -540,11 +539,6 @@
         @keyframes animatemodal {
             from {opacity: 0; transform: translateY(-50px);} /* Animasi masuk dari atas */
             to {opacity: 1; transform: translateY(0);}
-        }
-
-        /* Saat modal terbuka, sembunyikan overflow pada body untuk mencegah scrolling latar belakang */
-        body.modal-open {
-            overflow: hidden;
         }
 
         .close-button {
@@ -1061,6 +1055,11 @@
             // Load obat from localStorage, or an empty array if none exists
             let obats = JSON.parse(localStorage.getItem('obat')) || [];
 
+            // If localStorage is empty or null, save an empty array to it initially
+            if (localStorage.getItem('obat') === null || JSON.parse(localStorage.getItem('obat')).length === 0) {
+                saveObatsToLocalStorage();
+            }
+
             // Save obats to localStorage
             function saveObatsToLocalStorage() {
                 localStorage.setItem('obat', JSON.stringify(obats));
@@ -1294,37 +1293,40 @@
                 XLSX.writeFile(wb, 'Laporan_Data_Obat.xlsx');
             });
 
-            // Print Table
+            // Print Table - PERBAIKAN FUNGSI CETAK
             document.getElementById('print-table-btn').addEventListener('click', function() {
-                const table = document.querySelector('.obat-table').cloneNode(true); // Clone the table
-                const actionColumnIndex = Array.from(table.rows[0].cells).findIndex(th => th.textContent === 'Aksi');
+                const tableToPrint = document.querySelector('.obat-table').cloneNode(true); // Clone the table
 
-                // If 'Aksi' column exists, remove it
-                if (actionColumnIndex !== -1) {
-                    Array.from(table.rows).forEach(row => {
-                        if (row.cells[actionColumnIndex]) {
-                            row.deleteCell(actionColumnIndex);
-                        }
-                    });
+                // Remove the "Aksi" column from the cloned table
+                const actionColumnIndex = Array.from(tableToPrint.rows[0].cells).findIndex(th => th.textContent === 'Aksi');
+                if (actionColumnIndex > -1) {
+                    for (let i = 0; i < tableToPrint.rows.length; i++) {
+                        tableToPrint.rows[i].deleteCell(actionColumnIndex);
+                    }
                 }
 
-                const printWindow = window.open('', '', 'height=600,width=800');
-                printWindow.document.write('<html><head><title>Print Data Obat</title>');
-                // Copy necessary styles for printing
-                printWindow.document.write('<style>');
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>Cetak Data Obat</title>');
+                // Tambahkan CSS untuk styling cetak
                 printWindow.document.write(`
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
-                    th { background-color: #1de9b6; color: white; font-weight: bold; }
-                    h1 { color: #00b686; }
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
+                        h1 { color: #00b686; text-align: center; margin-bottom: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
+                        th { background-color: #1de9b6; color: white; font-weight: bold; }
+                        tbody tr:nth-child(even) { background-color: #f9f9f9; }
+                    </style>
                 `);
-                printWindow.document.write('</style>');
                 printWindow.document.write('</head><body>');
                 printWindow.document.write('<h1>Laporan Data Obat</h1>');
-                printWindow.document.write(table.outerHTML);
+                printWindow.document.write(tableToPrint.outerHTML);
+                printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.print();
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
             });
 
 
