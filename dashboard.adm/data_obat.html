@@ -1030,13 +1030,7 @@
             let obatIdToDelete = null;
 
             // Load obat from localStorage, or use dummy data if none exists
-            let obats = JSON.parse(localStorage.getItem('obat')) || [
-                { id: 'OBT-001', namaObat: 'Paracetamol', jenis: 'Tablet', stok: 100, harga: 5000, deskripsi: 'Obat penurun demam dan pereda nyeri.' },
-                { id: 'OBT-002', namaObat: 'Amoxicillin', jenis: 'Kapsul', stok: 50, harga: 12000, deskripsi: 'Antibiotik untuk infeksi bakteri.' },
-                { id: 'OBT-003', namaObat: 'Promag', jenis: 'Tablet', stok: 20, harga: 3000, deskripsi: 'Obat maag dan asam lambung.' },
-                { id: 'OBT-004', namaObat: 'Betadine Antiseptic', jenis: 'Cair', stok: 15, harga: 25000, deskripsi: 'Cairan antiseptik untuk luka.' },
-                { id: 'OBT-005', namaObat: 'Vitamin C', jenis: 'Tablet', stok: 8, harga: 7000, deskripsi: 'Suplemen vitamin C untuk daya tahan tubuh.' }
-            ];
+            
 
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('obat') === null || JSON.parse(localStorage.getItem('obat')).length === 0) {
