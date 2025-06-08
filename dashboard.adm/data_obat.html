@@ -493,19 +493,24 @@
             border-color: var(--primary-dark);
         }
 
-        /* Modal Styles */
+        /* Modal Styles - PERBAIKAN PENTING DI SINI */
         .modal {
-            display: none; /* Hidden by default - PENTING: ini yang membuat modal tidak muncul saat refresh */
+            display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
             z-index: 10000; /* Sit on top */
             left: 0;
             top: 0;
             width: 100%; /* Full width */
             height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            align-items: center; /* Center vertically (only when display: flex) */
-            justify-content: center; /* Center horizontally (only when display: flex) */
+            
+            /* Ini yang penting untuk centering! */
+            display: flex; /* Mengaktifkan flexbox */
+            align-items: center; /* Centering vertikal */
+            justify-content: center; /* Centering horizontal */
+            
+            /* Untuk memastikan modal tidak membuat scroll di background saat terbuka */
+            overflow: hidden;
         }
 
         .modal-content {
@@ -513,23 +518,33 @@
             padding: 20px;
             border: 1px solid #888;
             border-radius: 8px;
-            width: 80%;
-            max-width: 500px;
+            width: 90%; /* Lebih responsif di mobile */
+            max-width: 500px; /* Maksimum width */
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            position: relative;
-            /* Perbaikan centering: */
-            /* Menggunakan transform untuk centering vertikal dan horizontal */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            /* Animasi */
-            animation-name: animatetop;
+            position: relative; /* Untuk posisi tombol close */
+            
+            /* Menghapus transform karena sudah menggunakan flexbox untuk centering */
+            /* top: 50%; */
+            /* left: 50%; */
+            /* transform: translate(-50%, -50%); */
+
+            /* Memastikan konten modal bisa discroll jika terlalu panjang */
+            max-height: 90vh; /* Maksimum tinggi modal, agar tidak melebihi viewport */
+            overflow-y: auto; /* Aktifkan scroll jika konten modal melebihi max-height */
+
+            /* Animasi (tetap bisa digunakan) */
+            animation-name: animatemodal;
             animation-duration: 0.4s;
         }
 
-        @keyframes animatetop {
-            from {opacity: 0; transform: translate(-50%, -60%);} /* Sedikit lebih tinggi dari tengah */
-            to {opacity: 1; transform: translate(-50%, -50%);} /* Ke posisi tengah */
+        @keyframes animatemodal {
+            from {opacity: 0; transform: translateY(-50px);} /* Animasi masuk dari atas */
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        /* Saat modal terbuka, sembunyikan overflow pada body untuk mencegah scrolling latar belakang */
+        body.modal-open {
+            overflow: hidden;
         }
 
         .close-button {
@@ -676,8 +691,10 @@
                 justify-content: center;
             }
 
+            /* Perbaikan tambahan untuk modal di mobile */
             .modal-content {
                 width: 95%; /* Lebih responsif di mobile */
+                margin: 10px; /* Memberikan sedikit margin agar tidak terlalu mepet tepi */
             }
         }
     </style>
@@ -1041,19 +1058,8 @@
             const closeObatFormModalBtn = document.getElementById('closeObatFormModalBtn'); // Ambil tombol close di modal tambah/edit
             let obatIdToDelete = null;
 
-            // Load obat from localStorage, or use dummy data if none exists
-            // Dummy data (REMOVE IN PRODUCTION)
-            let obats = JSON.parse(localStorage.getItem('obat')) || [
-                { id: "OBT-240101-1234", namaObat: "Paracetamol", jenis: "Tablet", stok: 150, harga: 5000, deskripsi: "Obat demam dan nyeri" },
-                { id: "OBT-240101-5678", namaObat: "Amoxicillin", jenis: "Kapsul", stok: 80, harga: 12000, deskripsi: "Antibiotik" },
-                { id: "OBT-240102-9012", namaObat: "Tolak Angin", jenis: "Cair", stok: 200, harga: 3500, deskripsi: "Obat masuk angin" },
-                { id: "OBT-240102-3456", namaObat: "Vitamin C", jenis: "Tablet", stok: 300, harga: 2000, deskripsi: "Suplemen daya tahan tubuh" }
-            ];
-
-            // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
-            if (localStorage.getItem('obat') === null || JSON.parse(localStorage.getItem('obat')).length === 0) {
-                saveObatsToLocalStorage();
-            }
+            // Load obat from localStorage, or an empty array if none exists
+            let obats = JSON.parse(localStorage.getItem('obat')) || [];
 
             // Save obats to localStorage
             function saveObatsToLocalStorage() {
@@ -1119,6 +1125,15 @@
                 });
             }
 
+            // Utility function to toggle body overflow
+            function toggleBodyOverflow(showModal) {
+                if (showModal) {
+                    document.body.classList.add('modal-open');
+                } else {
+                    document.body.classList.remove('modal-open');
+                }
+            }
+
             // Handle View Obat
             function handleViewObat() {
                 const obatId = this.dataset.id;
@@ -1131,6 +1146,7 @@
                     document.getElementById('viewHarga').textContent = obat.harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
                     document.getElementById('viewDeskripsi').textContent = obat.deskripsi;
                     viewObatModal.style.display = 'flex'; // Tampilkan modal
+                    toggleBodyOverflow(true);
                 }
             }
 
@@ -1154,6 +1170,7 @@
             function handleDeleteObatClick() {
                 obatIdToDelete = this.dataset.id;
                 deleteConfirmationModal.style.display = 'flex'; // Tampilkan modal
+                toggleBodyOverflow(true);
             }
 
             // Confirm Delete Obat
@@ -1163,6 +1180,7 @@
                     saveObatsToLocalStorage(); // Save changes after deletion
                     displayObats(searchFilterInput.value); // Refresh table
                     deleteConfirmationModal.style.display = 'none';
+                    toggleBodyOverflow(false);
                     alert('Data obat berhasil dihapus!');
                     obatIdToDelete = null; // Clear ID
                 }
@@ -1171,6 +1189,8 @@
             // Show/Hide form functions (now controls modal visibility)
             function showForm() {
                 obatFormContainer.style.display = 'flex'; // Menggunakan flex untuk centering modal
+                toggleBodyOverflow(true);
+
                 // Jika ini mode tambah, reset form dan generate ID baru
                 if (formTitle.textContent === 'Tambah Obat Baru') {
                     obatForm.reset();
@@ -1180,6 +1200,7 @@
 
             function hideForm() {
                 obatFormContainer.style.display = 'none';
+                toggleBodyOverflow(false);
                 obatForm.reset();
                 obatIdInput.value = ''; // Clear ID
             }
@@ -1294,7 +1315,7 @@
                 printWindow.document.write(`
                     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; } /* FIX: Border hitam */
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
                     th { background-color: #1de9b6; color: white; font-weight: bold; }
                     h1 { color: #00b686; }
                 `);
@@ -1311,6 +1332,7 @@
             document.querySelectorAll('.modal .close-button').forEach(btn => {
                 btn.addEventListener('click', function() {
                     this.closest('.modal').style.display = 'none';
+                    toggleBodyOverflow(false); // Restore body scroll
                 });
             });
 
@@ -1318,19 +1340,22 @@
             window.addEventListener('click', function(event) {
                 if (event.target === viewObatModal) {
                     viewObatModal.style.display = 'none';
+                    toggleBodyOverflow(false);
                 }
                 if (event.target === deleteConfirmationModal) {
                     deleteConfirmationModal.style.display = 'none';
+                    toggleBodyOverflow(false);
                 }
                 // FIX: Add obatFormContainer to close on outside click
                 if (event.target === obatFormContainer) {
                     obatFormContainer.style.display = 'none';
+                    toggleBodyOverflow(false);
                 }
             });
 
             // Initial display: Hide form by default, and load data
-            hideForm();
-            displayObats();
+            hideForm(); // Pastikan modal tersembunyi saat pertama kali halaman dimuat
+            displayObats(); // Tampilkan tabel dengan data yang mungkin sudah ada (sekarang kosong)
         });
     </script>
 </body>
