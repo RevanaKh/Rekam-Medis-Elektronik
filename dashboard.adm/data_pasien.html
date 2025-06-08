@@ -1015,13 +1015,6 @@
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
             let patientIdToDelete = null;
 
-            // Load patients from localStorage, or use dummy data if none exists
-            let patients = JSON.parse(localStorage.getItem('patients')) || [
-                { idPasien: 'P001', namaPasien: 'Budi Santoso', alamat: 'Jl. Merdeka No.10', telepon: '081234567890', tanggalLahir: '1990-05-15' },
-                { idPasien: 'P002', namaPasien: 'Siti Aminah', alamat: 'Jl. Pahlawan No.5', telepon: '082345678901', tanggalLahir: '1988-11-22' },
-                { idPasien: 'P003', namaPasien: 'Andi Pratama', alamat: 'Jl. Diponegoro No.22', telepon: '087890123456', tanggalLahir: '1975-03-01' },
-            ];
-
             // Save patients to localStorage
             function savePatientsToLocalStorage() {
                 localStorage.setItem('patients', JSON.stringify(patients));
