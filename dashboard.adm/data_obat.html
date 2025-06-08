@@ -43,7 +43,7 @@
             display: flex;
             min-height: 100vh;
             background-color: var(--light-color);
-            overflow-x: hidden;
+            overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan di body */
         }
 
         /* Mobile Toggle outside sidebar */
@@ -291,14 +291,14 @@
             padding: 20px;
             transition: margin-left 0.3s ease;
             margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
+            width: calc(100% - var(--sidebar-width)); /* Menggunakan calc untuk responsivitas */
             overflow-y: auto;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Penting untuk mencegah scrollbar horizontal di main-content */
             position: relative;
             z-index: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: center; /* Memusatkan konten secara horizontal di dalam main-content */
         }
 
         .sidebar.minimized + .main-content {
@@ -317,7 +317,7 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1200px; /* Batasi lebar maksimum */
         }
 
         .card {
@@ -326,8 +326,8 @@
             box-shadow: var(--shadow);
             margin-bottom: 20px;
             overflow: hidden;
-            width: 100%;
-            max-width: 1200px;
+            width: 100%; /* Pastikan card mengisi lebar parent */
+            max-width: 1200px; /* Batasi lebar maksimum */
         }
 
         .card-header {
@@ -337,6 +337,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* Izinkan wrap pada item header jika ruang tidak cukup */
+            gap: 10px; /* Spasi antar item header */
         }
 
         .card-header h2 {
@@ -374,6 +376,7 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            white-space: nowrap; /* Mencegah teks tombol wrap */
         }
         .btn-primary {
             background-color: var(--primary-color);
@@ -410,22 +413,21 @@
 
         .table-responsive {
             margin-top: 20px;
-            overflow-x: auto;
+            overflow-x: auto; /* Memungkinkan tabel di-scroll secara horizontal */
             border-radius: 8px;
             box-shadow: var(--shadow);
-            width: 100%;
+            width: 100%; /* Pastikan container tabel mengisi lebar */
         }
 
         .obat-table {
-            width: 100%;
+            width: 100%; /* Tabel mengisi lebar container responsif */
             border-collapse: collapse;
             margin-bottom: 0;
-            min-width: 800px; /* Adjusted min-width for better display on smaller screens */
+            min-width: 800px; /* Minimal width tabel untuk menjaga layout pada desktop */
             background-color: var(--white);
         }
 
         .obat-table th, .obat-table td {
-            /* Perubahan di sini: Mengembalikan border tabel ke warna default */
             border: 1px solid var(--border-color); /* Kembali ke warna default atau #ddd */
             padding: 12px 15px;
             text-align: left;
@@ -457,13 +459,13 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
+            flex-wrap: wrap; /* Izinkan wrapping pada item jika ruang tidak cukup */
+            gap: 10px; /* Spasi antar elemen */
         }
 
         .search-add-container .form-group {
-            flex: 1;
-            min-width: 200px;
+            flex: 1; /* Biarkan form-group mengisi ruang yang tersedia */
+            min-width: 200px; /* Minimal lebar untuk input search */
             margin-bottom: 0;
         }
 
@@ -495,7 +497,7 @@
 
         /* Modal Styles - PERBAIKAN PENTING DI SINI */
         .modal {
-            display: none; /* Hidden by default - PERBAIKAN DI SINI */
+            display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
             z-index: 10000; /* Sit on top */
             left: 0;
@@ -505,6 +507,7 @@
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
             
             /* Ini yang penting untuk centering! */
+            display: flex; /* Menggunakan flexbox untuk centering */
             align-items: center; /* Centering vertikal */
             justify-content: center; /* Centering horizontal */
             
@@ -526,6 +529,7 @@
             max-width: 500px; /* Maksimum width */
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             position: relative; /* Untuk posisi tombol close */
+            box-sizing: border-box; /* Pastikan padding dan border termasuk dalam width */
             
             /* Memastikan konten modal bisa discroll jika terlalu panjang */
             max-height: 90vh; /* Maksimum tinggi modal, agar tidak melebihi viewport */
@@ -581,7 +585,8 @@
             margin-bottom: 0px; /* Adjusted to fit layout better */
             display: flex;
             gap: 15px;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Izinkan wrapping */
+            justify-content: flex-start; /* Atur posisi awal tombol */
         }
 
         .report-button {
@@ -616,13 +621,14 @@
             transform: translateY(-2px);
         }
 
-        #print-table-btn {
+        /* Tombol Cetak Dihapus dari HTML, jadi CSS ini bisa dihapus atau diabaikan */
+        /* #print-table-btn {
             background-color: var(--report-print-bg);
         }
         #print-table-btn:hover {
             background-color: #2980B9;
             transform: translateY(-2px);
-        }
+        } */
 
         .report-button:active {
             transform: translateY(0);
@@ -637,6 +643,8 @@
 
             .sidebar {
                 left: -250px;
+                /* Pastikan sidebar tidak membuat scrollbar horizontal di mobile */
+                width: var(--sidebar-width); /* Tetapkan lebar saat aktif */
             }
 
             .sidebar.active {
@@ -644,7 +652,9 @@
             }
 
             .main-content {
-                margin-left: 0;
+                margin-left: 0; /* Penting: Hapus margin kiri di mobile */
+                width: 100%; /* Pastikan main-content mengisi seluruh lebar */
+                padding: 15px; /* Sedikit padding di mobile */
             }
 
             .sidebar.minimized + .main-content {
@@ -661,6 +671,9 @@
 
             .header {
                 padding: 10px 15px;
+                flex-direction: column; /* Tumpuk item header */
+                align-items: flex-start;
+                gap: 10px;
             }
 
             .card-body {
@@ -668,17 +681,27 @@
             }
 
             .search-add-container {
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: column; /* Tumpuk elemen di mobile */
+                align-items: stretch; /* Regangkan item agar mengisi lebar */
+            }
+
+            .search-add-container .form-group {
+                min-width: unset; /* Hapus min-width agar lebih fleksibel */
+                width: 100%;
+            }
+
+            .search-add-container .btn-primary {
+                width: 100%; /* Tombol "Tambah Obat Baru" mengisi lebar penuh */
+                min-width: unset;
             }
 
             .obat-table {
-                min-width: unset; /* Allow table to shrink on smaller screens */
+                min-width: unset; /* Izinkan tabel untuk menyusut pada layar yang lebih kecil */
             }
 
             .report-buttons-container {
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: column; /* Tumpuk tombol laporan */
+                align-items: stretch; /* Regangkan tombol laporan */
             }
             .report-button {
                 width: 100%;
@@ -688,7 +711,8 @@
             /* Perbaikan tambahan untuk modal di mobile */
             .modal-content {
                 width: 95%; /* Lebih responsif di mobile */
-                margin: 10px; /* Memberikan sedikit margin agar tidak terlalu mepet tepi */
+                margin: 10px auto; /* Memberikan sedikit margin dan auto untuk centering */
+                /* Pastikan tidak ada properti left/right yang mengganggu centering */
             }
         }
     </style>
@@ -822,8 +846,7 @@
                     <div class="report-buttons-container">
                         <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i>Unduh PDF</button>
                         <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i>Unduh Excel</button>
-                        <button class="report-button" id="print-table-btn"><i class="fas fa-print"></i>Cetak</button>
-                    </div>
+                        </div>
                 </div>
 
                 <div class="table-responsive">
@@ -1260,81 +1283,87 @@
             // PDF Export
             document.getElementById('export-pdf-btn').addEventListener('click', function() {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const table = document.querySelector('.obat-table');
+                const doc = new jsPDF('p', 'pt', 'letter');
+                const table = document.querySelector('.obat-table'); // Get the table element
+                const tableClone = table.cloneNode(true); // Clone to avoid modifying original
 
-                // Hide action column before PDF export
-                const actionCells = document.querySelectorAll('.obat-table th:last-child, .obat-table td:last-child');
-                actionCells.forEach(cell => {
-                    cell.style.display = 'none';
-                });
-
-                doc.autoTable({
-                    html: table,
-                    startY: 20,
-                    headStyles: { fillColor: [29, 233, 182] }, // primary-color
-                    didDrawPage: function(data) {
-                        doc.text("Laporan Data Obat", 14, 15);
+                // Remove the "Aksi" column from the cloned table
+                const rows = tableClone.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('th, td');
+                    if (cells.length > 0) { // Ensure row has cells
+                        cells[cells.length - 1].remove(); // Remove last cell (Aksi)
                     }
                 });
 
-                doc.save('Laporan_Data_Obat.pdf');
-
-                // Restore action column display
-                actionCells.forEach(cell => {
-                    cell.style.display = '';
+                doc.autoTable({
+                    html: tableClone, // Use the cloned table without the 'Aksi' column
+                    startY: 60,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [29, 233, 182], // Corresponds to --primary-color
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 8,
+                        valign: 'middle',
+                        overflow: 'linebreak'
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 30, halign: 'center' }, // No
+                        1: { cellWidth: 70 },  // ID Obat
+                        2: { cellWidth: 100 }, // Nama Obat
+                        3: { cellWidth: 70 },  // Jenis
+                        4: { cellWidth: 40, halign: 'center' }, // Stok
+                        5: { cellWidth: 80 },  // Harga Satuan
+                        6: { cellWidth: 'auto' } // Deskripsi (biarkan auto)
+                    },
+                    didDrawPage: function (data) {
+                        doc.text("Laporan Data Obat", 40, 30);
+                    }
                 });
+                doc.save('data_obat.pdf');
             });
 
             // Excel Export
             document.getElementById('export-excel-btn').addEventListener('click', function() {
                 const table = document.querySelector('.obat-table');
                 const wb = XLSX.utils.table_to_book(table, { sheet: "Data Obat" });
-                XLSX.writeFile(wb, 'Laporan_Data_Obat.xlsx');
-            });
 
-            // Print Table - PERBAIKAN FUNGSI CETAK
-            document.getElementById('print-table-btn').addEventListener('click', function() {
-                const tableToPrint = document.querySelector('.obat-table').cloneNode(true); // Clone the table
-
-                // Remove the "Aksi" column from the cloned table
-                const actionColumnIndex = Array.from(tableToPrint.rows[0].cells).findIndex(th => th.textContent === 'Aksi');
-                if (actionColumnIndex > -1) {
-                    for (let i = 0; i < tableToPrint.rows.length; i++) {
-                        tableToPrint.rows[i].deleteCell(actionColumnIndex);
+                // Hapus kolom "Aksi" sebelum menulis ke Excel
+                const ws = wb.Sheets["Data Obat"];
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    for (let C = range.s.c; C <= range.e.c; ++C) {
+                        const cell = ws[XLSX.utils.encode_cell({r: R, c: C})];
+                        if (cell && cell.v === 'Aksi') { // Asumsi "Aksi" adalah header kolom terakhir
+                            // Shift cells left to remove the column
+                            for (let i = C; i < range.e.c; ++i) {
+                                const nextCell = ws[XLSX.utils.encode_cell({r: R, c: i + 1})];
+                                ws[XLSX.utils.encode_cell({r: R, c: i})] = nextCell;
+                            }
+                            delete ws[XLSX.utils.encode_cell({r: R, c: range.e.c})]; // Delete the last cell
+                        }
                     }
                 }
+                // Sesuaikan !ref untuk mencerminkan kolom yang dihapus
+                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c, range.e.r, range.e.c - 1);
 
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write('<html><head><title>Cetak Data Obat</title>');
-                // Tambahkan CSS untuk styling cetak
-                printWindow.document.write(`
-                    <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
-                        h1 { color: #00b686; text-align: center; margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
-                        th { background-color: #1de9b6; color: white; font-weight: bold; }
-                        tbody tr:nth-child(even) { background-color: #f9f9f9; }
-                    </style>
-                `);
-                printWindow.document.write('</head><body>');
-                printWindow.document.write('<h1>Laporan Data Obat</h1>');
-                printWindow.document.write(tableToPrint.outerHTML);
-                printWindow.document.write('</body></html>');
-                printWindow.document.close();
-                printWindow.print();
-                printWindow.onafterprint = function() {
-                    printWindow.close();
-                };
+
+                XLSX.writeFile(wb, 'data_obat.xlsx');
             });
+
+            // Tombol Cetak sudah dihapus, jadi tidak perlu ada kode untuknya di sini.
 
 
             // Close modals when clicking on the close button
             document.querySelectorAll('.modal .close-button').forEach(btn => {
                 btn.addEventListener('click', function() {
                     this.closest('.modal').style.display = 'none';
-                    toggleBodyOverflow(false); // Restore body scroll
+                    toggleBodyOverflow(false); // Enable body scroll
                 });
             });
 
@@ -1348,16 +1377,16 @@
                     deleteConfirmationModal.style.display = 'none';
                     toggleBodyOverflow(false);
                 }
-                // FIX: Add obatFormContainer to close on outside click
-                if (event.target === obatFormContainer) {
+                if (event.target === obatFormContainer) { // Untuk modal tambah/edit
                     obatFormContainer.style.display = 'none';
                     toggleBodyOverflow(false);
                 }
             });
 
-            // Initial display: Hide form by default, and load data
-            hideForm(); // Pastikan modal tersembunyi saat pertama kali halaman dimuat
-            displayObats(); // Tampilkan tabel dengan data yang mungkin sudah ada (sekarang kosong)
+            // Initial display
+            displayObats();
+            // Call displayObats with initial search term (empty string) to load all data
+            displayObats('');
         });
     </script>
 </body>
