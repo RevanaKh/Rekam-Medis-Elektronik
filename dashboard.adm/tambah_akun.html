@@ -885,7 +885,8 @@
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-            let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+            // PERBAIKAN: Mengubah kunci localStorage dari 'accounts' menjadi 'users'
+            let accounts = JSON.parse(localStorage.getItem('users')) || [];
             let currentAccountIdToDelete = null;
 
             function generateId() {
@@ -947,7 +948,8 @@
                     showAlert(successAlert, 'Akun berhasil ditambahkan!');
                 }
 
-                localStorage.setItem('accounts', JSON.stringify(accounts));
+                // PERBAIKAN: Mengubah kunci localStorage dari 'accounts' menjadi 'users'
+                localStorage.setItem('users', JSON.stringify(accounts));
                 userForm.reset();
                 hideForm();
                 displayAccounts();
@@ -972,7 +974,8 @@
 
             function deleteAccount() {
                 accounts = accounts.filter(acc => acc.id !== currentAccountIdToDelete);
-                localStorage.setItem('accounts', JSON.stringify(accounts));
+                // PERBAIKAN: Mengubah kunci localStorage dari 'accounts' menjadi 'users'
+                localStorage.setItem('users', JSON.stringify(accounts));
                 deleteModal.style.display = 'none';
                 showAlert(successAlert, 'Akun berhasil dihapus!');
                 displayAccounts();
