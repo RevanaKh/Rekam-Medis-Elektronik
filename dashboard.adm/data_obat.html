@@ -755,7 +755,7 @@
                 <a href="jadwal_dokter.html" class="nav-link">
                     <div class="nav-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 3v6a6 6 0 0 0 12 0V3"></path>
+                            <path d="M6 3v6a6 0 0 0 12 0V3"></path>
                             <circle cx="12" cy="14" r="4"></circle>
                             <line x1="12" y1="18" x2="12" y2="21"></line>
                             <line x1="9" y1="21" x2="15" y2="21"></line>
@@ -1071,36 +1071,24 @@
             const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const closeObatFormModalBtn = document.getElementById('closeObatFormModalBtn'); // Ambil tombol close di modal tambah/edit
+            const closeObatFormModalBtn = document.getElementById('closeObatFormModalBtn');
             let obatIdToDelete = null;
 
             // Load obat from localStorage, or an empty array if none exists
             let obats = JSON.parse(localStorage.getItem('obat')) || [];
-
-            // Hanya inisialisasi data dummy jika localStorage 'obat' kosong
-            // Ini akan memastikan tabel kosong pada kunjungan pertama atau setelah localStorage di-clear manual,
-            // tetapi data yang sudah diinput akan tetap persisten di kunjungan berikutnya.
-            if (obats.length === 0) {
-                // Biarkan obats tetap array kosong jika tidak ada data di localStorage
-                // Tidak perlu menambahkan data dummy di sini
-                saveObatsToLocalStorage(); // Pastikan localStorage disimpan sebagai array kosong
-            }
-
+            // Load lastObatNumber from localStorage, or initialize to 0
+            let lastObatNumber = parseInt(localStorage.getItem('lastObatNumber')) || 0;
 
             // Save obats to localStorage
             function saveObatsToLocalStorage() {
                 localStorage.setItem('obat', JSON.stringify(obats));
+                localStorage.setItem('lastObatNumber', lastObatNumber.toString());
             }
 
-            // Generate unique obat ID
+            // Generate unique obat ID in OBT-XXX format
             function generateObatId() {
-                const prefix = 'OBT-';
-                const date = new Date();
-                const year = date.getFullYear().toString().slice(-2);
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const day = date.getDate().toString().padStart(2, '0');
-                const randomNum = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
-                return `${prefix}${year}${month}${day}-${randomNum}`;
+                lastObatNumber++; // Increment the number for the next ID
+                return `OBT-${lastObatNumber.toString().padStart(3, '0')}`; // Format to OBT-001, OBT-002, etc.
             }
 
             // Display obats in the table
@@ -1113,10 +1101,9 @@
                 );
 
                 if (filteredObats.length === 0 && searchTerm === '') {
-                    // Tampilkan pesan "Tidak ada data" hanya jika tidak ada filter dan data kosong
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 8; // Sesuai dengan jumlah kolom di tabel
+                    noDataCell.colSpan = 8;
                     noDataCell.textContent = "Tidak ada data obat. Silakan tambahkan data baru.";
                     noDataCell.style.textAlign = "center";
                     noDataCell.style.padding = "20px";
@@ -1125,7 +1112,7 @@
                 } else {
                     filteredObats.forEach((obat, index) => {
                         const row = tableBody.insertRow();
-                        row.dataset.id = obat.id; // Store ID for easy access
+                        row.dataset.id = obat.id;
 
                         row.insertCell().textContent = index + 1 + ".";
                         row.insertCell().textContent = obat.id;
@@ -1144,13 +1131,13 @@
                         `;
                     });
                 }
-                attachObatActionListeners(); // Re-attach listeners after updating table
+                attachObatActionListeners();
             }
 
             // Attach event listeners for action buttons (view, edit, delete)
             function attachObatActionListeners() {
                 document.querySelectorAll('.view-btn').forEach(button => {
-                    button.removeEventListener('click', handleViewObat); // Prevent duplicate listeners
+                    button.removeEventListener('click', handleViewObat);
                     button.addEventListener('click', handleViewObat);
                 });
                 document.querySelectorAll('.edit-btn').forEach(button => {
@@ -1183,7 +1170,7 @@
                     document.getElementById('viewStok').textContent = obat.stok;
                     document.getElementById('viewHarga').textContent = obat.harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
                     document.getElementById('viewDeskripsi').textContent = obat.deskripsi;
-                    viewObatModal.style.display = 'flex'; // Tampilkan modal
+                    viewObatModal.style.display = 'flex';
                     toggleBodyOverflow(true);
                 }
             }
@@ -1200,14 +1187,14 @@
                     hargaInput.value = obat.harga;
                     deskripsiInput.value = obat.deskripsi;
                     formTitle.textContent = 'Edit Data Obat';
-                    showForm(); // Show form for editing (now as a modal)
+                    showForm();
                 }
             }
 
             // Handle Delete Obat Click
             function handleDeleteObatClick() {
                 obatIdToDelete = this.dataset.id;
-                deleteConfirmationModal.style.display = 'flex'; // Tampilkan modal
+                deleteConfirmationModal.style.display = 'flex';
                 toggleBodyOverflow(true);
             }
 
@@ -1215,18 +1202,18 @@
             confirmDeleteBtn.addEventListener('click', function() {
                 if (obatIdToDelete) {
                     obats = obats.filter(o => o.id !== obatIdToDelete);
-                    saveObatsToLocalStorage(); // Save changes after deletion
-                    displayObats(searchFilterInput.value); // Refresh table
+                    saveObatsToLocalStorage();
+                    displayObats(searchFilterInput.value);
                     deleteConfirmationModal.style.display = 'none';
                     toggleBodyOverflow(false);
                     alert('Data obat berhasil dihapus!');
-                    obatIdToDelete = null; // Clear ID
+                    obatIdToDelete = null;
                 }
             });
 
             // Show/Hide form functions (now controls modal visibility)
             function showForm() {
-                obatFormContainer.style.display = 'flex'; // Menggunakan flex untuk centering modal
+                obatFormContainer.style.display = 'flex';
                 toggleBodyOverflow(true);
 
                 // Jika ini mode tambah, reset form dan generate ID baru
@@ -1240,13 +1227,13 @@
                 obatFormContainer.style.display = 'none';
                 toggleBodyOverflow(false);
                 obatForm.reset();
-                obatIdInput.value = ''; // Clear ID
+                obatIdInput.value = '';
             }
 
             // Toggle Add/Edit Obat Form visibility
             toggleFormBtn.addEventListener('click', () => {
-                formTitle.textContent = 'Tambah Obat Baru'; // Set title for adding
-                showForm(); // Always show form as modal
+                formTitle.textContent = 'Tambah Obat Baru';
+                showForm();
             });
 
             // Cancel Form button (internal to the form modal)
@@ -1289,9 +1276,9 @@
                     alert('Obat baru berhasil ditambahkan!');
                 }
 
-                saveObatsToLocalStorage(); // Save changes
-                displayObats(searchFilterInput.value); // Refresh table
-                hideForm(); // Hide form after saving
+                saveObatsToLocalStorage();
+                displayObats(searchFilterInput.value);
+                hideForm();
             });
 
 
@@ -1299,24 +1286,24 @@
             document.getElementById('export-pdf-btn').addEventListener('click', function() {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'letter');
-                const table = document.querySelector('.obat-table'); // Get the table element
-                const tableClone = table.cloneNode(true); // Clone to avoid modifying original
+                const table = document.querySelector('.obat-table');
+                const tableClone = table.cloneNode(true);
 
                 // Remove the "Aksi" column from the cloned table
                 const rows = tableClone.querySelectorAll('tr');
                 rows.forEach(row => {
                     const cells = row.querySelectorAll('th, td');
-                    if (cells.length > 0) { // Ensure row has cells
-                        cells[cells.length - 1].remove(); // Remove last cell (Aksi)
+                    if (cells.length > 0) {
+                        cells[cells.length - 1].remove();
                     }
                 });
 
                 doc.autoTable({
-                    html: tableClone, // Use the cloned table without the 'Aksi' column
+                    html: tableClone,
                     startY: 60,
                     theme: 'grid',
                     headStyles: {
-                        fillColor: [29, 233, 182], // Corresponds to --primary-color
+                        fillColor: [29, 233, 182],
                         textColor: [255, 255, 255],
                         fontStyle: 'bold',
                         halign: 'center'
@@ -1328,13 +1315,13 @@
                         overflow: 'linebreak'
                     },
                     columnStyles: {
-                        0: { cellWidth: 30, halign: 'center' }, // No
-                        1: { cellWidth: 70 },  // ID Obat
-                        2: { cellWidth: 100 }, // Nama Obat
-                        3: { cellWidth: 70 },  // Jenis
-                        4: { cellWidth: 40, halign: 'center' }, // Stok
-                        5: { cellWidth: 80 },  // Harga Satuan
-                        6: { cellWidth: 'auto' } // Deskripsi (biarkan auto)
+                        0: { cellWidth: 30, halign: 'center' },
+                        1: { cellWidth: 70 },
+                        2: { cellWidth: 100 },
+                        3: { cellWidth: 70 },
+                        4: { cellWidth: 40, halign: 'center' },
+                        5: { cellWidth: 80 },
+                        6: { cellWidth: 'auto' }
                     },
                     didDrawPage: function (data) {
                         doc.text("Laporan Data Obat", 40, 30);
@@ -1354,31 +1341,27 @@
                 for (let R = range.s.r; R <= range.e.r; ++R) {
                     for (let C = range.s.c; C <= range.e.c; ++C) {
                         const cell = ws[XLSX.utils.encode_cell({r: R, c: C})];
-                        if (cell && cell.v === 'Aksi') { // Asumsi "Aksi" adalah header kolom terakhir
-                            // Shift cells left to remove the column
+                        if (cell && cell.v === 'Aksi') {
                             for (let i = C; i < range.e.c; ++i) {
                                 const nextCell = ws[XLSX.utils.encode_cell({r: R, c: i + 1})];
                                 ws[XLSX.utils.encode_cell({r: R, c: i})] = nextCell;
                             }
-                            delete ws[XLSX.utils.encode_cell({r: R, c: range.e.c})]; // Delete the last cell
+                            delete ws[XLSX.utils.encode_cell({r: R, c: range.e.c})];
                         }
                     }
                 }
-                // Sesuaikan !ref untuk mencerminkan kolom yang dihapus
                 ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c, range.e.r, range.e.c - 1);
 
 
                 XLSX.writeFile(wb, 'data_obat.xlsx');
             });
 
-            // Tombol Cetak sudah dihapus, jadi tidak perlu ada kode untuknya di sini.
-
 
             // Close modals when clicking on the close button
             document.querySelectorAll('.modal .close-button').forEach(btn => {
                 btn.addEventListener('click', function() {
                     this.closest('.modal').style.display = 'none';
-                    toggleBodyOverflow(false); // Enable body scroll
+                    toggleBodyOverflow(false);
                 });
             });
 
@@ -1392,15 +1375,15 @@
                     deleteConfirmationModal.style.display = 'none';
                     toggleBodyOverflow(false);
                 }
-                if (event.target === obatFormContainer) { // Untuk modal tambah/edit
+                if (event.target === obatFormContainer) {
                     obatFormContainer.style.display = 'none';
                     toggleBodyOverflow(false);
                 }
             });
 
             // Initial display
-            displayObats(); // Call displayObats with initial search term (empty string) to load all data
-            hideForm(); // Ensure the form modal is hidden on page load
+            displayObats();
+            hideForm();
         });
     </script>
 </body>
