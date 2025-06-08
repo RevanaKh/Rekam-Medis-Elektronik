@@ -495,7 +495,7 @@
             border-color: var(--primary-dark);
         }
 
-        /* Modal Styles - PERBAIKAN PENTING DI SINI */
+        /* Modal Styles */
         .modal {
             display: none; /* Hidden by default */
             position: fixed; /* Stay in place */
@@ -1077,10 +1077,15 @@
             // Load obat from localStorage, or an empty array if none exists
             let obats = JSON.parse(localStorage.getItem('obat')) || [];
 
-            // If localStorage is empty or null, save an empty array to it initially
-            if (localStorage.getItem('obat') === null || JSON.parse(localStorage.getItem('obat')).length === 0) {
-                saveObatsToLocalStorage();
+            // Hanya inisialisasi data dummy jika localStorage 'obat' kosong
+            // Ini akan memastikan tabel kosong pada kunjungan pertama atau setelah localStorage di-clear manual,
+            // tetapi data yang sudah diinput akan tetap persisten di kunjungan berikutnya.
+            if (obats.length === 0) {
+                // Biarkan obats tetap array kosong jika tidak ada data di localStorage
+                // Tidak perlu menambahkan data dummy di sini
+                saveObatsToLocalStorage(); // Pastikan localStorage disimpan sebagai array kosong
             }
+
 
             // Save obats to localStorage
             function saveObatsToLocalStorage() {
@@ -1107,26 +1112,38 @@
                     obat.jenis.toLowerCase().includes(searchTerm.toLowerCase())
                 );
 
-                filteredObats.forEach((obat, index) => {
-                    const row = tableBody.insertRow();
-                    row.dataset.id = obat.id; // Store ID for easy access
+                if (filteredObats.length === 0 && searchTerm === '') {
+                    // Tampilkan pesan "Tidak ada data" hanya jika tidak ada filter dan data kosong
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 8; // Sesuai dengan jumlah kolom di tabel
+                    noDataCell.textContent = "Tidak ada data obat. Silakan tambahkan data baru.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                } else {
+                    filteredObats.forEach((obat, index) => {
+                        const row = tableBody.insertRow();
+                        row.dataset.id = obat.id; // Store ID for easy access
 
-                    row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = obat.id;
-                    row.insertCell().textContent = obat.namaObat;
-                    row.insertCell().textContent = obat.jenis;
-                    row.insertCell().textContent = obat.stok;
-                    row.insertCell().textContent = obat.harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-                    row.insertCell().textContent = obat.deskripsi;
+                        row.insertCell().textContent = index + 1 + ".";
+                        row.insertCell().textContent = obat.id;
+                        row.insertCell().textContent = obat.namaObat;
+                        row.insertCell().textContent = obat.jenis;
+                        row.insertCell().textContent = obat.stok;
+                        row.insertCell().textContent = obat.harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                        row.insertCell().textContent = obat.deskripsi;
 
-                    const actionCell = row.insertCell();
-                    actionCell.classList.add('action-buttons');
-                    actionCell.innerHTML = `
-                        <button class="btn btn-info btn-sm view-btn" data-id="${obat.id}"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-warning btn-sm edit-btn" data-id="${obat.id}"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm delete-btn" data-id="${obat.id}"><i class="fas fa-trash"></i></button>
-                    `;
-                });
+                        const actionCell = row.insertCell();
+                        actionCell.classList.add('action-buttons');
+                        actionCell.innerHTML = `
+                            <button class="btn btn-info btn-sm view-btn" data-id="${obat.id}"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-warning btn-sm edit-btn" data-id="${obat.id}"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="${obat.id}"><i class="fas fa-trash"></i></button>
+                        `;
+                    });
+                }
                 attachObatActionListeners(); // Re-attach listeners after updating table
             }
 
@@ -1267,8 +1284,7 @@
                     obats[existingIndex] = newObat;
                     alert('Data obat berhasil diperbarui!');
                 } else {
-                    // This should theoretically not happen if ID is always generated or existing
-                    // For robustness, if for some reason ID was not found, add it
+                    // Ini harusnya kasus penambahan baru
                     obats.push(newObat);
                     alert('Obat baru berhasil ditambahkan!');
                 }
