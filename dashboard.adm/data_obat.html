@@ -423,7 +423,8 @@
         }
 
         .obat-table th, .obat-table td {
-            border: 1px solid var(--border-color);
+            /* Perubahan di sini: Border berwarna hitam */
+            border: 1px solid #000; /* Warna hitam untuk border */
             padding: 12px 15px;
             text-align: left;
             font-size: 0.9em;
@@ -501,13 +502,13 @@
             height: 100%; /* Full height */
             overflow: auto; /* Enable scroll if needed */
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            justify-content: center;
-            align-items: center;
+            display: flex; /* Menggunakan flexbox untuk centering */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: auto;
             padding: 20px;
             border: 1px solid #888;
             border-radius: 8px;
@@ -515,13 +516,29 @@
             max-width: 500px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             position: relative;
+            /* Perbaikan centering: */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* Animasi */
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+        }
+
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: -50%; opacity: 1} /* Diubah agar animasi masuk dari atas ke tengah */
         }
 
         .close-button {
             color: #aaa;
-            float: right;
+            /* Perubahan: Posisi absolut di dalam modal-content */
+            position: absolute;
+            top: 10px;
+            right: 20px;
             font-size: 28px;
             font-weight: bold;
+            cursor: pointer;
         }
 
         .close-button:hover,
@@ -659,7 +676,7 @@
             }
 
             .modal-content {
-                width: 95%;
+                width: 95%; /* Lebih responsif di mobile */
             }
         }
     </style>
@@ -821,45 +838,46 @@
             </div>
         </div>
 
-        <div id="obatFormContainer" class="card" style="display: none;">
-            <div class="card-header">
+        <div id="obatFormContainer" class="modal">
+            <div class="modal-content">
+                <span class="close-button" id="closeObatFormModalBtn">&times;</span>
                 <h2 id="formTitle">Tambah Obat Baru</h2>
-            </div>
-            <div class="card-body">
-                <form id="obatForm">
-                    <input type="hidden" id="obatId">
-                    <div class="form-group">
-                        <label for="namaObat">Nama Obat:</label>
-                        <input type="text" id="namaObat" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="jenisObat">Jenis:</label>
-                        <select id="jenisObat" class="form-control" required>
-                            <option value="">Pilih Jenis Obat</option>
-                            <option value="Tablet">Tablet</option>
-                            <option value="Sirup">Sirup</option>
-                            <option value="Kapsul">Kapsul</option>
-                            <option value="Salep">Salep</option>
-                            <option value="Injeksi">Injeksi</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="stok">Stok:</label>
-                        <input type="number" id="stok" class="form-control" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="harga">Harga Satuan (IDR):</label>
-                        <input type="number" id="harga" class="form-control" step="100" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="deskripsi">Deskripsi:</label>
-                        <textarea id="deskripsi" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="modal-buttons">
-                        <button type="button" class="btn btn-secondary" id="cancelFormBtn">Batal</button>
-                        <button type="submit" class="btn btn-primary" id="saveObatBtn">Simpan Obat</button>
-                    </div>
-                </form>
+                <div class="card-body">
+                    <form id="obatForm">
+                        <input type="hidden" id="obatId">
+                        <div class="form-group">
+                            <label for="namaObat">Nama Obat:</label>
+                            <input type="text" id="namaObat" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jenisObat">Jenis:</label>
+                            <select id="jenisObat" class="form-control" required>
+                                <option value="">Pilih Jenis Obat</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Sirup">Sirup</option>
+                                <option value="Kapsul">Kapsul</option>
+                                <option value="Salep">Salep</option>
+                                <option value="Injeksi">Injeksi</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="stok">Stok:</label>
+                            <input type="number" id="stok" class="form-control" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="harga">Harga Satuan (IDR):</label>
+                            <input type="number" id="harga" class="form-control" step="100" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="deskripsi">Deskripsi:</label>
+                            <textarea id="deskripsi" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="button" class="btn btn-secondary" id="cancelFormBtn">Batal</button>
+                            <button type="submit" class="btn btn-primary" id="saveObatBtn">Simpan Obat</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -1018,6 +1036,7 @@
             const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const closeObatFormModalBtn = document.getElementById('closeObatFormModalBtn'); // Ambil tombol close di modal tambah/edit
             let obatIdToDelete = null;
 
             // Load obat from localStorage, or use dummy data if none exists
@@ -1109,7 +1128,7 @@
                     document.getElementById('viewStok').textContent = obat.stok;
                     document.getElementById('viewHarga').textContent = obat.harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
                     document.getElementById('viewDeskripsi').textContent = obat.deskripsi;
-                    viewObatModal.style.display = 'flex';
+                    viewObatModal.style.display = 'flex'; // Tampilkan modal
                 }
             }
 
@@ -1125,14 +1144,14 @@
                     hargaInput.value = obat.harga;
                     deskripsiInput.value = obat.deskripsi;
                     formTitle.textContent = 'Edit Data Obat';
-                    showForm(true); // Show form for editing
+                    showForm(true); // Show form for editing (now as a modal)
                 }
             }
 
             // Handle Delete Obat Click
             function handleDeleteObatClick() {
                 obatIdToDelete = this.dataset.id;
-                deleteConfirmationModal.style.display = 'flex';
+                deleteConfirmationModal.style.display = 'flex'; // Tampilkan modal
             }
 
             // Confirm Delete Obat
@@ -1147,17 +1166,15 @@
                 }
             });
 
-            // Show/Hide form functions
+            // Show/Hide form functions (now controls modal visibility)
             function showForm(isEdit = false) {
-                obatFormContainer.style.display = 'block';
+                obatFormContainer.style.display = 'flex'; // Menggunakan flex untuk centering modal
                 if (!isEdit) {
                     obatForm.reset();
-                    obatIdInput.value = ''; // Clear ID for new obat
+                    obatIdInput.value = generateObatId(); // Generate new ID for new obat
                     formTitle.textContent = 'Tambah Obat Baru';
-                    obatIdInput.value = generateObatId(); // Generate new ID
                 }
-                // Scroll to form
-                obatFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Tidak perlu scroll karena modal overlay
             }
 
             function hideForm() {
@@ -1168,15 +1185,16 @@
 
             // Toggle Add/Edit Obat Form visibility
             toggleFormBtn.addEventListener('click', () => {
-                if (obatFormContainer.style.display === 'none' || obatFormContainer.style.display === '') {
-                    showForm();
-                } else {
-                    hideForm();
-                }
+                showForm(); // Always show form as modal
             });
 
-            // Cancel Form button
+            // Cancel Form button (internal to the form modal)
             cancelFormBtn.addEventListener('click', () => {
+                hideForm();
+            });
+
+            // Close button specifically for the "Tambah/Edit Obat" modal
+            closeObatFormModalBtn.addEventListener('click', () => {
                 hideForm();
             });
 
@@ -1189,7 +1207,7 @@
             obatForm.addEventListener('submit', function(event) {
                 event.preventDefault();
 
-                const id = obatIdInput.value; // Use existing ID if present
+                const id = obatIdInput.value;
                 const newObat = {
                     id: id,
                     namaObat: namaObatInput.value,
@@ -1205,8 +1223,8 @@
                     obats[existingIndex] = newObat;
                     alert('Data obat berhasil diperbarui!');
                 } else {
-                    // This should not happen if ID is always generated or existing
-                    // For safety, add new if not found (though logic should ensure ID is always present)
+                    // This should theoretically not happen if ID is always generated or existing
+                    // For robustness, if for some reason ID was not found, add it
                     obats.push(newObat);
                     alert('Obat baru berhasil ditambahkan!');
                 }
@@ -1274,7 +1292,7 @@
                 printWindow.document.write(`
                     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
+                    th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 0.9em; } /* FIX: Border hitam */
                     th { background-color: #1de9b6; color: white; font-weight: bold; }
                     h1 { color: #00b686; }
                 `);
@@ -1302,14 +1320,14 @@
                 if (event.target === deleteConfirmationModal) {
                     deleteConfirmationModal.style.display = 'none';
                 }
-                // FIX: Add check for obatFormContainer to close it when clicking outside
-                if (event.target === obatFormContainer && obatFormContainer.classList.contains('modal')) {
+                // FIX: Add obatFormContainer to close on outside click
+                if (event.target === obatFormContainer) {
                     obatFormContainer.style.display = 'none';
                 }
             });
 
             // Initial display
-            hideForm();
+            hideForm(); // Pastikan form modal disembunyikan saat inisialisasi
             displayObats();
         });
     </script>
