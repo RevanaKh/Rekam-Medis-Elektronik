@@ -24,6 +24,7 @@
             --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             --sidebar-width: 250px;
             --sidebar-minimized-width: 60px;
+            --border-color: #ddd; /* Warna border default, misalnya untuk tabel */
 
             /* Warna baru untuk tombol laporan sesuai gambar */
             --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
@@ -353,10 +354,11 @@
             margin-bottom: 15px;
         }
 
+        /* Perubahan di sini: Border hitam untuk form-control */
         .form-control {
             width: 100%;
             padding: 10px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #000; /* Warna hitam untuk border input form */
             border-radius: 4px;
             font-size: 14px;
             box-sizing: border-box;
@@ -423,8 +425,8 @@
         }
 
         .obat-table th, .obat-table td {
-            /* Perubahan di sini: Border berwarna hitam */
-            border: 1px solid #000; /* Warna hitam untuk border */
+            /* Perubahan di sini: Mengembalikan border tabel ke warna default */
+            border: 1px solid var(--border-color); /* Kembali ke warna default atau #ddd */
             padding: 12px 15px;
             text-align: left;
             font-size: 0.9em;
@@ -493,7 +495,7 @@
 
         /* Modal Styles */
         .modal {
-            display: none; /* Hidden by default */
+            display: none; /* Hidden by default - PENTING: ini yang membuat modal tidak muncul saat refresh */
             position: fixed; /* Stay in place */
             z-index: 10000; /* Sit on top */
             left: 0;
@@ -502,9 +504,8 @@
             height: 100%; /* Full height */
             overflow: auto; /* Enable scroll if needed */
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            display: flex; /* Menggunakan flexbox untuk centering */
-            align-items: center; /* Center vertically */
-            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically (only when display: flex) */
+            justify-content: center; /* Center horizontally (only when display: flex) */
         }
 
         .modal-content {
@@ -517,6 +518,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             position: relative;
             /* Perbaikan centering: */
+            /* Menggunakan transform untuk centering vertikal dan horizontal */
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -526,13 +528,12 @@
         }
 
         @keyframes animatetop {
-            from {top: -300px; opacity: 0}
-            to {top: -50%; opacity: 1} /* Diubah agar animasi masuk dari atas ke tengah */
+            from {opacity: 0; transform: translate(-50%, -60%);} /* Sedikit lebih tinggi dari tengah */
+            to {opacity: 1; transform: translate(-50%, -50%);} /* Ke posisi tengah */
         }
 
         .close-button {
             color: #aaa;
-            /* Perubahan: Posisi absolut di dalam modal-content */
             position: absolute;
             top: 10px;
             right: 20px;
@@ -810,6 +811,7 @@
                     <div class="report-buttons-container">
                         <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i>Unduh PDF</button>
                         <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i>Unduh Excel</button>
+                        <button class="report-button" id="print-table-btn"><i class="fas fa-print"></i>Cetak</button>
                     </div>
                 </div>
 
@@ -1144,7 +1146,7 @@
                     hargaInput.value = obat.harga;
                     deskripsiInput.value = obat.deskripsi;
                     formTitle.textContent = 'Edit Data Obat';
-                    showForm(true); // Show form for editing (now as a modal)
+                    showForm(); // Show form for editing (now as a modal)
                 }
             }
 
@@ -1167,14 +1169,13 @@
             });
 
             // Show/Hide form functions (now controls modal visibility)
-            function showForm(isEdit = false) {
+            function showForm() {
                 obatFormContainer.style.display = 'flex'; // Menggunakan flex untuk centering modal
-                if (!isEdit) {
+                // Jika ini mode tambah, reset form dan generate ID baru
+                if (formTitle.textContent === 'Tambah Obat Baru') {
                     obatForm.reset();
                     obatIdInput.value = generateObatId(); // Generate new ID for new obat
-                    formTitle.textContent = 'Tambah Obat Baru';
                 }
-                // Tidak perlu scroll karena modal overlay
             }
 
             function hideForm() {
@@ -1185,6 +1186,7 @@
 
             // Toggle Add/Edit Obat Form visibility
             toggleFormBtn.addEventListener('click', () => {
+                formTitle.textContent = 'Tambah Obat Baru'; // Set title for adding
                 showForm(); // Always show form as modal
             });
 
@@ -1292,7 +1294,7 @@
                 printWindow.document.write(`
                     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #000; padding: 8px; text-align: left; font-size: 0.9em; } /* FIX: Border hitam */
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; } /* FIX: Border hitam */
                     th { background-color: #1de9b6; color: white; font-weight: bold; }
                     h1 { color: #00b686; }
                 `);
@@ -1326,8 +1328,8 @@
                 }
             });
 
-            // Initial display
-            hideForm(); // Pastikan form modal disembunyikan saat inisialisasi
+            // Initial display: Hide form by default, and load data
+            hideForm();
             displayObats();
         });
     </script>
