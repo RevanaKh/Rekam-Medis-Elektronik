@@ -507,7 +507,6 @@
             background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
             
             /* Ini yang penting untuk centering! */
-            display: flex; /* Menggunakan flexbox untuk centering */
             align-items: center; /* Centering vertikal */
             justify-content: center; /* Centering horizontal */
             
@@ -1384,9 +1383,8 @@
             });
 
             // Initial display
-            displayObats();
-            // Call displayObats with initial search term (empty string) to load all data
-            displayObats('');
+            displayObats(); // Call displayObats with initial search term (empty string) to load all data
+            hideForm(); // Ensure the form modal is hidden on page load
         });
     </script>
 </body>
