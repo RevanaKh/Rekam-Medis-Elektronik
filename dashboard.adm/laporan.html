@@ -407,6 +407,7 @@
             padding: 8px;
             text-align: left;
             font-size: 0.9em;
+            white-space: nowrap; /* Ensure text doesn't wrap inside cells */
         }
 
         .report-table th {
@@ -515,20 +516,37 @@
                 display: none !important; /* Hide sidebar and buttons when printing */
             }
             .main-content {
-                margin-left: 0 !important; /* No margin when printing */
-                width: 100% !important; /* Full width for content */
-                padding: 0 !important; /* Adjust padding for print */
-                box-shadow: none !important; /* Remove shadow */
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                align-items: flex-start !important; /* Ensure content is aligned to the left */
             }
             .content-section {
-                padding: 15px !important; /* Smaller padding for print */
-                box-shadow: none !important; /* Remove shadow */
-                border: 1px solid #eee; /* Light border for sections */
+                padding: 15px !important;
+                box-shadow: none !important;
+                border: 1px solid #eee;
                 margin-bottom: 10px !important;
+                width: auto !important; /* Allow content to adjust naturally */
+                max-width: none !important; /* Remove max-width restriction */
+            }
+            .report-table {
+                width: 100% !important; /* Ensure table uses full print width */
+                min-width: unset !important; /* Remove min-width for print */
+                page-break-inside: auto; /* Allow table to break across pages */
             }
             .report-table th, .report-table td {
                 padding: 5px !important;
                 font-size: 0.8em !important;
+                border: 1px solid #000 !important; /* Ensure borders are visible in print */
+                white-space: normal !important; /* Allow text to wrap in cells for print */
+            }
+            .report-table thead {
+                display: table-header-group; /* Ensure header repeats on new pages */
+            }
+            .report-table tr {
+                page-break-inside: avoid; /* Avoid breaking rows across pages */
+                page-break-after: auto;
             }
             /* Ensure text color is black for printing */
             h1, h3, p, span, th, td {
@@ -686,9 +704,9 @@
                         <tr>
                             <th>ID Pasien</th>
                             <th>Nama Pasien</th>
-                            <th>Alamat</th>
-                            <th>Telepon</th>
                             <th>Tanggal Lahir</th>
+                            <th>Telepon</th>
+                            <th>Alamat</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -706,8 +724,8 @@
                     <span id="total-dokter"></span>
                 </div>
                 <div class="report-item">
-                    <span>Dokter Hadir Hari Ini:</span>
-                    <span id="dokter-hadir-hari-ini"></span>
+                    <span>Dokter Aktif Hari Ini:</span>
+                    <span id="dokter-aktif-hari-ini"></span>
                 </div>
             </div>
             <div class="report-table-container">
@@ -716,10 +734,8 @@
                         <tr>
                             <th>ID Dokter</th>
                             <th>Nama Dokter</th>
-                            <th>Spesialisasi</th>
-                            <th>Telepon</th>
-                            <th>Email</th>
-                            <th>Hari Praktek</th> <!-- Perbarui header sesuai data jadwal_dokter -->
+                            <th>Poli</th>
+                            <th>Hari Praktek</th>
                             <th>Jam Mulai</th>
                             <th>Jam Selesai</th>
                             <th>Status</th>
@@ -740,8 +756,12 @@
                     <span id="total-transaksi"></span>
                 </div>
                 <div class="report-item">
-                    <span>Total Pendapatan:</span>
+                    <span>Total Pendapatan (Lunas):</span>
                     <span id="total-pendapatan"></span>
+                </div>
+                <div class="report-item">
+                    <span>Total Belum Lunas:</span>
+                    <span id="total-belum-lunas"></span>
                 </div>
             </div>
             <div class="report-table-container">
@@ -779,7 +799,7 @@
                 <table id="pemeriksaanTable" class="report-table">
                     <thead>
                         <tr>
-                            <th>ID Pemeriksaan</th>
+                            <th>ID Rekam Medis</th>
                             <th>Tanggal</th>
                             <th>Nama Pasien</th>
                             <th>Dokter</th>
@@ -845,6 +865,10 @@
                     <span>Apoteker Terdaftar:</span>
                     <span id="apoteker-count"></span>
                 </div>
+                <div class="report-item">
+                    <span>Pasien Terdaftar (Akun):</span>
+                    <span id="pasien-akun-count"></span>
+                </div>
             </div>
             <div class="report-table-container">
                 <table id="usersTable" class="report-table">
@@ -904,44 +928,51 @@
             loadUserData(); // Load user data to display welcome message
 
 
-            // Data untuk demo (akan diganti dengan data dari localStorage)
+            // Data dari localStorage
             const pasienData = JSON.parse(localStorage.getItem('patients')) || [];
-            const dokterData = JSON.parse(localStorage.getItem('doctors')) || [];
+            const dokterJadwalData = JSON.parse(localStorage.getItem('doctors')) || []; // Mengambil data jadwal dokter
             const transaksiPasienData = JSON.parse(localStorage.getItem('transactions')) || [];
             const pemeriksaanData = JSON.parse(localStorage.getItem('medicalRecords')) || []; // Asumsi kunci localStorage
-            const obatData = JSON.parse(localStorage.getItem('obat')) || [];
-            const userData = JSON.parse(localStorage.getItem('users')) || [];
+            const obatData = JSON.parse(localStorage.getItem('obat')) || []; // Mengambil data obat
+            const userData = JSON.parse(localStorage.getItem('users')) || []; // Mengambil data pengguna
 
             // Populate HTML tables with data and update summary numbers
             function populateReportTables() {
-                const currentMonth = new Date().getMonth();
-                const currentYear = new Date().getFullYear();
+                const today = new Date();
+                const currentMonth = today.getMonth();
+                const currentYear = today.getFullYear();
+                const currentDay = today.getDay(); // Sunday - Saturday : 0 - 6
+                const daysOfWeek = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+                const todayDayName = daysOfWeek[currentDay];
+
 
                 // Laporan Data Pasien
                 const pasienTableBody = document.querySelector('#pasienTable tbody');
                 pasienTableBody.innerHTML = '';
                 pasienData.forEach(p => {
                     const row = pasienTableBody.insertRow();
-                    row.insertCell().textContent = p.idPasien;
-                    row.insertCell().textContent = p.namaPasien;
-                    row.insertCell().textContent = p.alamat;
-                    row.insertCell().textContent = p.telepon;
-                    row.insertCell().textContent = p.tanggalLahir;
+                    row.insertCell().textContent = p.noRm; // ID Pasien
+                    row.insertCell().textContent = p.nama; // Nama Pasien
+                    row.insertCell().textContent = p.tglLahir; // Tanggal Lahir
+                    row.insertCell().textContent = p.noTelp; // Telepon
+                    row.insertCell().textContent = p.alamat; // Alamat
                 });
                 document.getElementById('total-pasien').textContent = pasienData.length;
                 const newPatientsThisMonth = pasienData.filter(p => {
-                    // Menggunakan tanggalLahir sebagai perkiraan tanggal registrasi
-                    const regDate = new Date(p.tanggalLahir); 
+                    // Menggunakan tglLahir sebagai perkiraan tanggal registrasi
+                    // Jika ada field 'tanggalRegistrasi' di objek pasien, itu akan lebih akurat
+                    const regDate = new Date(p.tglLahir); 
                     return regDate.getMonth() === currentMonth && regDate.getFullYear() === currentYear;
                 }).length;
                 document.getElementById('pasien-baru-bulan-ini').textContent = newPatientsThisMonth;
 
-                // Laporan Data Dokter
+
+                // Laporan Data Dokter (dari jadwal_dokter.html)
                 const dokterTableBody = document.querySelector('#dokterTable tbody');
                 dokterTableBody.innerHTML = '';
-                dokterData.forEach(d => {
+                dokterJadwalData.forEach(d => {
                     const row = dokterTableBody.insertRow();
-                    row.insertCell().textContent = d.id; // Menggunakan 'id' dari jadwal_dokter.html
+                    row.insertCell().textContent = d.id; // ID Dokter
                     row.insertCell().textContent = d.namaDokter;
                     row.insertCell().textContent = d.poli;
                     row.insertCell().textContent = d.hari;
@@ -949,30 +980,41 @@
                     row.insertCell().textContent = d.jamSelesai;
                     row.insertCell().textContent = d.status;
                 });
-                document.getElementById('total-dokter').textContent = dokterData.length;
-                // Dummy for "Dokter Hadir Hari Ini" - in real app, this would check current date against schedule
-                document.getElementById('dokter-hadir-hari-ini').textContent = Math.floor(Math.random() * dokterData.length) + 1;
+                document.getElementById('total-dokter').textContent = dokterJadwalData.length;
+                // Hitung Dokter Aktif Hari Ini
+                const activeDoctorsToday = dokterJadwalData.filter(d => 
+                    d.status === 'Aktif' && d.hari.toLowerCase() === todayDayName
+                ).length;
+                document.getElementById('dokter-aktif-hari-ini').textContent = activeDoctorsToday;
 
 
                 // Laporan Transaksi Pasien
                 const transaksiPasienTableBody = document.querySelector('#transaksiPasienTable tbody');
                 transaksiPasienTableBody.innerHTML = '';
-                let totalPendapatan = 0;
+                let totalPendapatanLunas = 0;
+                let totalBelumLunas = 0;
+
                 transaksiPasienData.forEach(t => {
                     const row = transaksiPasienTableBody.insertRow();
                     row.insertCell().textContent = t.id;
                     row.insertCell().textContent = t.tanggalTransaksi;
                     row.insertCell().textContent = t.namaPasien;
                     row.insertCell().textContent = t.jenisLayanan;
-                    row.insertCell().textContent = t.totalBiaya.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                    row.insertCell().textContent = parseFloat(t.totalBiaya).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
                     row.insertCell().textContent = t.statusPembayaran;
-                    totalPendapatan += t.totalBiaya;
+
+                    if (t.statusPembayaran === 'Lunas') {
+                        totalPendapatanLunas += t.totalBiaya;
+                    } else {
+                        totalBelumLunas += t.totalBiaya;
+                    }
                 });
                 document.getElementById('total-transaksi').textContent = transaksiPasienData.length;
-                document.getElementById('total-pendapatan').textContent = totalPendapatan.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                document.getElementById('total-pendapatan').textContent = totalPendapatanLunas.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                document.getElementById('total-belum-lunas').textContent = totalBelumLunas.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
 
 
-                // Laporan Pemeriksaan Pasien
+                // Laporan Pemeriksaan Pasien (Medical Records)
                 const pemeriksaanTableBody = document.querySelector('#pemeriksaanTable tbody');
                 pemeriksaanTableBody.innerHTML = '';
                 pemeriksaanData.forEach(p => {
@@ -998,9 +1040,11 @@
                 obatTableBody.innerHTML = '';
                 obatData.forEach(o => {
                     const row = obatTableBody.insertRow();
-                    row.insertCell().textContent = o.id;
+                    row.insertCell().textContent = o.kodeObat; // ID Obat
                     row.insertCell().textContent = o.namaObat;
-                    row.insertCell().textContent = o.jenis;
+                    // Asumsi 'jenis' tidak ada di data_obat.html yang diberikan. 
+                    // Jika ada, pastikan propertinya bernama 'jenis'
+                    row.insertCell().textContent = o.jenis || 'N/A'; // Tambahkan fallback jika 'jenis' tidak ada
                     row.insertCell().textContent = o.stok;
                     row.insertCell().textContent = o.harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
                     row.insertCell().textContent = o.deskripsi;
@@ -1015,15 +1059,16 @@
                 usersTableBody.innerHTML = '';
                 userData.forEach(u => {
                     const row = usersTableBody.insertRow();
-                    row.insertCell().textContent = u.id;
-                    row.insertCell().textContent = u.nama;
+                    row.insertCell().textContent = u.id; // ID User
+                    row.insertCell().textContent = u.nama || u.email; // Nama (jika ada) atau Email
                     row.insertCell().textContent = u.email;
                     row.insertCell().textContent = u.role;
                 });
                 document.getElementById('total-pengguna').textContent = userData.length;
-                document.getElementById('admin-count').textContent = userData.filter(u => u.role === 'admin').length;
-                document.getElementById('dokter-count').textContent = userData.filter(u => u.role === 'dokter').length;
-                document.getElementById('apoteker-count').textContent = userData.filter(u => u.role === 'apoteker').length;
+                document.getElementById('admin-count').textContent = userData.filter(u => u.role === 'Admin').length;
+                document.getElementById('dokter-count').textContent = userData.filter(u => u.role === 'Dokter').length;
+                document.getElementById('apoteker-count').textContent = userData.filter(u => u.role === 'Apoteker').length;
+                document.getElementById('pasien-akun-count').textContent = userData.filter(u => u.role === 'Pasien').length;
             }
 
             // Sidebar and Mobile Menu Toggle
@@ -1161,30 +1206,37 @@
                 exportAllExcelBtn.addEventListener('click', () => {
                     const wb = XLSX.utils.book_new();
 
-                    // Add Pasien data
-                    const ws_pasien = XLSX.utils.table_to_sheet(document.getElementById('pasienTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_pasien, "Data Pasien");
+                    // Function to add a table to the workbook, excluding the last column (Aksi)
+                    const addTableToWorkbook = (tableId, sheetName) => {
+                        const table = document.getElementById(tableId);
+                        // Clone the table to remove the "Aksi" column before export
+                        const clonedTable = table.cloneNode(true);
 
-                    // Add Dokter data
-                    const ws_dokter = XLSX.utils.table_to_sheet(document.getElementById('dokterTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_dokter, "Data Dokter");
+                        // Remove the last column (Aksi) from the cloned table's header
+                        const headerRow = clonedTable.querySelector('thead tr');
+                        if (headerRow && headerRow.children.length > 0) {
+                            headerRow.removeChild(headerRow.lastElementChild);
+                        }
 
-                    // Add Transaksi Pasien data
-                    const ws_transaksi = XLSX.utils.table_to_sheet(document.getElementById('transaksiPasienTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_transaksi, "Transaksi Pasien");
+                        // Remove the last column (Aksi) from each row in the cloned table's body
+                        const bodyRows = clonedTable.querySelectorAll('tbody tr');
+                        bodyRows.forEach(row => {
+                            if (row.children.length > 0) {
+                                row.removeChild(row.lastElementChild);
+                            }
+                        });
 
-                    // Add Pemeriksaan data
-                    const ws_pemeriksaan = XLSX.utils.table_to_sheet(document.getElementById('pemeriksaanTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_pemeriksaan, "Pemeriksaan Pasien");
+                        const ws = XLSX.utils.table_to_sheet(clonedTable);
+                        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                    };
 
-                    // Add Obat data
-                    const ws_obat = XLSX.utils.table_to_sheet(document.getElementById('obatTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_obat, "Stok Obat");
-
-                    // Add Pengguna data
-                    const ws_pengguna = XLSX.utils.table_to_sheet(document.getElementById('usersTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_pengguna, "Pengguna Sistem");
-
+                    addTableToWorkbook('pasienTable', "Data Pasien");
+                    addTableToWorkbook('dokterTable', "Data Dokter");
+                    addTableToWorkbook('transaksiPasienTable', "Transaksi Pasien");
+                    addTableToWorkbook('pemeriksaanTable', "Pemeriksaan Pasien");
+                    addTableToWorkbook('obatTable', "Stok Obat");
+                    addTableToWorkbook('usersTable', "Pengguna Sistem");
+                    
                     XLSX.writeFile(wb, 'Laporan_Menyeluruh_Klinik.xlsx');
                 });
             }
