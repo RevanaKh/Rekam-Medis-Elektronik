@@ -1026,13 +1026,7 @@
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
             let transactionIdToDelete = null;
 
-            // Load transactions from localStorage, or use dummy data if none exists
-            let transactions = JSON.parse(localStorage.getItem('transactions')) || [
-                { id: 'TRX-001', tanggalTransaksi: '2023-01-10', namaPasien: 'Budi Santoso', jenisLayanan: 'Pemeriksaan Umum', totalBiaya: 150000, statusPembayaran: 'Lunas' },
-                { id: 'TRX-002', tanggalTransaksi: '2023-01-12', namaPasien: 'Siti Aminah', jenisLayanan: 'Konsultasi Spesialis', totalBiaya: 250000, statusPembayaran: 'Belum Dibayar' },
-                { id: 'TRX-003', tanggalTransaksi: '2023-01-15', namaPasien: 'Andi Pratama', jenisLayanan: 'Tindakan Medis Kecil', totalBiaya: 500000, statusPembayaran: 'Cicilan' },
-            ];
-
+            
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('transactions') === null || JSON.parse(localStorage.getItem('transactions')).length === 0) {
                 saveTransactionsToLocalStorage();
