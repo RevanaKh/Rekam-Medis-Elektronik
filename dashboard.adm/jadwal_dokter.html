@@ -1036,6 +1036,12 @@
                 { id: 'D004', namaDokter: 'Dr. Salwa Azzahra Nurrohmah', poli: 'THT', hari: 'jumat', jamMulai: '13:00', jamSelesai: '16:00', status: 'Aktif' }
             ];
 
+            // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
+            // Ini akan memastikan data dummy ada di localStorage saat halaman pertama kali dimuat
+            if (localStorage.getItem('doctors') === null || JSON.parse(localStorage.getItem('doctors')).length === 0) {
+                saveDoctorsToLocalStorage();
+            }
+
             let currentJadwalIdToDelete = null;
 
             // Fungsi untuk menghasilkan ID unik
@@ -1051,6 +1057,9 @@
             // Fungsi untuk menampilkan jadwal dokter di tabel
             function displayJadwal(filterDoctor = '', filterPoli = '', filterHari = '') {
                 tableBody.innerHTML = '';
+                // Pastikan untuk memuat ulang data dari localStorage setiap kali menampilkan
+                doctors = JSON.parse(localStorage.getItem('doctors')) || [];
+
                 const filteredDoctors = doctors.filter(jadwal => {
                     const matchesDoctor = jadwal.namaDokter.toLowerCase().includes(filterDoctor.toLowerCase());
                     const matchesPoli = filterPoli === '' || jadwal.poli.toLowerCase() === filterPoli.toLowerCase();
@@ -1086,6 +1095,7 @@
                 jadwalForm.reset();
                 jadwalIdInput.value = ''; // Kosongkan ID untuk jadwal baru
                 modalTitle.textContent = 'Tambah Jadwal Baru';
+                modalDoctorNameInput.disabled = false; // Pastikan nama dokter bisa diisi untuk tambah baru
                 jadwalModal.style.display = 'flex';
             });
 
@@ -1124,8 +1134,10 @@
                 event.preventDefault();
 
                 let id = jadwalIdInput.value;
-                if (!id) {
-                    id = generateId(); // Hasilkan ID baru jika tidak ada ID yang ada
+                const isEditing = !!id; // True jika id ada, berarti sedang mengedit
+
+                if (!isEditing) {
+                    id = generateId(); // Hasilkan ID baru jika tidak ada ID yang ada (tambah baru)
                 }
 
                 const newJadwal = {
@@ -1138,13 +1150,13 @@
                     status: modalStatusInput.value
                 };
 
-                const existingIndex = doctors.findIndex(j => j.id === id);
-                if (existingIndex > -1) {
-                    // Edit jadwal yang sudah ada
-                    doctors[existingIndex] = newJadwal;
-                    alert('Jadwal berhasil diperbarui!');
+                if (isEditing) {
+                    const existingIndex = doctors.findIndex(j => j.id === id);
+                    if (existingIndex > -1) {
+                        doctors[existingIndex] = newJadwal;
+                        alert('Jadwal berhasil diperbarui!');
+                    }
                 } else {
-                    // Tambah jadwal baru
                     doctors.push(newJadwal);
                     alert('Jadwal berhasil ditambahkan!');
                 }
@@ -1188,6 +1200,7 @@
                 if (jadwal) {
                     jadwalIdInput.value = jadwal.id;
                     modalDoctorNameInput.value = jadwal.namaDokter;
+                    modalDoctorNameInput.disabled = true; // Nonaktifkan edit nama dokter saat mode edit
                     modalPoliInput.value = jadwal.poli;
                     modalDayInput.value = jadwal.hari;
                     modalStartTimeInput.value = jadwal.jamMulai;
