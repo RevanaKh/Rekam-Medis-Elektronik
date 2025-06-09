@@ -509,13 +509,60 @@
         .report-button.excel:hover {
             background-color: #229954;
         }
+
         .report-button.print {
-            background-color: #3498DB;
+            background-color: #3498DB; /* Biru */
+        }
+        .report-button.print:hover {
+            background-color: #217DBB;
         }
 
-        .report-button.print:hover {
-            background-color: #2196F3;
+        /* Summary Cards */
+        .summary-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 1200px;
         }
+
+        .summary-card {
+            padding: 20px;
+            border-radius: 8px;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .summary-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+        .summary-icon.red { color: var(--danger-color); }
+        .summary-icon.green { color: var(--success-color); }
+        .summary-icon.blue { color: var(--info-color); }
+        .summary-icon.orange { color: var(--warning-color); }
+
+        .summary-content {
+            flex-grow: 1;
+        }
+
+        .summary-label {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -577,159 +624,248 @@
                 gap: 10px;
             }
 
-            .report-buttons {
+            .form-row {
+                flex-direction: column;
+                gap: 0; /* Remove gap for single column layout */
+            }
+            .form-row .form-group {
+                flex: 1 1 100%; /* Full width on small screens */
+                margin-bottom: 15px; /* Add margin back for vertical spacing */
+            }
+            .form-row .form-group:last-child {
+                margin-bottom: 0;
+            }
+
+            .btn-group {
                 flex-direction: column;
                 align-items: stretch;
             }
-            .report-button {
+            .btn-group .btn {
                 width: 100%;
+                margin-bottom: 10px;
+            }
+            .btn-group .btn:last-child {
+                margin-bottom: 0;
+            }
+
+            .summary-cards-container {
+                grid-template-columns: 1fr; /* Stack on small screens */
+            }
+
+            .report-buttons {
                 justify-content: center;
-            }
-
-            .table-responsive {
+                flex-direction: column;
                 width: 100%;
-                overflow-x: auto;
             }
+            .report-buttons .btn {
+                width: 100%;
+            }
+        }
 
+        /* Print Specific Styles */
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            .sidebar, .header, .mobile-toggle, .toggle-btn, .btn-group, .actions, .modal, .report-buttons {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #eee;
+                margin: 10px;
+                page-break-inside: avoid; /* Avoid breaking cards across pages */
+            }
             .report-table {
-                min-width: 600px;
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .report-table th, .report-table td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 10pt;
+                white-space: normal; /* Allow text wrapping in print */
+            }
+            .report-table th {
+                background-color: #f0f0f0 !important;
+                color: #333 !important;
+                -webkit-print-color-adjust: exact; /* Ensure background colors are printed */
+                print-color-adjust: exact;
+            }
+            .report-table tbody tr:nth-child(even) {
+                background-color: #f9f9f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .status-lunas {
+                color: var(--success-color) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .status-belum-lunas {
+                color: var(--danger-color) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .card-header {
+                background-color: #e0e0e0 !important; /* Lighter header for print */
+                color: #333 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            h1, h2, h3 {
+                color: #000 !important;
+            }
+            .summary-cards-container {
+                display: none; /* Hide summary cards in print if not desired, or style them for print */
             }
         }
     </style>
 </head>
 <body>
-    <div class="mobile-toggle" id="mobile-toggle">
-        ≡
-    </div>
+    <div class="mobile-toggle"><i class="fas fa-bars"></i></div>
 
-    <div class="sidebar" id="sidebar">
-        <button class="toggle-btn" id="sidebar-toggle">
-            <i class="fas fa-chevron-left"></i>
-        </button>
+    <div class="sidebar">
         <div class="sidebar-header">
-            <div class="menu-icon">≡</div>
+            <i class="fas fa-bars menu-icon"></i>
+            <span class="menu-text">SI Klinik</span>
+            <button class="toggle-btn" id="toggle-sidebar">
+                <i class="fas fa-angle-left"></i>
+            </button>
         </div>
         <ul class="nav-list">
             <li class="nav-item">
                 <a href="dashboard_adm.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Home</div>
+                    <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                    <span class="nav-text">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="data_pasien.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Data Pasien</div>
+                <a href="pasien.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    <span class="nav-text">Data Pasien</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="dokter.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-user-md"></i></span>
+                    <span class="nav-text">Data Dokter</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="obat.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-pills"></i></span>
+                    <span class="nav-text">Data Obat</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="jadwal_dokter.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 3v6a6 6 0 0 0 12 0V3"></path>
-                            <circle cx="12" cy="14" r="4"></circle>
-                            <line x1="12" y1="18" x2="12" y2="21"></line>
-                            <line x1="9" y1="21" x2="15" y2="21"></line>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Jadwal Praktek Dokter</div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="data_obat.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="9" y1="9" x2="15" y2="9"></line>
-                            <line x1="9" y1="14" x2="15" y2="14"></line>
-                            <line x1="9" y1="19" x2="15" y2="19"></line>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Data Obat</div>
+                    <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+                    <span class="nav-text">Jadwal Praktek Dokter</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="t-pasien.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                            <line x1="1" y1="10" x2="23" y2="10"></line>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Transaksi Pasien</div>
+                    <span class="nav-icon"><i class="fas fa-receipt"></i></span>
+                    <span class="nav-text">Transaksi Pasien</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="tambah_akun.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                            <line x1="17" y1="11" x2="23" y2="11"></line>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Tambah Akun</div>
+                <a href="pengguna.html" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-user-circle"></i></span>
+                    <span class="nav-text">Pengguna Sistem</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="laporan.html" class="nav-link active">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                    </div>
-                    <div class="nav-text">Laporan</div>
+                    <span class="nav-icon"><i class="fas fa-chart-pie"></i></span>
+                    <span class="nav-text">Laporan</span>
                 </a>
             </li>
         </ul>
         <div class="logout-section">
-            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link">
-                <div class="logout-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                </div>
-                <div class="logout-text">LOG OUT</div>
+            <a href="index.html" class="logout-link">
+                <span class="logout-icon"><i class="fas fa-sign-out-alt"></i></span>
+                <span class="logout-text">Logout</span>
             </a>
         </div>
     </div>
 
-    <div class="main-content" id="main-content">
+    <div class="main-content">
         <div class="header">
-            <h1>Laporan Sistem</h1>
+            <h1>Laporan Data Klinik</h1>
+        </div>
+
+        <div class="summary-cards-container">
+            <div class="summary-card">
+                <div class="summary-icon blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label">Total Pasien</div>
+                    <div class="summary-value" id="total-patients-report">0</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon green">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label">Total Pendapatan (Lunas)</div>
+                    <div class="summary-value" id="total-revenue-report">Rp 0</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label">Total Belum Lunas</div>
+                    <div class="summary-value" id="total-unpaid-report">Rp 0</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon orange">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label">Total Jenis Obat</div>
+                    <div class="summary-value" id="total-obat-report">0</div>
+                </div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon info">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-label">Total Dokter</div>
+                    <div class="summary-value" id="total-doctors-report">0</div>
+                </div>
+            </div>
         </div>
 
         <div class="card">
             <div class="card-header">
                 <h2><i class="fas fa-users"></i> Laporan Data Pasien</h2>
                 <div class="report-buttons">
-                    <button class="report-button pdf" id="export-patients-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button excel" id="export-patients-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+                    <button class="btn report-button print" id="print-pasien-list"><i class="fas fa-print"></i> Cetak</button>
+                    <button class="btn report-button excel" id="export-excel-pasien-list"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button class="btn report-button pdf" id="export-pdf-pasien-list"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="report-table" id="patientsReportTable">
+                    <table class="report-table" id="pasien-report-table">
                         <thead>
                             <tr>
-                                <th>No.</th>
                                 <th>ID Pasien</th>
                                 <th>Nama Lengkap</th>
                                 <th>Tanggal Lahir</th>
@@ -749,21 +885,23 @@
             <div class="card-header">
                 <h2><i class="fas fa-calendar-alt"></i> Laporan Jadwal Praktek Dokter</h2>
                 <div class="report-buttons">
-                    <button class="report-button pdf" id="export-schedules-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button excel" id="export-schedules-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+                    <button class="btn report-button print" id="print-jadwal-list"><i class="fas fa-print"></i> Cetak</button>
+                    <button class="btn report-button excel" id="export-excel-jadwal-list"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button class="btn report-button pdf" id="export-pdf-jadwal-list"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="report-table" id="schedulesReportTable">
+                    <table class="report-table" id="jadwal-report-table">
                         <thead>
                             <tr>
-                                <th>No.</th>
+                                <th>ID Jadwal</th>
                                 <th>Nama Dokter</th>
-                                <th>Poli</th>
-                                <th>Hari</th>
+                                <th>Spesialisasi</th>
+                                <th>Hari Praktek</th>
                                 <th>Jam Mulai</th>
                                 <th>Jam Selesai</th>
+                                <th>Poliklinik</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -777,20 +915,22 @@
             <div class="card-header">
                 <h2><i class="fas fa-pills"></i> Laporan Data Obat</h2>
                 <div class="report-buttons">
-                    <button class="report-button pdf" id="export-medicines-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button excel" id="export-medicines-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+                    <button class="btn report-button print" id="print-obat-list"><i class="fas fa-print"></i> Cetak</button>
+                    <button class="btn report-button excel" id="export-excel-obat-list"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button class="btn report-button pdf" id="export-pdf-obat-list"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="report-table" id="medicinesReportTable">
+                    <table class="report-table" id="obat-report-table">
                         <thead>
                             <tr>
-                                <th>No.</th>
+                                <th>ID Obat</th>
                                 <th>Nama Obat</th>
                                 <th>Jenis</th>
                                 <th>Stok</th>
-                                <th>Harga (Rp)</th>
+                                <th>Harga</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -804,21 +944,22 @@
             <div class="card-header">
                 <h2><i class="fas fa-receipt"></i> Laporan Transaksi Pasien</h2>
                 <div class="report-buttons">
-                    <button class="report-button pdf" id="export-transactions-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button excel" id="export-transactions-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+                    <button class="btn report-button print" id="print-transaksi-list"><i class="fas fa-print"></i> Cetak</button>
+                    <button class="btn report-button excel" id="export-excel-transaksi-list"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button class="btn report-button pdf" id="export-pdf-transaksi-list"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="report-table" id="transactionsReportTable">
+                    <table class="report-table" id="transaksi-report-table">
                         <thead>
                             <tr>
-                                <th>No.</th>
                                 <th>ID Transaksi</th>
                                 <th>Tanggal</th>
                                 <th>Nama Pasien</th>
-                                <th>Jenis Layanan</th>
+                                <th>Layanan & Obat</th>
                                 <th>Total Biaya</th>
+                                <th>Metode Pembayaran</th>
                                 <th>Status Pembayaran</th>
                             </tr>
                         </thead>
@@ -829,25 +970,26 @@
             </div>
         </div>
 
-        <div class="card" id="unpaidTransactionsCard">
+        <div class="card">
             <div class="card-header">
-                <h2><i class="fas fa-exclamation-triangle"></i> Transaksi Belum Lunas</h2>
+                <h2><i class="fas fa-exclamation-triangle"></i> Laporan Transaksi Belum Lunas</h2>
                 <div class="report-buttons">
-                    <button class="report-button pdf" id="export-unpaid-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF (Belum Lunas)</button>
-                    <button class="report-button excel" id="export-unpaid-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel (Belum Lunas)</button>
+                    <button class="btn report-button print" id="print-belum-lunas-list"><i class="fas fa-print"></i> Cetak</button>
+                    <button class="btn report-button excel" id="export-excel-belum-lunas-list"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    <button class="btn report-button pdf" id="export-pdf-belum-lunas-list"><i class="fas fa-file-pdf"></i> Export PDF</button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="report-table" id="unpaidTransactionsTable">
+                    <table class="report-table" id="belum-lunas-report-table">
                         <thead>
                             <tr>
-                                <th>No.</th>
                                 <th>ID Transaksi</th>
                                 <th>Tanggal</th>
                                 <th>Nama Pasien</th>
-                                <th>Jenis Layanan</th>
+                                <th>Layanan & Obat</th>
                                 <th>Total Biaya</th>
+                                <th>Metode Pembayaran</th>
                                 <th>Status Pembayaran</th>
                             </tr>
                         </thead>
@@ -857,104 +999,57 @@
                 </div>
             </div>
         </div>
-
 
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            function checkAccess(allowedRoles) {
-                const user = sessionStorage.getItem('loggedInUser');
-                if (user) {
-                    const loggedInUser = JSON.parse(user);
-                    if (!allowedRoles.includes(loggedInUser.role)) {
-                        alert('Anda tidak memiliki akses ke halaman ini.');
-                        sessionStorage.clear();
-                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                    }
-                } else {
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                }
-            }
-            checkAccess(['admin']); // Only admin can access reports
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('toggle-sidebar');
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            const mainContent = document.querySelector('.main-content');
 
-            // Sidebar and Mobile Menu Toggle (retained from t-pasien.html for consistency)
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebar-toggle');
-            const mobileToggle = document.getElementById('mobile-toggle');
-            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
-            const mainContent = document.getElementById('main-content');
+            // Summary elements
+            const totalPatientsReport = document.getElementById('total-patients-report');
+            const totalRevenueReport = document.getElementById('total-revenue-report');
+            const totalUnpaidReport = document.getElementById('total-unpaid-report');
+            const totalObatReport = document.getElementById('total-obat-report');
+            const totalDoctorsReport = document.getElementById('total-doctors-report');
 
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('minimized');
-                    if (sidebar.classList.contains('minimized')) {
-                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                    } else {
-                        mainContent.style.marginLeft = 'var(--sidebar-width)';
-                    }
-                });
-            }
 
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    sidebar.classList.toggle('active');
-                });
-            }
+            // Table bodies
+            const pasienTableBody = document.querySelector('#pasien-report-table tbody');
+            const jadwalTableBody = document.querySelector('#jadwal-report-table tbody');
+            const obatTableBody = document.querySelector('#obat-report-table tbody');
+            const transaksiTableBody = document.querySelector('#transaksi-report-table tbody');
+            const belumLunasTableBody = document.querySelector('#belum-lunas-report-table tbody');
 
-            if (menuIcon) {
-                menuIcon.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('active');
-                    } else {
-                        sidebar.classList.toggle('minimized');
-                        if (sidebar.classList.contains('minimized')) {
-                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                        } else {
-                            mainContent.style.marginLeft = 'var(--sidebar-width)';
-                        }
-                    }
-                });
-            }
 
-            mainContent.addEventListener('click', () => {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+            // Sidebar Toggle Logic
+            toggleBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('minimized');
+                mainContent.style.marginLeft = sidebar.classList.contains('minimized') ? 'var(--sidebar-minimized-width)' : 'var(--sidebar-width)';
+                this.classList.toggle('fa-angle-left');
+                this.classList.toggle('fa-angle-right');
+            });
+
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+
+            mainContent.addEventListener('click', function(event) {
+                if (sidebar.classList.contains('active') && !sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
                     sidebar.classList.remove('active');
                 }
             });
 
-            sidebar.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-
-            function initSidebar() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('minimized');
-                    sidebar.classList.remove('active');
-                    mainContent.style.marginLeft = '0';
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                }
+            // Function to retrieve data from localStorage
+            function getData(key) {
+                return JSON.parse(localStorage.getItem(key)) || [];
             }
-            initSidebar();
 
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
-                    if (sidebar.classList.contains('minimized')) {
-                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                    } else {
-                        mainContent.style.marginLeft = 'var(--sidebar-width)';
-                    }
-                    sidebar.classList.remove('active');
-                } else {
-                    mainContent.style.marginLeft = '0';
-                }
-            });
-
-
-            // --- Helper Functions ---
-            function formatRupiah(amount) {
+            // Function to format currency
+            function formatCurrency(amount) {
                 return new Intl.NumberFormat('id-ID', {
                     style: 'currency',
                     currency: 'IDR',
@@ -962,247 +1057,262 @@
                 }).format(amount);
             }
 
-            // --- Report Table Population Functions ---
+            // --- Populate Report Tables ---
 
-            function populatePatientsReportTable() {
-                const patients = JSON.parse(localStorage.getItem('patients')) || [];
-                const tableBody = document.querySelector('#patientsReportTable tbody');
-                tableBody.innerHTML = '';
-                patients.forEach((patient, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = (index + 1) + ".";
-                    row.insertCell().textContent = patient.id;
-                    row.insertCell().textContent = patient.namaLengkap;
-                    row.insertCell().textContent = patient.tanggalLahir;
-                    row.insertCell().textContent = patient.jenisKelamin;
-                    row.insertCell().textContent = patient.alamat;
-                    row.insertCell().textContent = patient.nomorTelepon;
+            function populatePasienTable() {
+                const patients = getData('patients');
+                pasienTableBody.innerHTML = '';
+                patients.forEach(patient => {
+                    const row = pasienTableBody.insertRow();
+                    row.insertCell(0).textContent = patient.id;
+                    row.insertCell(1).textContent = patient.namaLengkap;
+                    row.insertCell(2).textContent = patient.tanggalLahir;
+                    row.insertCell(3).textContent = patient.jenisKelamin;
+                    row.insertCell(4).textContent = patient.alamat;
+                    row.insertCell(5).textContent = patient.nomorTelepon;
                 });
+                totalPatientsReport.textContent = patients.length;
             }
 
-            function populateSchedulesReportTable() {
-                const schedules = JSON.parse(localStorage.getItem('jadwalDokter')) || [];
-                const tableBody = document.querySelector('#schedulesReportTable tbody');
-                tableBody.innerHTML = '';
-                schedules.forEach((schedule, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = (index + 1) + ".";
-                    row.insertCell().textContent = schedule.namaDokter;
-                    row.insertCell().textContent = schedule.poli;
-                    row.insertCell().textContent = schedule.hari;
-                    row.insertCell().textContent = schedule.jamMulai;
-                    row.insertCell().textContent = schedule.jamSelesai;
+            function populateJadwalTable() {
+                const schedules = getData('schedules'); // Assuming 'schedules' key for dokter jadwal
+                jadwalTableBody.innerHTML = '';
+                const uniqueDoctors = new Set();
+                schedules.forEach(schedule => {
+                    const row = jadwalTableBody.insertRow();
+                    row.insertCell(0).textContent = schedule.id;
+                    row.insertCell(1).textContent = schedule.namaDokter;
+                    row.insertCell(2).textContent = schedule.spesialisasi;
+                    row.insertCell(3).textContent = schedule.hariPraktek;
+                    row.insertCell(4).textContent = schedule.jamMulai;
+                    row.insertCell(5).textContent = schedule.jamSelesai;
+                    row.insertCell(6).textContent = schedule.poliklinik;
+                    uniqueDoctors.add(schedule.namaDokter); // Count unique doctors
                 });
+                totalDoctorsReport.textContent = uniqueDoctors.size;
             }
 
-            function populateMedicinesReportTable() {
-                const medicines = JSON.parse(localStorage.getItem('obat')) || [];
-                const tableBody = document.querySelector('#medicinesReportTable tbody');
-                tableBody.innerHTML = '';
-                medicines.forEach((medicine, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = (index + 1) + ".";
-                    row.insertCell().textContent = medicine.namaObat;
-                    row.insertCell().textContent = medicine.jenisObat;
-                    row.insertCell().textContent = medicine.stok;
-                    row.insertCell().textContent = formatRupiah(medicine.harga);
+            function populateObatTable() {
+                const medicines = getData('medicines'); // Assuming 'medicines' key for obat
+                obatTableBody.innerHTML = '';
+                medicines.forEach(medicine => {
+                    const row = obatTableBody.insertRow();
+                    row.insertCell(0).textContent = medicine.id;
+                    row.insertCell(1).textContent = medicine.namaObat;
+                    row.insertCell(2).textContent = medicine.jenisObat;
+                    row.insertCell(3).textContent = medicine.stok;
+                    row.insertCell(4).textContent = formatCurrency(medicine.harga);
+                    row.insertCell(5).textContent = medicine.keterangan;
                 });
+                totalObatReport.textContent = medicines.length;
             }
 
-            function populateTransactionReportTable() {
-                const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-                const tableBody = document.querySelector('#transactionsReportTable tbody');
-                tableBody.innerHTML = '';
-                transactions.forEach((transaction, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = (index + 1) + ".";
-                    row.insertCell().textContent = transaction.id;
-                    row.insertCell().textContent = transaction.tanggal;
-                    row.insertCell().textContent = transaction.namaPasien;
-                    row.insertCell().textContent = transaction.jenisLayanan;
-                    row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                    const statusCell = row.insertCell();
-                    statusCell.textContent = transaction.statusPembayaran;
-                    // Apply color based on status
-                    if (transaction.statusPembayaran === 'Lunas') {
+            function populateTransactionsTable() {
+                const transactions = getData('transactions');
+                transaksiTableBody.innerHTML = '';
+                belumLunasTableBody.innerHTML = ''; // Clear for unpaid table too
+
+                let totalRevenue = 0;
+                let totalUnpaidAmount = 0;
+
+                transactions.forEach(transaksi => {
+                    const biayaLayanan = parseFloat(transaksi.biayaLayanan) || 0;
+                    const biayaObat = parseFloat(transaksi.biayaObat) || 0;
+                    const totalBiaya = biayaLayanan + biayaObat;
+
+                    // Add to total revenue
+                    totalRevenue += totalBiaya;
+
+                    const row = transaksiTableBody.insertRow();
+                    row.insertCell(0).textContent = transaksi.id;
+                    row.insertCell(1).textContent = transaksi.tanggal;
+                    row.insertCell(2).textContent = transaksi.namaPasien;
+                    row.insertCell(3).textContent = `${transaksi.layanan}${transaksi.obatResep ? ` (${transaksi.obatResep})` : ''}`;
+                    row.insertCell(4).textContent = formatCurrency(totalBiaya);
+                    row.insertCell(5).textContent = transaksi.metodePembayaran;
+
+                    const statusCell = row.insertCell(6);
+                    statusCell.textContent = transaksi.statusPembayaran;
+                    if (transaksi.statusPembayaran === "Lunas") {
                         statusCell.classList.add('status-lunas');
                     } else {
                         statusCell.classList.add('status-belum-lunas');
+                        totalUnpaidAmount += totalBiaya; // Add to unpaid total if not lunas
+                        // Also add to "Belum Lunas" specific table
+                        const unpaidRow = belumLunasTableBody.insertRow();
+                        unpaidRow.insertCell(0).textContent = transaksi.id;
+                        unpaidRow.insertCell(1).textContent = transaksi.tanggal;
+                        unpaidRow.insertCell(2).textContent = transaksi.namaPasien;
+                        unpaidRow.insertCell(3).textContent = `${transaksi.layanan}${transaksi.obatResep ? ` (${transaksi.obatResep})` : ''}`;
+                        unpaidRow.insertCell(4).textContent = formatCurrency(totalBiaya);
+                        unpaidRow.insertCell(5).textContent = transaksi.metodePembayaran;
+                        const unpaidStatusCell = unpaidRow.insertCell(6);
+                        unpaidStatusCell.textContent = transaksi.statusPembayaran;
+                        unpaidStatusCell.classList.add('status-belum-lunas');
                     }
                 });
+
+                // Update summary cards
+                totalRevenueReport.textContent = formatCurrency(totalRevenue);
+                totalUnpaidReport.textContent = formatCurrency(totalUnpaidAmount);
             }
-
-            // NEW FUNCTION: Populate Unpaid Transactions Table
-            function populateUnpaidTransactionsTable() {
-                const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-                const unpaidTransactions = transactions.filter(t => t.statusPembayaran === 'Belum Lunas');
-                const tableBody = document.querySelector('#unpaidTransactionsTable tbody');
-                tableBody.innerHTML = '';
-
-                if (unpaidTransactions.length === 0) {
-                    const row = tableBody.insertRow();
-                    const cell = row.insertCell();
-                    cell.colSpan = 7; // Spanning all columns
-                    cell.textContent = "Tidak ada transaksi yang belum lunas.";
-                    cell.style.textAlign = "center";
-                    cell.style.padding = "20px";
-                    cell.style.color = "#555";
-                    return;
-                }
-
-                unpaidTransactions.forEach((transaction, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = (index + 1) + ".";
-                    row.insertCell().textContent = transaction.id;
-                    row.insertCell().textContent = transaction.tanggal;
-                    row.insertCell().textContent = transaction.namaPasien;
-                    row.insertCell().textContent = transaction.jenisLayanan;
-                    row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                    const statusCell = row.insertCell();
-                    statusCell.textContent = transaction.statusPembayaran;
-                    statusCell.classList.add('status-belum-lunas'); // Always red for this table
-                });
-            }
-
 
             function populateAllReportTables() {
-                populatePatientsReportTable();
-                populateSchedulesReportTable();
-                populateMedicinesReportTable();
-                populateTransactionReportTable();
-                populateUnpaidTransactionsTable(); // Call new function
+                populatePasienTable();
+                populateJadwalTable();
+                populateObatTable();
+                populateTransactionsTable();
+                // If you add other reports, call their populate functions here
             }
 
+            // --- Export/Print Functions (from previous t-pasien.html code) ---
 
-            // --- Export Functions ---
+            // General print function for any table
+            function printTable(tableId, title) {
+                const table = document.getElementById(tableId);
+                const printWindow = window.open('', '', 'height=600,width=800');
+                printWindow.document.write('<html><head><title>' + title + '</title>');
+                printWindow.document.write('<style>');
+                printWindow.document.write(`
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px;}
+                    th { background-color: #1de9b6; color: white; font-weight: bold; }
+                    h1 { color: #00b686; text-align: center; margin-bottom: 20px;}
+                    .status-lunas { color: #4CAF50; font-weight: bold; }
+                    .status-belum-lunas { color: #f44336; font-weight: bold; }
+                    @media print {
+                        .status-lunas { color: #4CAF50 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        .status-belum-lunas { color: #f44336 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    }
+                `);
+                printWindow.document.write('</style>');
+                printWindow.document.write('</head><body>');
+                printWindow.document.write('<h1>' + title + '</h1>');
+                printWindow.document.write(table.outerHTML);
+                printWindow.document.close();
+                printWindow.print();
+            }
 
-            // General function to export a table to PDF
-            function exportTableToPdf(tableId, title, fileName, columnsToExclude = []) {
+            // General Excel Export Function for any table
+            function exportTableToExcel(tableId, fileName) {
+                const table = document.getElementById(tableId);
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                XLSX.writeFile(wb, fileName + ".xlsx");
+            }
+
+            // General PDF Export Function for any table
+            function exportTableToPdf(tableId, title, columnWidths = 'auto') {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
+
+                doc.text(title, 14, 15);
+
                 const table = document.getElementById(tableId);
-
-                // Prepare table headers and data
-                const headerCells = Array.from(table.querySelector('thead tr').children);
-                let tableColumn = [];
-                let colIndices = [];
-
-                headerCells.forEach((th, index) => {
-                    if (!columnsToExclude.includes(index)) {
-                        tableColumn.push(th.textContent.trim());
-                        colIndices.push(index);
-                    }
-                });
-
-                const tableRows = [];
-                Array.from(table.querySelector('tbody').children).forEach(row => {
-                    const rowData = [];
-                    Array.from(row.children).forEach((cell, cellIndex) => {
-                        if (colIndices.includes(cellIndex)) {
-                            rowData.push(cell.textContent.trim());
-                        }
-                    });
-                    tableRows.push(rowData);
-                });
-
-                doc.autoTable({
-                    head: [tableColumn],
-                    body: tableRows,
-                    startY: 20,
-                    headStyles: { fillColor: [29, 233, 182] },
-                    didDrawPage: function(data) {
-                        doc.text(title, 14, 15);
-                    }
-                });
-                doc.save(fileName);
-            }
-
-            // General function to export a table to Excel
-            function exportTableToExcel(tableId, sheetName, fileName, columnsToExclude = []) {
-                const table = document.getElementById(tableId);
+                // Adjust headers and data extraction to correctly handle text and styling
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
                 const data = [];
-                const headers = [];
-
-                // Get headers, excluding specified columns
-                Array.from(table.querySelector('thead tr').children).forEach((th, index) => {
-                    if (!columnsToExclude.includes(index)) {
-                        headers.push(th.textContent.trim());
-                    }
-                });
-                data.push(headers);
-
-                // Get row data, excluding specified columns
-                Array.from(table.querySelector('tbody').children).forEach(row => {
-                    const rowData = [];
-                    Array.from(row.children).forEach((cell, index) => {
-                        if (!columnsToExclude.includes(index)) {
-                            rowData.push(cell.textContent.trim());
-                        }
-                    });
+                table.querySelectorAll('tbody tr').forEach(row => {
+                    const rowData = Array.from(row.querySelectorAll('td')).map(td => td.textContent.trim());
                     data.push(rowData);
                 });
 
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, sheetName);
-                XLSX.writeFile(wb, fileName);
+                doc.autoTable({
+                    head: [headers],
+                    body: data,
+                    startY: 25,
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 3,
+                        halign: 'left',
+                        valign: 'middle'
+                    },
+                    headStyles: {
+                        fillColor: [30, 233, 182], // Primary color
+                        textColor: [255, 255, 255], // White
+                        fontStyle: 'bold'
+                    },
+                    didDrawCell: function(data) {
+                        // Apply specific colors to 'Status Pembayaran' column for transaction tables
+                        if ((tableId === 'transaksi-report-table' || tableId === 'belum-lunas-report-table') && data.column.index === 6 && data.cell.section === 'body') { // Column 6 is Status Pembayaran
+                            const status = data.cell.text[0];
+                            if (status === 'Lunas') {
+                                doc.setTextColor(76, 175, 80); // Success green
+                            } else if (status === 'Belum Lunas') {
+                                doc.setTextColor(244, 67, 54); // Danger red
+                            }
+                        }
+                    }
+                });
+                doc.save(title.replace(/\s/g, '_').toLowerCase() + '.pdf');
             }
 
 
-            // Attach event listeners for PDF & Excel export buttons
-            document.getElementById('export-patients-pdf-btn').addEventListener('click', () => {
-                exportTableToPdf('patientsReportTable', 'Laporan Data Pasien', 'laporan_data_pasien.pdf');
-            });
-            document.getElementById('export-patients-excel-btn').addEventListener('click', () => {
-                exportTableToExcel('patientsReportTable', 'Data Pasien', 'laporan_data_pasien.xlsx');
-            });
+            // --- Event Listeners for Report Buttons ---
 
-            document.getElementById('export-schedules-pdf-btn').addEventListener('click', () => {
-                exportTableToPdf('schedulesReportTable', 'Laporan Jadwal Praktek Dokter', 'laporan_jadwal_dokter.pdf');
-            });
-            document.getElementById('export-schedules-excel-btn').addEventListener('click', () => {
-                exportTableToExcel('schedulesReportTable', 'Jadwal Dokter', 'laporan_jadwal_dokter.xlsx');
-            });
+            // Pasien Report
+            document.getElementById('print-pasien-list').addEventListener('click', () => printTable('pasien-report-table', 'Laporan Data Pasien'));
+            document.getElementById('export-excel-pasien-list').addEventListener('click', () => exportTableToExcel('pasien-report-table', 'laporan_data_pasien'));
+            document.getElementById('export-pdf-pasien-list').addEventListener('click', () => exportTableToPdf('pasien-report-table', 'Laporan Data Pasien'));
 
-            document.getElementById('export-medicines-pdf-btn').addEventListener('click', () => {
-                exportTableToPdf('medicinesReportTable', 'Laporan Data Obat', 'laporan_data_obat.pdf');
-            });
-            document.getElementById('export-medicines-excel-btn').addEventListener('click', () => {
-                exportTableToExcel('medicinesReportTable', 'Data Obat', 'laporan_data_obat.xlsx');
-            });
+            // Jadwal Dokter Report
+            document.getElementById('print-jadwal-list').addEventListener('click', () => printTable('jadwal-report-table', 'Laporan Jadwal Praktek Dokter'));
+            document.getElementById('export-excel-jadwal-list').addEventListener('click', () => exportTableToExcel('jadwal-report-table', 'laporan_jadwal_praktek_dokter'));
+            document.getElementById('export-pdf-jadwal-list').addEventListener('click', () => exportTableToPdf('jadwal-report-table', 'Laporan Jadwal Praktek Dokter'));
 
-            document.getElementById('export-transactions-pdf-btn').addEventListener('click', () => {
-                exportTableToPdf('transactionsReportTable', 'Laporan Transaksi Pasien', 'laporan_transaksi_pasien.pdf');
-            });
-            document.getElementById('export-transactions-excel-btn').addEventListener('click', () => {
-                exportTableToExcel('transactionsReportTable', 'Transaksi Pasien', 'laporan_transaksi_pasien.xlsx');
-            });
+            // Obat Report
+            document.getElementById('print-obat-list').addEventListener('click', () => printTable('obat-report-table', 'Laporan Data Obat'));
+            document.getElementById('export-excel-obat-list').addEventListener('click', () => exportTableToExcel('obat-report-table', 'laporan_data_obat'));
+            document.getElementById('export-pdf-obat-list').addEventListener('click', () => exportTableToPdf('obat-report-table', 'Laporan Data Obat'));
 
-            // NEW: Export buttons for Unpaid Transactions
-            document.getElementById('export-unpaid-pdf-btn').addEventListener('click', () => {
-                exportTableToPdf('unpaidTransactionsTable', 'Laporan Transaksi Belum Lunas', 'laporan_transaksi_belum_lunas.pdf');
-            });
-            document.getElementById('export-unpaid-excel-btn').addEventListener('click', () => {
-                exportTableToExcel('unpaidTransactionsTable', 'Transaksi Belum Lunas', 'laporan_transaksi_belum_lunas.xlsx');
-            });
+            // Transaksi Pasien Report
+            document.getElementById('print-transaksi-list').addEventListener('click', () => printTable('transaksi-report-table', 'Laporan Transaksi Pasien'));
+            document.getElementById('export-excel-transaksi-list').addEventListener('click', () => exportTableToExcel('transaksi-report-table', 'laporan_transaksi_pasien'));
+            document.getElementById('export-pdf-transaksi-list').addEventListener('click', () => exportTableToPdf('transaksi-report-table', 'Laporan Transaksi Pasien'));
+
+            // Transaksi Belum Lunas Report
+            document.getElementById('print-belum-lunas-list').addEventListener('click', () => printTable('belum-lunas-report-table', 'Laporan Transaksi Belum Lunas'));
+            document.getElementById('export-excel-belum-lunas-list').addEventListener('click', () => exportTableToExcel('belum-lunas-report-table', 'laporan_transaksi_belum_lunas'));
+            document.getElementById('export-pdf-belum-lunas-list').addEventListener('click', () => exportTableToPdf('belum-lunas-report-table', 'Laporan Transaksi Belum Lunas'));
 
 
             // Initial display and sidebar setup
             function init() {
                 populateAllReportTables();
 
+                // Check screen width on load and apply initial sidebar state
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
+                    sidebar.classList.remove('active'); // Ensure hidden by default
+                    mainContent.style.marginLeft = '0';
+                } else {
+                    sidebar.classList.remove('active'); // Ensure not active on desktop
+                    mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
+                }
+            }
+
+            // Run initialization
+            init();
+
+            // Handle window resize for sidebar
+            window.addEventListener('resize', function() {
                 if (window.innerWidth <= 768) {
                     sidebar.classList.remove('minimized');
                     sidebar.classList.remove('active');
                     mainContent.style.marginLeft = '0';
                 } else {
                     sidebar.classList.remove('active');
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    if (!sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    }
                 }
-            }
+            });
 
-            // Run initialization
-            init();
+            // Listen for custom event from t-pasien.html to re-populate tables
+            window.addEventListener('transactionsUpdated', populateTransactionsTable);
+
         });
     </script>
 </body>
