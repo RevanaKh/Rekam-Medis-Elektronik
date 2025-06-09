@@ -17,355 +17,537 @@
             --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
             --light-color: #f4f4f4; /* Background umum */
             --danger-color: #f44336; /* Warna merah untuk danger */
-            --success-color: #4CAF50; /* Warna hijau untuk sukses */
-            --warning-color: #ff9800; /* Warna kuning untuk peringatan */
-            --text-color: #333; /* Warna teks umum */
-            --border-color: #ddd; /* Warna border tabel dan elemen lain */
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --success-color: #4CAF50;
+            --text-color: #333;
+            --white: #fff;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             --sidebar-width: 250px;
-            --sidebar-minimized-width: 70px;
+            --sidebar-minimized-width: 60px;
+            --border-color: #ddd; /* Added for table borders consistency */
+
+            /* Warna baru untuk tombol laporan sesuai gambar */
+            --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
+            --report-print-bg: #3498DB; /* Biru untuk Cetak */
+            --report-excel-bg: #27AE60; /* Hijau untuk Excel */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: var(--font-family);
-            margin: 0;
-            background-color: var(--light-color);
-            color: var(--text-color);
             display: flex;
             min-height: 100vh;
-            overflow-x: hidden;
+            background-color: var(--light-color);
+            overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan di body */
         }
 
+        /* Mobile Toggle outside sidebar */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            font-size: 2rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            z-index: 1100;
+            padding: 5px 10px;
+            background-color: var(--primary-dark);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar.active ~ .mobile-toggle {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+
+        /* Sidebar/Navigasi Utama */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
-            color: white;
-            padding-top: 20px;
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
             position: fixed;
             height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-color) 2px 0 5px;
-            z-index: 1000;
         }
 
         .sidebar.minimized {
             width: var(--sidebar-minimized-width);
         }
 
-        .sidebar.minimized .logo h2 {
-            display: none;
-        }
-
-        .sidebar.minimized .logo i {
-            margin: 0;
-            padding: 0;
-            font-size: 2em;
-            text-align: center;
-            width: 100%;
-        }
-
-        .sidebar.minimized ul li a span {
-            display: none;
-        }
-
-        .sidebar.minimized ul li a {
-            justify-content: center;
-            padding: 15px 0;
-        }
-
-        .sidebar.minimized .toggle-btn {
-            align-self: center;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
+        .sidebar-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 0 15px;
-            box-sizing: border-box;
-        }
-
-        .logo i {
-            font-size: 2.5em;
-            margin-right: 10px;
-        }
-
-        .logo h2 {
-            margin: 0;
-            font-size: 1.5em;
+            padding: 20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            font-size: 1.5rem;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis;
+            position: relative;
+            justify-content: flex-start;
+            gap: 10px;
         }
 
-        .sidebar ul {
+        .sidebar.minimized .sidebar-header {
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .menu-icon {
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 5px;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        .menu-text {
+            font-size: 1.5rem;
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-list {
             list-style: none;
             padding: 0;
+            margin-top: 20px;
             flex-grow: 1;
         }
 
-        .sidebar ul li {
-            margin-bottom: 10px;
+        .nav-item {
+            position: relative;
         }
 
-        .sidebar ul li a {
-            color: white;
-            text-decoration: none;
+        .nav-link {
             display: flex;
             align-items: center;
             padding: 15px 20px;
-            transition: background-color 0.2s ease;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
-        .sidebar ul li a i {
-            margin-right: 15px;
-            font-size: 1.2em;
+        .nav-icon {
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
         }
 
-        .sidebar ul li a:hover,
-        .sidebar ul li a.active {
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .nav-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar.minimized .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .nav-link:hover, .nav-link.active {
             background-color: var(--primary-dark);
+            color: var(--white);
         }
 
-        .logout-btn {
-            background-color: var(--secondary-color);
-            color: white;
+        /* Logout Section - Modified */
+        .logout-section {
+            padding: 0;
             text-align: center;
-            padding: 15px;
-            border-top: 1px solid var(--primary-dark);
-            cursor: pointer;
-            transition: background-color 0.2s ease;
+            width: 100%;
+            flex-shrink: 0;
             margin-top: auto;
         }
 
-        .logout-btn:hover {
-            background-color: #555;
+        .logout-link {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
+        .logout-link:hover {
+            background-color: #222;
+        }
+
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .logout-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+        }
+
+        .logout-text {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar.minimized .logout-link {
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            justify-content: center;
+        }
+
+        .sidebar.minimized .logout-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .sidebar.minimized .logout-icon {
+            margin-right: 0;
+        }
+
+        /* Tombol Toggle untuk Desktop */
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -20px;
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: translateX(-190px) rotate(180deg);
+        }
+
+        /* Area Konten Utama */
         .main-content {
             flex-grow: 1;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
             padding: 20px;
-            box-sizing: border-box;
-            width: calc(100% - var(--sidebar-width));
+            transition: margin-left 0.3s ease;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width)); /* Menggunakan calc untuk responsivitas */
+            overflow-y: auto;
+            overflow-x: hidden; /* Penting untuk mencegah scrollbar horizontal di main-content */
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Memusatkan konten secara horizontal di dalam main-content */
         }
 
-        .main-content.sidebar-minimized {
+        .sidebar.minimized + .main-content {
             margin-left: var(--sidebar-minimized-width);
             width: calc(100% - var(--sidebar-minimized-width));
         }
 
-        header {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-color) 0 2px 4px;
+        /* Global styles for content */
+        .header {
+            background-color: var(--white);
+            padding: 15px 20px;
             margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
+            max-width: 1200px; /* Batasi lebar maksimum */
         }
 
-        header h1 {
-            margin: 0;
-            color: var(--primary-dark);
+        .card {
+            background-color: var(--white);
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+            width: 100%; /* Pastikan card mengisi lebar parent */
+            max-width: 1200px; /* Batasi lebar maksimum */
         }
 
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5em;
-            cursor: pointer;
-            padding: 10px;
-            align-self: flex-start;
-            margin-left: auto;
-            display: block;
-        }
-
-        .actions {
+        .card-header {
+            background-color: #000000;
+            color: var(--white);
+            padding: 15px 20px;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Izinkan wrap pada item header jika ruang tidak cukup */
+            gap: 10px; /* Spasi antar item header */
+        }
+
+        .card-header h2 {
+            color: var(--white);
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Perubahan di sini: Border hitam untuk form-control */
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #000; /* Warna hitam untuk border input form */
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
         }
 
         .btn {
             padding: 10px 15px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s ease;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap; /* Mencegah teks tombol wrap */
         }
-
         .btn-primary {
             background-color: var(--primary-color);
-            color: white;
+            color: var(--white);
         }
-
         .btn-primary:hover {
             background-color: var(--primary-dark);
         }
-
+        .btn-info {
+            background-color: #17a2b8;
+            color: var(--white);
+        }
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: var(--secondary-color);
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
         .btn-danger {
             background-color: var(--danger-color);
-            color: white;
+            color: var(--white);
         }
-
         .btn-danger:hover {
-            background-color: #d32f2f;
+            background-color: #c82333;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
         }
 
-        .table-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-color) 0 2px 4px;
-            overflow-x: auto; /* For responsive tables */
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .table-responsive {
             margin-top: 20px;
+            overflow-x: auto; /* Memungkinkan tabel di-scroll secara horizontal */
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 100%; /* Pastikan container tabel mengisi lebar */
         }
 
-        th, td {
-            border: 1px solid var(--border-color);
-            padding: 12px;
+        .patient-table {
+            width: 100%; /* Tabel mengisi lebar container responsif */
+            border-collapse: collapse;
+            margin-bottom: 0;
+            min-width: 800px; /* Minimal width tabel untuk menjaga layout pada desktop */
+            background-color: var(--white);
+        }
+
+        .patient-table th, .patient-table td {
+            border: 1px solid var(--border-color); /* Kembali ke warna default atau #ddd */
+            padding: 12px 15px;
             text-align: left;
-            white-space: nowrap; /* Prevent wrapping in cells */
+            font-size: 0.9em;
+            white-space: nowrap; /* Prevent text wrapping in cells */
         }
 
-        th {
+        .patient-table th {
             background-color: var(--primary-color);
-            color: white;
+            color: var(--white);
             font-weight: bold;
         }
 
-        tr:nth-child(even) {
-            background-color: var(--light-color);
+        .patient-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
-        tr:hover {
-            background-color: #e9e9e9;
+        .patient-table tbody tr:hover {
+            background-color: #f1f1f1;
         }
 
-        .action-buttons button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1em;
-            margin: 0 5px;
-            color: var(--primary-color);
-            transition: color 0.2s ease;
-        }
-
-        .action-buttons button:hover {
-            color: var(--primary-dark);
-        }
-
-        .action-buttons button.delete-btn {
-            color: var(--danger-color);
-        }
-
-        .action-buttons button.delete-btn:hover {
-            color: #d32f2f;
-        }
-
-        .search-container {
-            margin-bottom: 20px;
+        .action-buttons {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 5px;
         }
 
-        .search-container input[type="text"] {
-            flex-grow: 1;
-            padding: 10px;
+        .search-add-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Izinkan wrapping pada item jika ruang tidak cukup */
+            gap: 10px; /* Spasi antar elemen */
+        }
+
+        .search-add-container .form-group {
+            flex: 1; /* Biarkan form-group mengisi ruang yang tersedia */
+            min-width: 200px; /* Minimal lebar untuk input search */
+            margin-bottom: 0;
+        }
+
+        .search-add-container .btn-primary {
+            min-width: 180px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1em;
+            background-color: var(--white);
+            cursor: pointer;
+            border-radius: 4px;
+            color: var(--text-color);
+        }
+
+        .pagination-btn.active, .pagination-btn:hover {
+            background-color: var(--primary-dark);
+            color: var(--white);
+            border-color: var(--primary-dark);
         }
 
         /* Modal Styles */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 1001;
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 10000; /* Sit on top */
             left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            justify-content: center;
-            align-items: center;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+
+            /* Ini yang penting untuk centering! */
+            align-items: center; /* Centering vertikal */
+            justify-content: center; /* Centering horizontal */
+
+            /* Untuk memastikan modal tidak membuat scroll di background saat terbuka */
+            overflow: hidden;
+        }
+
+        /* Saat modal terbuka, sembunyikan overflow pada body untuk mencegah scrolling latar belakang */
+        body.modal-open {
+            overflow: hidden;
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: auto;
-            padding: 30px;
+            padding: 20px;
             border: 1px solid #888;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 600px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
+            border-radius: 8px;
+            width: 90%; /* Lebih responsif di mobile */
+            max-width: 500px; /* Maksimum width */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative; /* Untuk posisi tombol close */
+            box-sizing: border-box; /* Pastikan padding dan border termasuk dalam width */
+
+            /* Memastikan konten modal bisa discroll jika terlalu panjang */
+            max-height: 90vh; /* Maksimum tinggi modal, agar tidak melebihi viewport */
+            overflow-y: auto; /* Aktifkan scroll jika konten modal melebihi max-height */
+
+            /* Animasi (tetap bisa digunakan) */
+            animation-name: animatemodal;
+            animation-duration: 0.4s;
         }
 
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-        }
-
-        .modal-content label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-
-        .modal-content input[type="text"],
-        .modal-content input[type="date"],
-        .modal-content select,
-        .modal-content textarea {
-            width: calc(100% - 22px); /* Adjust for padding and border */
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        .modal-content textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .modal-buttons {
-            text-align: right;
-            margin-top: 20px;
-        }
-
-        .modal-buttons .btn {
-            margin-left: 10px;
+        @keyframes animatemodal {
+            from {opacity: 0; transform: translateY(-50px);} /* Animasi masuk dari atas */
+            to {opacity: 1; transform: translateY(0);}
         }
 
         .close-button {
             color: #aaa;
             position: absolute;
             top: 10px;
-            right: 15px;
+            right: 20px;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
@@ -373,234 +555,146 @@
 
         .close-button:hover,
         .close-button:focus {
-            color: #000;
+            color: black;
             text-decoration: none;
             cursor: pointer;
         }
 
-        /* Specific styles for View Patient Modal */
-        #viewPatientModal .modal-content {
-            max-width: 700px;
-        }
-
-        #viewPatientDetails p {
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        #viewPatientDetails p strong {
-            color: var(--primary-dark);
-            display: inline-block;
-            width: 150px; /* Align labels */
-        }
-
-        /* Delete Confirmation Modal */
-        #deleteConfirmationModal .modal-content {
-            max-width: 400px;
-            text-align: center;
-        }
-
-        #deleteConfirmationModal .modal-buttons {
-            justify-content: center;
+        .modal-buttons {
             display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        /* Body overflow control */
-        body.modal-open {
-            overflow: hidden;
+        /* Styles for View Details Modal Content */
+        .view-details p {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .view-details strong {
+            display: inline-block;
+            width: 120px; /* Adjust as needed for alignment */
         }
 
-        /* Mobile Toggle */
-        .mobile-toggle {
-            display: none; /* Hidden by default on desktop */
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 1002; /* Above sidebar and content */
-            background-color: var(--primary-color);
-            color: white;
+        /* CSS for PDF/Excel Print Buttons (from laporan.html for consistency) */
+        .report-buttons-container {
+            margin-top: 0px; /* Adjusted to fit layout better */
+            margin-bottom: 0px; /* Adjusted to fit layout better */
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap; /* Izinkan wrapping */
+            justify-content: flex-start; /* Atur posisi awal tombol */
+        }
+
+        .report-button {
+            color: var(--white);
+            border: none;
             padding: 10px 15px;
             border-radius: 5px;
-            font-size: 1.5em;
             cursor: pointer;
-            box-shadow: var(--shadow-color) 0 2px 5px;
-        }
-
-        /* New Sidebar structure styles */
-        .sidebar-header {
+            font-size: 1rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px 0;
-            background-color: var(--primary-dark); /* Darker shade for header */
-            margin-bottom: 20px;
-        }
-
-        .menu-icon {
-            font-size: 2em;
-            color: white;
-        }
-
-        .nav-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .nav-item {
-            margin-bottom: 5px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: white;
+            gap: 8px;
             text-decoration: none;
-            transition: background-color 0.3s ease, padding-left 0.3s ease;
+            box-shadow: var(--shadow);
         }
 
-        .nav-link:hover,
-        .nav-link.active {
-            background-color: var(--primary-dark);
-            padding-left: 25px;
+        #export-pdf-btn {
+            background-color: var(--report-pdf-bg);
         }
 
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        #export-pdf-btn:hover {
+            background-color: #C0392B;
+            transform: translateY(-2px);
         }
 
-        .nav-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: white;
+        #export-excel-btn {
+            background-color: var(--report-excel-bg);
+        }
+        #export-excel-btn:hover {
+            background-color: #229954;
+            transform: translateY(-2px);
         }
 
-        .nav-text {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .logout-section {
-            margin-top: auto; /* Pushes logout to the bottom */
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 15px 20px;
-        }
-
-        .logout-link {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: white;
-            transition: opacity 0.3s ease;
-        }
-
-        .logout-link:hover {
-            opacity: 0.8;
-        }
-
-        .logout-icon {
-            margin-right: 15px;
-        }
-
-        /* Sidebar minimized state */
-        .sidebar.minimized .nav-text,
-        .sidebar.minimized .sidebar-header,
-        .sidebar.minimized .logout-text {
-            display: none;
-        }
-
-        .sidebar.minimized .nav-link {
-            justify-content: center;
-            padding: 12px;
-        }
-
-        .sidebar.minimized .nav-icon {
-            margin-right: 0;
-        }
-
-        .sidebar.minimized .toggle-btn {
-            transform: rotate(180deg); /* Rotate arrow when minimized */
-        }
-
-        .sidebar.minimized {
-            width: var(--sidebar-minimized-width);
-        }
-
-        .sidebar.minimized .toggle-btn {
-            /* Adjust positioning if needed for minimized state */
-            align-self: center; /* Center the toggle button */
-            margin-left: 0; /* Remove auto margin */
-            margin-bottom: 20px; /* Add some space at the bottom if needed */
-        }
-
-        /* Sidebar toggle button specific to this new design */
-        .sidebar .toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5em;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            z-index: 1003;
-        }
-
-
-        /* Media Queries for Responsiveness */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+
             .sidebar {
-                width: 0;
-                left: -250px; /* Hide off-screen */
-                transition: all 0.3s ease-in-out;
+                left: -250px;
+                width: var(--sidebar-width);
             }
 
             .sidebar.active {
-                width: var(--sidebar-width);
-                left: 0; /* Slide in */
+                left: 0;
             }
 
             .main-content {
                 margin-left: 0;
                 width: 100%;
+                padding: 15px;
             }
 
-            .mobile-toggle {
-                display: block; /* Show mobile toggle button */
+            .sidebar.minimized + .main-content {
+                margin-left: 0;
             }
 
-            header {
+            .toggle-btn {
+                display: none;
+            }
+
+            body {
+                flex-direction: column;
+            }
+
+            .header {
+                padding: 10px 15px;
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 10px;
             }
 
-            .search-container {
+            .card-body {
+                padding: 15px;
+            }
+
+            .search-add-container {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .search-container input[type="text"] {
+            .search-add-container .form-group {
+                min-width: unset;
                 width: 100%;
             }
 
-            .modal-content {
-                width: 95%;
-                padding: 20px;
+            .search-add-container .btn-primary {
+                width: 100%;
+                min-width: unset;
             }
 
-            .modal-content input[type="text"],
-            .modal-content input[type="date"],
-            .modal-content select,
-            .modal-content textarea {
-                width: calc(100% - 20px);
+            .patient-table {
+                min-width: unset;
+            }
+
+            .report-buttons-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .report-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Perbaikan tambahan untuk modal di mobile */
+            .modal-content {
+                width: 95%;
+                margin: 10px auto;
             }
         }
     </style>
@@ -719,68 +813,87 @@
         </div>
     </div>
 
-    <div class="main-content" id="mainContent">
-        <header>
-            <h1>Data Pasien</h1>
-            <div class="actions">
-                <input type="text" id="searchPatient" placeholder="Cari Pasien...">
-                <button class="btn btn-primary" id="addPatientBtn"><i class="fas fa-plus"></i> Tambah Pasien</button>
+    <div class="main-content" id="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-users"></i> Data Pasien</h2>
+                <button class="btn btn-primary" id="toggleFormBtn"><i class="fas fa-user-plus"></i> Tambah Pasien Baru</button>
             </div>
-        </header>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>Nama Pasien</th>
-                        <th>Jenis Kelamin</th>
-                        <th>Tanggal Lahir</th>
-                        <th>Alamat</th>
-                        <th>No. Telepon</th>
-                        <th>Riwayat Penyakit</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="patientTableBody">
-                    </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="patientFormContainer" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="formTitle">Tambah Pasien Baru</h2>
-            <form id="patientForm">
-                <input type="hidden" id="patientId">
-                <label for="namaPasien">Nama Pasien:</label>
-                <input type="text" id="namaPasien" required>
-
-                <label for="jenisKelamin">Jenis Kelamin:</label>
-                <select id="jenisKelamin" required>
-                    <option value="">Pilih</option>
-                    <option value="Laki-laki">Laki-laki</option>
-                    <option value="Perempuan">Perempuan</option>
-                </select>
-
-                <label for="tanggalLahir">Tanggal Lahir:</label>
-                <input type="date" id="tanggalLahir" required>
-
-                <label for="alamat">Alamat:</label>
-                <textarea id="alamat" required></textarea>
-
-                <label for="noTelepon">No. Telepon:</label>
-                <input type="text" id="noTelepon" required>
-
-                <label for="riwayatPenyakit">Riwayat Penyakit:</label>
-                <textarea id="riwayatPenyakit"></textarea>
-
-                <div class="modal-buttons">
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                    <button type="button" class="btn btn-danger" id="cancelFormBtn">Batal</button>
+            <div class="card-body">
+                <div class="search-add-container">
+                    <div class="form-group">
+                        <label for="searchFilter">Cari Pasien:</label>
+                        <input type="text" id="searchFilter" class="form-control" placeholder="Cari berdasarkan Nama atau ID Pasien">
+                    </div>
+                    <div class="report-buttons-container">
+                        <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i>Unduh PDF</button>
+                        <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i>Unduh Excel</button>
+                        </div>
                 </div>
-            </form>
+
+                <div class="table-responsive">
+                    <table class="patient-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>ID Pasien</th>
+                                <th>Nama Lengkap</th>
+                                <th>Tanggal Lahir</th>
+                                <th>Jenis Kelamin</th>
+                                <th>Alamat</th>
+                                <th>Telepon</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <button class="pagination-btn active">1</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="patientFormContainer" class="modal">
+            <div class="modal-content">
+                <span class="close-button" id="closePatientFormModalBtn">&times;</span>
+                <h2 id="formTitle">Tambah Pasien Baru</h2>
+                <div class="card-body">
+                    <form id="patientForm">
+                        <input type="hidden" id="patientId">
+                        <div class="form-group">
+                            <label for="namaLengkap">Nama Lengkap:</label>
+                            <input type="text" id="namaLengkap" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tanggalLahir">Tanggal Lahir:</label>
+                            <input type="date" id="tanggalLahir" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jenisKelamin">Jenis Kelamin:</label>
+                            <select id="jenisKelamin" class="form-control" required>
+                                <option value="">Pilih Jenis Kelamin</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="alamat">Alamat:</label>
+                            <textarea id="alamat" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="telepon">Telepon:</label>
+                            <input type="tel" id="telepon" class="form-control" pattern="[0-9]{10,15}" title="Nomor telepon harus antara 10 sampai 15 digit angka" required>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="button" class="btn btn-secondary" id="cancelFormBtn">Batal</button>
+                            <button type="submit" class="btn btn-primary" id="savePatientBtn">Simpan Pasien</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -788,19 +901,16 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>Detail Pasien</h2>
-            <div id="viewPatientDetails">
-                <p><strong>ID Pasien:</strong> <span id="detailId"></span></p>
-                <p><strong>Nama Pasien:</strong> <span id="detailNamaPasien"></span></p>
-                <p><strong>Jenis Kelamin:</strong> <span id="detailJenisKelamin"></span></p>
-                <p><strong>Tanggal Lahir:</strong> <span id="detailTanggalLahir"></span></p>
-                <p><strong>Alamat:</strong> <span id="detailAlamat"></span></p>
-                <p><strong>No. Telepon:</strong> <span id="detailNoTelepon"></span></p>
-                <p><strong>Riwayat Penyakit:</strong> <span id="detailRiwayatPenyakit"></span></p>
+            <div class="view-details">
+                <p><strong>ID Pasien:</strong> <span id="viewIdPasien"></span></p>
+                <p><strong>Nama Lengkap:</strong> <span id="viewNamaLengkap"></span></p>
+                <p><strong>Tanggal Lahir:</strong> <span id="viewTanggalLahir"></span></p>
+                <p><strong>Jenis Kelamin:</strong> <span id="viewJenisKelamin"></span></p>
+                <p><strong>Alamat:</strong> <span id="viewAlamat"></span></p>
+                <p><strong>Telepon:</strong> <span id="viewTelepon"></span></p>
             </div>
             <div class="modal-buttons">
-                <button type="button" class="btn btn-primary" id="editFromViewBtn">Edit</button>
-                <button type="button" class="btn btn-danger" id="deleteFromViewBtn">Hapus</button>
-                <button type="button" class="btn" id="closeViewModalBtn">Tutup</button>
+                <button type="button" class="btn btn-secondary close-button">Tutup</button>
             </div>
         </div>
     </div>
@@ -809,344 +919,413 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>Konfirmasi Hapus</h2>
-            <p>Anda yakin ingin menghapus data pasien ini?</p>
+            <p>Apakah Anda yakin ingin menghapus data pasien ini?</p>
             <div class="modal-buttons">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Batal</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
-                <button type="button" class="btn" id="cancelDeleteBtn">Batal</button>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebarBtn = document.getElementById('sidebar-toggle');
-            const mobileToggle = document.getElementById('mobile-toggle');
-            const mainContent = document.getElementById('mainContent');
-
-            const addPatientBtn = document.getElementById('addPatientBtn');
-            const patientFormContainer = document.getElementById('patientFormContainer');
-            const patientForm = document.getElementById('patientForm');
-            const cancelFormBtn = document.getElementById('cancelFormBtn');
-            const formTitle = document.getElementById('formTitle');
-
-            const patientIdInput = document.getElementById('patientId');
-            const namaPasienInput = document.getElementById('namaPasien');
-            const jenisKelaminInput = document.getElementById('jenisKelamin');
-            const tanggalLahirInput = document.getElementById('tanggalLahir');
-            const alamatInput = document.getElementById('alamat');
-            const noTeleponInput = document.getElementById('noTelepon');
-            const riwayatPenyakitInput = document.getElementById('riwayatPenyakit');
-            const searchPatientInput = document.getElementById('searchPatient');
-
-            const patientTableBody = document.getElementById('patientTableBody');
-
-            const viewPatientModal = document.getElementById('viewPatientModal');
-            const detailId = document.getElementById('detailId');
-            const detailNamaPasien = document.getElementById('detailNamaPasien');
-            const detailJenisKelamin = document.getElementById('detailJenisKelamin');
-            const detailTanggalLahir = document.getElementById('detailTanggalLahir');
-            const detailAlamat = document.getElementById('detailAlamat');
-            const detailNoTelepon = document.getElementById('detailNoTelepon');
-            const detailRiwayatPenyakit = document.getElementById('detailRiwayatPenyakit');
-            const editFromViewBtn = document.getElementById('editFromViewBtn');
-            const deleteFromViewBtn = document.getElementById('deleteFromViewBtn');
-            const closeViewModalBtn = document.getElementById('closeViewModalBtn');
-
-            const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-
-            let patients = []; // Data pasien akan disimpan di sini
-            let currentPatientIdToDelete = null;
-
-            // Fungsi untuk mengontrol overflow body saat modal terbuka/tertutup
-            function toggleBodyOverflow(isOpen) {
-                if (isOpen) {
-                    document.body.classList.add('modal-open');
-                } else {
-                    document.body.classList.remove('modal-open');
-                }
-            }
-
-            // Fungsi untuk menampilkan form tambah/edit pasien
-            function showForm(isEdit = false, patientData = {}) {
-                patientFormContainer.style.display = 'flex';
-                toggleBodyOverflow(true);
-                if (isEdit) {
-                    formTitle.textContent = 'Edit Data Pasien';
-                    patientIdInput.value = patientData.id;
-                    namaPasienInput.value = patientData['Nama Pasien'];
-                    jenisKelaminInput.value = patientData['Jenis Kelamin'];
-                    tanggalLahirInput.value = patientData['Tanggal Lahir'];
-                    alamatInput.value = patientData['Alamat'];
-                    noTeleponInput.value = patientData['No Telepon'];
-                    riwayatPenyakitInput.value = patientData['Riwayat Penyakit'];
-                } else {
-                    formTitle.textContent = 'Tambah Pasien Baru';
-                    patientIdInput.value = ''; // Clear ID for new patient
-                    patientForm.reset(); // Reset form fields
-                }
-            }
-
-            // Fungsi untuk menyembunyikan form
-            function hideForm() {
-                patientFormContainer.style.display = 'none';
-                toggleBodyOverflow(false);
-            }
-
-            // Fungsi untuk memuat data pasien dari data_pasien.xlsx
-            async function loadPatients() {
-                try {
-                    const response = await fetch('data_pasien.xlsx');
-                    if (!response.ok) {
-                        if (response.status === 404) {
-                            console.warn("File 'data_pasien.xlsx' tidak ditemukan. Membuat data baru.");
-                            patients = []; // Inisialisasi array kosong jika file tidak ada
-                        } else {
-                            throw new Error(`Gagal mengambil file Excel: ${response.statusText}`);
-                        }
-                    } else {
-                        const arrayBuffer = await response.arrayBuffer();
-                        const data = new Uint8Array(arrayBuffer);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-                        if (rawData.length <= 1) { // If only header row or empty
-                            patients = [];
-                        } else {
-                            const headers = rawData[0];
-                            const patientList = rawData.slice(1).map(row => {
-                                let obj = {};
-                                headers.forEach((header, i) => {
-                                    obj[header] = row[i];
-                                });
-                                return obj;
-                            });
-                            patients = patientList.filter(p => p['ID Pasien']); // Filter out rows without ID if any
-                        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fungsi untuk memuat data pengguna dari sessionStorage dan menampilkannya
+            function loadUserData() {
+                const user = sessionStorage.getItem('loggedInUser');
+                if (user) {
+                    const loggedInUser = JSON.parse(user);
+                    const welcomeUserElement = document.getElementById('welcome-user');
+                    if (welcomeUserElement) {
+                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
                     }
-                    displayPatients(); // Tampilkan pasien setelah dimuat
-                } catch (error) {
-                    console.error("Error loading patients:", error);
-                    alert("Gagal memuat data pasien: " + error.message);
-                    patients = []; // Pastikan array tetap kosong jika terjadi error
-                    displayPatients();
+                } else {
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
             }
 
-            // Fungsi untuk menyimpan data pasien ke data_pasien.xlsx
-            async function savePatients() {
-                const ws = XLSX.utils.json_to_sheet(patients.map(p => {
-                    // Pastikan urutan dan nama kolom sesuai yang Anda inginkan di Excel
-                    return {
-                        'ID Pasien': p['ID Pasien'],
-                        'Nama Pasien': p['Nama Pasien'],
-                        'Jenis Kelamin': p['Jenis Kelamin'],
-                        'Tanggal Lahir': p['Tanggal Lahir'],
-                        'Alamat': p['Alamat'],
-                        'No Telepon': p['No Telepon'],
-                        'Riwayat Penyakit': p['Riwayat Penyakit']
-                    };
-                }));
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Pasien");
-                XLSX.writeFile(wb, 'data_pasien.xlsx'); // Simpan file
-                console.log("Data pasien berhasil disimpan ke data_pasien.xlsx");
+            // Fungsi untuk memeriksa akses berdasarkan peran
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser');
+                if (user) {
+                    const loggedInUser = JSON.parse(user);
+                    if (!allowedRoles.includes(loggedInUser.role)) {
+                        alert('Anda tidak memiliki akses ke halaman ini.');
+                        sessionStorage.clear();
+                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                    }
+                } else {
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
             }
 
-            // Fungsi untuk menampilkan pasien di tabel
-            function displayPatients(searchTerm = '') {
-                patientTableBody.innerHTML = ''; // Kosongkan tabel sebelum mengisi ulang
-                const filteredPatients = patients.filter(patient => {
-                    const name = patient['Nama Pasien'] ? patient['Nama Pasien'].toLowerCase() : '';
-                    const address = patient['Alamat'] ? patient['Alamat'].toLowerCase() : '';
-                    return name.includes(searchTerm.toLowerCase()) || address.includes(searchTerm.toLowerCase());
-                });
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['admin', 'pendaftaran', 'dokter']); // Admin, Pendaftaran, dan Dokter bisa akses
+            loadUserData(); // Load user data to display welcome message
 
-                filteredPatients.forEach((patient, index) => {
-                    const row = patientTableBody.insertRow();
-                    row.dataset.id = patient['ID Pasien']; // Simpan ID di baris
-                    row.insertCell().textContent = index + 1;
-                    row.insertCell().textContent = patient['Nama Pasien'];
-                    row.insertCell().textContent = patient['Jenis Kelamin'];
-                    row.insertCell().textContent = patient['Tanggal Lahir'];
-                    row.insertCell().textContent = patient['Alamat'];
-                    row.insertCell().textContent = patient['No Telepon'];
-                    row.insertCell().textContent = patient['Riwayat Penyakit'];
 
-                    // Kolom Aksi
-                    const actionCell = row.insertCell();
-                    actionCell.classList.add('action-buttons');
-                    actionCell.innerHTML = `
-                        <button class="view-btn" data-id="${patient['ID Pasien']}" title="Lihat Detail"><i class="fas fa-eye"></i></button>
-                        <button class="edit-btn" data-id="${patient['ID Pasien']}" title="Edit"><i class="fas fa-edit"></i></button>
-                        <button class="delete-btn" data-id="${patient['ID Pasien']}" title="Hapus"><i class="fas fa-trash"></i></button>
-                    `;
-                });
+            // Sidebar and Mobile Menu Toggle (Same as data_obat.html)
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+            const mainContent = document.getElementById('main-content');
 
-                attachEventListenersToTableButtons(); // Lampirkan event listener setelah tabel diisi ulang
-            }
-
-            // Fungsi untuk melampirkan event listener ke tombol di tabel
-            function attachEventListenersToTableButtons() {
-                document.querySelectorAll('.view-btn').forEach(button => {
-                    button.onclick = (e) => {
-                        const id = e.currentTarget.dataset.id;
-                        const patient = patients.find(p => p['ID Pasien'] == id);
-                        if (patient) {
-                            showViewPatientModal(patient);
-                        }
-                    };
-                });
-
-                document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.onclick = (e) => {
-                        const id = e.currentTarget.dataset.id;
-                        const patient = patients.find(p => p['ID Pasien'] == id);
-                        if (patient) {
-                            showForm(true, patient);
-                        }
-                    };
-                });
-
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.onclick = (e) => {
-                        currentPatientIdToDelete = e.currentTarget.dataset.id;
-                        deleteConfirmationModal.style.display = 'flex';
-                        toggleBodyOverflow(true);
-                    };
-                });
-            }
-
-            // Fungsi untuk menampilkan modal detail pasien
-            function showViewPatientModal(patient) {
-                detailId.textContent = patient['ID Pasien'];
-                detailNamaPasien.textContent = patient['Nama Pasien'];
-                detailJenisKelamin.textContent = patient['Jenis Kelamin'];
-                detailTanggalLahir.textContent = patient['Tanggal Lahir'];
-                detailAlamat.textContent = patient['Alamat'];
-                detailNoTelepon.textContent = patient['No Telepon'];
-                detailRiwayatPenyakit.textContent = patient['Riwayat Penyakit'];
-
-                viewPatientModal.style.display = 'flex';
-                toggleBodyOverflow(true);
-
-                // Set ID pasien di tombol edit dan hapus pada modal detail
-                editFromViewBtn.dataset.id = patient['ID Pasien'];
-                deleteFromViewBtn.dataset.id = patient['ID Pasien'];
-            }
-
-            // Event Listeners
-            if (toggleSidebarBtn && sidebar && mainContent) {
-                toggleSidebarBtn.addEventListener('click', () => {
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('minimized');
-                    mainContent.classList.toggle('sidebar-minimized');
-                    if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                });
+            }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    } else {
+                        sidebar.classList.toggle('minimized');
                         if (sidebar.classList.contains('minimized')) {
                             mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
                         } else {
                             mainContent.style.marginLeft = 'var(--sidebar-width)';
                         }
                     }
-                    const icon = toggleSidebarBtn.querySelector('i');
-                    if (icon) {
-                        icon.classList.toggle('fa-chevron-left');
-                        icon.classList.toggle('fa-chevron-right');
-                    }
                 });
             }
 
-            if (mobileToggle && sidebar) {
-                mobileToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-            }
-
-
-            addPatientBtn.addEventListener('click', () => showForm(false));
-            cancelFormBtn.addEventListener('click', hideForm);
-            closeViewModalBtn.addEventListener('click', () => {
-                viewPatientModal.style.display = 'none';
-                toggleBodyOverflow(false);
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
             });
 
-            // Handle Add/Edit Form Submission
-            patientForm.addEventListener('submit', (e) => {
-                e.preventDefault();
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                    sidebar.classList.remove('active');
+                } else {
+                    mainContent.style.marginLeft = '0';
+                }
+            });
+
+
+            // --- Patient Management Logic ---
+            const patientFormContainer = document.getElementById('patientFormContainer');
+            const patientForm = document.getElementById('patientForm');
+            const toggleFormBtn = document.getElementById('toggleFormBtn');
+            const cancelFormBtn = document.getElementById('cancelFormBtn');
+            const tableBody = document.querySelector('.patient-table tbody');
+            const formTitle = document.getElementById('formTitle');
+            const patientIdInput = document.getElementById('patientId');
+            const namaLengkapInput = document.getElementById('namaLengkap');
+            const tanggalLahirInput = document.getElementById('tanggalLahir');
+            const jenisKelaminInput = document.getElementById('jenisKelamin');
+            const alamatInput = document.getElementById('alamat');
+            const teleponInput = document.getElementById('telepon');
+            const searchFilterInput = document.getElementById('searchFilter');
+
+            const viewPatientModal = document.getElementById('viewPatientModal');
+            const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const closePatientFormModalBtn = document.getElementById('closePatientFormModalBtn');
+            let patientIdToDelete = null;
+
+            // Load patients from localStorage, or an empty array if none exists
+            let patients = JSON.parse(localStorage.getItem('patients')) || [];
+            // Load lastPatientNumber from localStorage, or initialize to 0
+            let lastPatientNumber = parseInt(localStorage.getItem('lastPatientNumber')) || 0;
+
+            // Save patients to localStorage
+            function savePatientsToLocalStorage() {
+                localStorage.setItem('patients', JSON.stringify(patients));
+                localStorage.setItem('lastPatientNumber', lastPatientNumber.toString());
+            }
+
+            // Generate unique patient ID in RM-XXX format
+            function generatePatientId() {
+                lastPatientNumber++; // Increment the number for the next ID
+                return `RM-${lastPatientNumber.toString().padStart(3, '0')}`; // Format to RM-001, RM-002, etc.
+            }
+
+            // Display patients in the table
+            function displayPatients(searchTerm = '') {
+                tableBody.innerHTML = ''; // Clear existing rows
+                const filteredPatients = patients.filter(patient =>
+                    patient.namaLengkap.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    patient.alamat.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    patient.telepon.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+
+                if (filteredPatients.length === 0 && searchTerm === '') {
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 8;
+                    noDataCell.textContent = "Tidak ada data pasien. Silakan tambahkan data baru.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                } else {
+                    filteredPatients.forEach((patient, index) => {
+                        const row = tableBody.insertRow();
+                        row.dataset.id = patient.id;
+
+                        row.insertCell().textContent = index + 1 + ".";
+                        row.insertCell().textContent = patient.id;
+                        row.insertCell().textContent = patient.namaLengkap;
+                        row.insertCell().textContent = patient.tanggalLahir;
+                        row.insertCell().textContent = patient.jenisKelamin;
+                        row.insertCell().textContent = patient.alamat;
+                        row.insertCell().textContent = patient.telepon;
+
+                        const actionCell = row.insertCell();
+                        actionCell.classList.add('action-buttons');
+                        actionCell.innerHTML = `
+                            <button class="btn btn-info btn-sm view-btn" data-id="${patient.id}"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-warning btn-sm edit-btn" data-id="${patient.id}"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="${patient.id}"><i class="fas fa-trash"></i></button>
+                        `;
+                    });
+                }
+                attachPatientActionListeners();
+            }
+
+            // Attach event listeners for action buttons (view, edit, delete)
+            function attachPatientActionListeners() {
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.removeEventListener('click', handleViewPatient);
+                    button.addEventListener('click', handleViewPatient);
+                });
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.removeEventListener('click', handleEditPatient);
+                    button.addEventListener('click', handleEditPatient);
+                });
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.removeEventListener('click', handleDeletePatientClick);
+                    button.addEventListener('click', handleDeletePatientClick);
+                });
+            }
+
+            // Utility function to toggle body overflow
+            function toggleBodyOverflow(showModal) {
+                if (showModal) {
+                    document.body.classList.add('modal-open');
+                } else {
+                    document.body.classList.remove('modal-open');
+                }
+            }
+
+            // Handle View Patient
+            function handleViewPatient() {
+                const patientId = this.dataset.id;
+                const patient = patients.find(p => p.id === patientId);
+                if (patient) {
+                    document.getElementById('viewIdPasien').textContent = patient.id;
+                    document.getElementById('viewNamaLengkap').textContent = patient.namaLengkap;
+                    document.getElementById('viewTanggalLahir').textContent = patient.tanggalLahir;
+                    document.getElementById('viewJenisKelamin').textContent = patient.jenisKelamin;
+                    document.getElementById('viewAlamat').textContent = patient.alamat;
+                    document.getElementById('viewTelepon').textContent = patient.telepon;
+                    viewPatientModal.style.display = 'flex';
+                    toggleBodyOverflow(true);
+                }
+            }
+
+            // Handle Edit Patient
+            function handleEditPatient() {
+                const patientId = this.dataset.id;
+                const patient = patients.find(p => p.id === patientId);
+                if (patient) {
+                    patientIdInput.value = patient.id;
+                    namaLengkapInput.value = patient.namaLengkap;
+                    tanggalLahirInput.value = patient.tanggalLahir;
+                    jenisKelaminInput.value = patient.jenisKelamin;
+                    alamatInput.value = patient.alamat;
+                    teleponInput.value = patient.telepon;
+                    formTitle.textContent = 'Edit Data Pasien';
+                    showForm();
+                }
+            }
+
+            // Handle Delete Patient Click
+            function handleDeletePatientClick() {
+                patientIdToDelete = this.dataset.id;
+                deleteConfirmationModal.style.display = 'flex';
+                toggleBodyOverflow(true);
+            }
+
+            // Confirm Delete Patient
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (patientIdToDelete) {
+                    patients = patients.filter(p => p.id !== patientIdToDelete);
+                    savePatientsToLocalStorage();
+                    displayPatients(searchFilterInput.value);
+                    deleteConfirmationModal.style.display = 'none';
+                    toggleBodyOverflow(false);
+                    alert('Data pasien berhasil dihapus!');
+                    patientIdToDelete = null;
+                }
+            });
+
+            // Show/Hide form functions (now controls modal visibility)
+            function showForm() {
+                patientFormContainer.style.display = 'flex';
+                toggleBodyOverflow(true);
+
+                // If this is add mode, reset form and generate new ID
+                if (formTitle.textContent === 'Tambah Pasien Baru') {
+                    patientForm.reset();
+                    patientIdInput.value = generatePatientId(); // Generate new ID for new patient
+                }
+            }
+
+            function hideForm() {
+                patientFormContainer.style.display = 'none';
+                toggleBodyOverflow(false);
+                patientForm.reset();
+                patientIdInput.value = '';
+            }
+
+            // Toggle Add/Edit Patient Form visibility
+            toggleFormBtn.addEventListener('click', () => {
+                formTitle.textContent = 'Tambah Pasien Baru';
+                showForm();
+            });
+
+            // Cancel Form button (internal to the form modal)
+            cancelFormBtn.addEventListener('click', () => {
+                hideForm();
+            });
+
+            // Close button specifically for the "Tambah/Edit Pasien" modal
+            closePatientFormModalBtn.addEventListener('click', () => {
+                hideForm();
+            });
+
+            // Search Filter
+            searchFilterInput.addEventListener('keyup', function() {
+                displayPatients(this.value);
+            });
+
+            // Save Patient (Add/Edit)
+            patientForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
                 const id = patientIdInput.value;
                 const newPatient = {
-                    'ID Pasien': id || `PSN-${Date.now()}`, // Generate new ID if not editing
-                    'Nama Pasien': namaPasienInput.value,
-                    'Jenis Kelamin': jenisKelaminInput.value,
-                    'Tanggal Lahir': tanggalLahirInput.value,
-                    'Alamat': alamatInput.value,
-                    'No Telepon': noTeleponInput.value,
-                    'Riwayat Penyakit': riwayatPenyakitInput.value
+                    id: id,
+                    namaLengkap: namaLengkapInput.value,
+                    tanggalLahir: tanggalLahirInput.value,
+                    jenisKelamin: jenisKelaminInput.value,
+                    alamat: alamatInput.value,
+                    telepon: teleponInput.value
                 };
 
-                if (id) {
-                    // Edit existing patient
-                    const index = patients.findIndex(p => p['ID Pasien'] == id);
-                    if (index !== -1) {
-                        patients[index] = newPatient;
-                        console.log("Data pasien berhasil diupdate:", newPatient);
-                    }
+                const existingIndex = patients.findIndex(p => p.id === id);
+                if (existingIndex > -1) {
+                    // Update existing patient
+                    patients[existingIndex] = newPatient;
+                    alert('Data pasien berhasil diperbarui!');
                 } else {
                     // Add new patient
                     patients.push(newPatient);
-                    console.log("Data pasien baru berhasil ditambahkan:", newPatient);
+                    alert('Pasien baru berhasil ditambahkan!');
                 }
 
-                savePatients(); // Simpan perubahan ke Excel
-                displayPatients(); // Perbarui tampilan tabel
-                hideForm(); // Sembunyikan form
+                savePatientsToLocalStorage();
+                displayPatients(searchFilterInput.value);
+                hideForm();
             });
 
-            // Handle Delete from View Modal
-            deleteFromViewBtn.addEventListener('click', (e) => {
-                currentPatientIdToDelete = e.currentTarget.dataset.id;
-                viewPatientModal.style.display = 'none'; // Close view modal first
-                deleteConfirmationModal.style.display = 'flex';
-                toggleBodyOverflow(true);
+
+            // PDF Export
+            document.getElementById('export-pdf-btn').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'letter');
+                const table = document.querySelector('.patient-table');
+                const tableClone = table.cloneNode(true);
+
+                // Remove the "Aksi" column from the cloned table
+                const rows = tableClone.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('th, td');
+                    if (cells.length > 0) {
+                        cells[cells.length - 1].remove();
+                    }
+                });
+
+                doc.autoTable({
+                    html: tableClone,
+                    startY: 60,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [29, 233, 182],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 8,
+                        valign: 'middle',
+                        overflow: 'linebreak'
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 30, halign: 'center' }, // No.
+                        1: { cellWidth: 70 }, // ID Pasien
+                        2: { cellWidth: 100 }, // Nama Lengkap
+                        3: { cellWidth: 70 }, // Tanggal Lahir
+                        4: { cellWidth: 60, halign: 'center' }, // Jenis Kelamin
+                        5: { cellWidth: 'auto' }, // Alamat
+                        6: { cellWidth: 80 } // Telepon
+                    },
+                    didDrawPage: function (data) {
+                        doc.text("Laporan Data Pasien", 40, 30);
+                    }
+                });
+                doc.save('data_pasien.pdf');
             });
 
-            // Handle Edit from View Modal
-            editFromViewBtn.addEventListener('click', (e) => {
-                const id = e.currentTarget.dataset.id;
-                const patient = patients.find(p => p['ID Pasien'] == id);
-                if (patient) {
-                    viewPatientModal.style.display = 'none'; // Close view modal
-                    showForm(true, patient); // Open form in edit mode
+            // Excel Export
+            document.getElementById('export-excel-btn').addEventListener('click', function() {
+                const table = document.querySelector('.patient-table');
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Data Pasien" });
+
+                // Hapus kolom "Aksi" sebelum menulis ke Excel
+                const ws = wb.Sheets["Data Pasien"];
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    // Iterate backwards to remove the last column (Aksi)
+                    const cellRef = XLSX.utils.encode_cell({r: R, c: range.e.c});
+                    delete ws[cellRef]; // Delete the cell
                 }
-            });
+                // Update the sheet's range to exclude the last column
+                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c, range.e.r, range.e.c - 1);
 
 
-            // Handle Delete Confirmation
-            confirmDeleteBtn.addEventListener('click', () => {
-                if (currentPatientIdToDelete) {
-                    patients = patients.filter(p => p['ID Pasien'] != currentPatientIdToDelete);
-                    savePatients(); // Simpan perubahan ke Excel
-                    displayPatients(); // Perbarui tampilan tabel
-                    currentPatientIdToDelete = null; // Reset
-                    console.log("Data pasien berhasil dihapus.");
-                }
-                deleteConfirmationModal.style.display = 'none';
-                toggleBodyOverflow(false);
+                XLSX.writeFile(wb, 'data_pasien.xlsx');
             });
 
-            cancelDeleteBtn.addEventListener('click', () => {
-                deleteConfirmationModal.style.display = 'none';
-                toggleBodyOverflow(false);
-                currentPatientIdToDelete = null;
-            });
-
-            // Search functionality
-            searchPatientInput.addEventListener('input', (e) => {
-                displayPatients(e.target.value);
-            });
 
             // Close modals when clicking on the close button
             document.querySelectorAll('.modal .close-button').forEach(btn => {
@@ -1172,22 +1351,9 @@
                 }
             });
 
-            // Initial display and load
-            loadPatients(); // Load data saat halaman pertama kali dibuka
-
-            // Adjust main content margin on window resize for desktop view
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
-                    if (sidebar.classList.contains('minimized')) {
-                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                    } else {
-                        mainContent.style.marginLeft = 'var(--sidebar-width)';
-                    }
-                    sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
-                } else {
-                    mainContent.style.marginLeft = '0';
-                }
-            });
+            // Initial display
+            displayPatients();
+            hideForm(); // Ensure form is hidden on load
         });
     </script>
 </body>
