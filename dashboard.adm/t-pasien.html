@@ -312,11 +312,20 @@
             border-radius: 5px;
             box-shadow: var(--shadow);
             display: flex;
-            justify-content: space-between;
+            /* Update: Justify content center for title */
+            justify-content: center; /* Mengubah dari space-between */
             align-items: center;
             width: 100%;
             max-width: 1200px;
         }
+
+        /* Update: Untuk memastikan judul "Transaksi Pasien" berada di tengah */
+        .header h1 {
+            flex-grow: 1; /* Biarkan judul mengambil ruang yang tersisa */
+            text-align: center; /* Pusatkan teks */
+            margin: 0; /* Pastikan tidak ada margin tambahan */
+        }
+
 
         .card {
             background-color: var(--white);
@@ -335,11 +344,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* Allow wrapping for buttons on smaller screens */
+            gap: 10px; /* Space between items in header */
         }
 
         .card-header h2 {
             color: var(--white);
             margin: 0;
+            flex-shrink: 0; /* Prevent h2 from shrinking */
         }
 
         .card-body {
@@ -564,30 +576,45 @@
 
         /* PDF/Excel buttons (if needed for this page) */
         .report-buttons {
-            margin-top: 20px;
             display: flex;
             gap: 10px;
-            justify-content: flex-end;
+            justify-content: flex-end; /* Align to the right within its flex container */
+            flex-wrap: wrap; /* Allow wrapping for buttons on smaller screens */
         }
 
         .report-button {
-            background-color: var(--primary-color);
-            color: var(--white);
             padding: 8px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--white); /* Default text color for report buttons */
         }
 
-        .report-button.pdf { background-color: #E74C3C; }
-        .report-button.excel { background-color: #27AE60; }
-        .report-button.print { background-color: #3498DB; }
+        .report-button.pdf {
+            background-color: #E74C3C; /* Merah */
+        }
+        .report-button.pdf:hover {
+            background-color: #C0392B;
+        }
 
-        .report-button.pdf:hover { background-color: #C0392B; }
-        .report-button.excel:hover { background-color: #229954; }
-        .report-button.print:hover { background-color: #2196F3; }
+        .report-button.excel {
+            background-color: #27AE60; /* Hijau */
+        }
+        .report-button.excel:hover {
+            background-color: #229954;
+        }
+        .report-button.print {
+            background-color: #3498DB;
+        }
+
+        .report-button.print:hover {
+            background-color: #2196F3;
+        }
 
 
         /* Responsive adjustments */
@@ -637,8 +664,11 @@
                 padding: 10px 15px;
                 margin-top: 60px; /* Add margin to prevent header from being hidden by mobile toggle */
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center; /* Center header content vertically on mobile */
                 gap: 10px;
+            }
+            .header h1 {
+                text-align: center;
             }
 
             .card-header {
@@ -647,10 +677,16 @@
                 gap: 10px;
             }
 
-            .card-header .btn-primary {
+            .card-header .btn-primary, .card-header .report-buttons button {
                 width: 100%;
                 justify-content: center;
             }
+
+            .report-buttons {
+                width: 100%; /* Make report buttons take full width */
+                justify-content: center;
+            }
+
 
             .search-filter-section {
                 flex-direction: column;
@@ -802,12 +838,18 @@
     <div class="main-content" id="main-content">
         <div class="header">
             <h1>Transaksi Pasien</h1>
-        </div>
+            </div>
 
         <div class="card">
             <div class="card-header">
                 <h2><i class="fas fa-receipt"></i> Daftar Transaksi</h2>
-                <button class="btn btn-primary" id="addTransactionBtn"><i class="fas fa-plus"></i> Tambah Transaksi Baru</button>
+                <div>
+                    <button class="btn btn-primary" id="addTransactionBtn"><i class="fas fa-plus"></i> Tambah Transaksi Baru</button>
+                    <div class="report-buttons" style="margin-top: 10px;">
+                        <button class="report-button pdf" id="export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
+                        <button class="report-button excel" id="export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="search-filter-section">
@@ -833,7 +875,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="transaction-table">
+                    <table class="transaction-table" id="transactionTable">
                         <thead>
                             <tr>
                                 <th>No.</th>
@@ -928,26 +970,17 @@
     </div>
 
     <script>
+        // Memastikan DOM sepenuhnya dimuat sebelum menjalankan script
         document.addEventListener('DOMContentLoaded', function() {
-            // Fungsi untuk memuat data pengguna dari sessionStorage dan menampilkannya
-            function loadUserData() {
-                const user = sessionStorage.getItem('loggedInUser');
-                if (user) {
-                    const loggedInUser = JSON.parse(user);
-                    const welcomeUserElement = document.getElementById('welcome-user');
-                    if (welcomeUserElement) {
-                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
-                    }
-                } else {
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                }
-            }
-
             // Fungsi untuk memeriksa akses berdasarkan peran
             function checkAccess(allowedRoles) {
                 const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
                     const loggedInUser = JSON.parse(user);
+                    // Menghapus pengecekan 'welcomeUserElement' karena elemen ini sudah dihapus
+                    // if (welcomeUserElement) {
+                    //     welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
+                    // }
                     if (!allowedRoles.includes(loggedInUser.role)) {
                         alert('Anda tidak memiliki akses ke halaman ini.');
                         sessionStorage.clear();
@@ -958,9 +991,8 @@
                 }
             }
 
-            // Jalankan pemeriksaan akses terlebih dahulu
+            // Jalankan pemeriksaan akses
             checkAccess(['admin', 'pendaftaran']);
-            loadUserData(); // Panggil untuk memuat data pengguna setelah akses diperiksa
 
             // Sidebar and Mobile Menu Toggle
             const sidebar = document.getElementById('sidebar');
@@ -1042,7 +1074,8 @@
             const hideFormBtn = document.getElementById('hideFormBtn');
             const transactionForm = document.getElementById('transactionForm');
             const formCardTitle = document.getElementById('formCardTitle');
-            const tableBody = document.querySelector('.transaction-table tbody');
+            const transactionTable = document.getElementById('transactionTable'); // Get the table element
+            const tableBody = transactionTable.querySelector('tbody');
 
             const transactionIdInput = document.getElementById('transactionId');
             const transactionDateInput = document.getElementById('transactionDate');
@@ -1056,7 +1089,7 @@
             const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const closeModalBtns = document.querySelectorAll('.modal .close-button');
+            const closeModalBtns = document.querySelectorAll('.modal .close-button'); // Selecting all close buttons
 
             // Filter inputs
             const transactionSearchInput = document.getElementById('transactionSearch');
@@ -1064,6 +1097,12 @@
             const dateFilterInput = document.getElementById('dateFilter');
             const applyFilterBtn = document.getElementById('applyFilterBtn');
 
+            // Export buttons
+            const exportPdfBtn = document.getElementById('export-pdf-btn');
+            const exportExcelBtn = document.getElementById('export-excel-btn');
+
+
+           
 
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('transactions') === null || JSON.parse(localStorage.getItem('transactions')).length === 0) {
@@ -1139,6 +1178,7 @@
                         <button class="btn btn-danger btn-sm delete-btn" data-id="${transaction.id}"><i class="fas fa-trash"></i></button>
                     `;
                 });
+                // Attach listeners AFTER all rows are added
                 attachTableActionListeners();
             }
 
@@ -1193,6 +1233,7 @@
                 }
 
                 saveTransactionsToLocalStorage();
+                // Redisplay data with current filters applied
                 displayTransactions(transactionSearchInput.value, statusFilterInput.value, dateFilterInput.value);
                 hideForm();
                 transactionForm.reset();
@@ -1201,7 +1242,8 @@
             // Attach listeners for View, Edit, Delete buttons
             function attachTableActionListeners() {
                 document.querySelectorAll('.view-btn').forEach(button => {
-                    button.removeEventListener('click', handleViewClick); // Prevent duplicate listeners
+                    // Remove existing listeners to prevent duplication
+                    button.removeEventListener('click', handleViewClick);
                     button.addEventListener('click', handleViewClick);
                 });
                 document.querySelectorAll('.edit-btn').forEach(button => {
@@ -1218,7 +1260,9 @@
                 const transactionId = this.dataset.id;
                 const transaction = transactions.find(t => t.id === transactionId);
                 if (transaction) {
-                    document.getElementById('viewNo').textContent = transactions.indexOf(transaction) + 1 + ".";
+                    // Find index in original (unfiltered) transactions array
+                    const originalIndex = transactions.findIndex(t => t.id === transactionId);
+                    document.getElementById('viewNo').textContent = (originalIndex > -1 ? originalIndex + 1 : '') + ".";
                     document.getElementById('viewTransactionId').textContent = transaction.id;
                     document.getElementById('viewTransactionDate').textContent = transaction.tanggal;
                     document.getElementById('viewPatientName').textContent = transaction.namaPasien;
@@ -1254,6 +1298,7 @@
                 if (currentTransactionIdToDelete) {
                     transactions = transactions.filter(t => t.id !== currentTransactionIdToDelete);
                     saveTransactionsToLocalStorage();
+                    // Redisplay data with current filters applied
                     displayTransactions(transactionSearchInput.value, statusFilterInput.value, dateFilterInput.value);
                     deleteConfirmationModal.style.display = 'none';
                     alert('Transaksi berhasil dihapus!');
@@ -1268,8 +1313,7 @@
 
             closeModalBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    viewTransactionModal.style.display = 'none';
-                    deleteConfirmationModal.style.display = 'none';
+                    btn.closest('.modal').style.display = 'none';
                 });
             });
 
@@ -1295,7 +1339,91 @@
                 displayTransactions(searchText, statusFilter, dateFilter);
             }
 
+            // --- Export Functions ---
+            exportPdfBtn.addEventListener('click', exportPdf);
+            exportExcelBtn.addEventListener('click', exportExcel);
+
+            function exportPdf() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Dapatkan data tabel saat ini yang difilter
+                const filteredTransactions = transactions.filter(transaction => {
+                    const searchText = transactionSearchInput.value.toLowerCase();
+                    const statusFilter = statusFilterInput.value;
+                    const dateFilter = dateFilterInput.value;
+
+                    const matchesSearch = transaction.id.toLowerCase().includes(searchText) ||
+                                          transaction.namaPasien.toLowerCase().includes(searchText) ||
+                                          transaction.jenisLayanan.toLowerCase().includes(searchText);
+                    const matchesStatus = statusFilter === '' || transaction.statusPembayaran.toLowerCase() === statusFilter.toLowerCase();
+                    const matchesDate = dateFilter === '' || transaction.tanggal === dateFilter;
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
+
+                const tableColumn = ["No.", "ID Transaksi", "Tanggal", "Nama Pasien", "Jenis Layanan", "Total Biaya", "Status Pembayaran"];
+                const tableRows = [];
+
+                filteredTransactions.forEach((transaction, index) => {
+                    const transactionData = [
+                        (index + 1) + ".",
+                        transaction.id,
+                        transaction.tanggal,
+                        transaction.namaPasien,
+                        transaction.jenisLayanan,
+                        formatRupiah(transaction.totalBiaya),
+                        transaction.statusPembayaran
+                    ];
+                    tableRows.push(transactionData);
+                });
+
+                doc.autoTable({
+                    head: [tableColumn],
+                    body: tableRows,
+                    startY: 20,
+                    headStyles: { fillColor: [29, 233, 182] }, // Warna header tabel sesuai primary-color
+                    didDrawPage: function(data) {
+                        doc.text("Laporan Transaksi Pasien", 14, 15);
+                    }
+                });
+
+                doc.save('laporan_transaksi_pasien.pdf');
+            }
+
+            function exportExcel() {
+                // Dapatkan data tabel saat ini yang difilter
+                const filteredTransactions = transactions.filter(transaction => {
+                    const searchText = transactionSearchInput.value.toLowerCase();
+                    const statusFilter = statusFilterInput.value;
+                    const dateFilter = dateFilterInput.value;
+
+                    const matchesSearch = transaction.id.toLowerCase().includes(searchText) ||
+                                          transaction.namaPasien.toLowerCase().includes(searchText) ||
+                                          transaction.jenisLayanan.toLowerCase().includes(searchText);
+                    const matchesStatus = statusFilter === '' || transaction.statusPembayaran.toLowerCase() === statusFilter.toLowerCase();
+                    const matchesDate = dateFilter === '' || transaction.tanggal === dateFilter;
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
+
+                const data = filteredTransactions.map((transaction, index) => ({
+                    "No.": (index + 1) + ".",
+                    "ID Transaksi": transaction.id,
+                    "Tanggal": transaction.tanggal,
+                    "Nama Pasien": transaction.namaPasien,
+                    "Jenis Layanan": transaction.jenisLayanan,
+                    "Total Biaya": transaction.totalBiaya, // Simpan sebagai angka agar Excel bisa memprosesnya
+                    "Status Pembayaran": transaction.statusPembayaran
+                }));
+
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Laporan Transaksi");
+                XLSX.writeFile(wb, "laporan_transaksi_pasien.xlsx");
+            }
+
+
             // Initial display and populate datalist
+            hideForm(); // Hide form on initial load
             displayTransactions();
             populatePatientDatalist();
         });
