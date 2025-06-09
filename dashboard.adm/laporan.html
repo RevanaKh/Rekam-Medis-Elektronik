@@ -903,13 +903,6 @@
 
             // --- Laporan Logic ---
 
-            // Dummy Data Initialization (if not present in localStorage)
-            function generateDummyData(key, defaultData) {
-                if (!localStorage.getItem(key)) {
-                    localStorage.setItem(key, JSON.stringify(defaultData));
-                }
-            }
-
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
