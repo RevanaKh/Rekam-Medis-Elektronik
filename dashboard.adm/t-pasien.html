@@ -570,16 +570,14 @@
         }
 
         /* Form display toggle */
-        #transactionFormContainer {
-            display: none; /* Hidden by default */
-        }
+        /* #transactionFormContainer will be managed by JS display:block/none */
 
-        /* PDF/Excel buttons (if needed for this page) */
+        /* PDF/Excel buttons */
         .report-buttons {
             display: flex;
             gap: 10px;
-            justify-content: flex-end; /* Align to the right within its flex container */
-            flex-wrap: wrap; /* Allow wrapping for buttons on smaller screens */
+            justify-content: flex-end;
+            flex-wrap: wrap;
         }
 
         .report-button {
@@ -592,7 +590,7 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            color: var(--white); /* Default text color for report buttons */
+            color: var(--white);
         }
 
         .report-button.pdf {
@@ -838,7 +836,7 @@
     <div class="main-content" id="main-content">
         <div class="header">
             <h1>Transaksi Pasien</h1>
-            </div>
+        </div>
 
         <div class="card">
             <div class="card-header">
@@ -850,6 +848,40 @@
                 </div>
             </div>
             <div class="card-body">
+                <div id="transactionFormContainer" style="display: none; margin-bottom: 20px; padding: 15px; border: 1px solid var(--border-color); border-radius: 5px; background-color: #f9f9f9;">
+                    <h2 id="formCardTitle" style="margin-top: 0; margin-bottom: 15px; color: var(--secondary-color);">Tambah Transaksi Baru</h2>
+                    <form id="transactionForm">
+                        <input type="hidden" id="transactionId">
+                        <div class="form-group">
+                            <label for="transactionDate">Tanggal:</label>
+                            <input type="date" id="transactionDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patientName">Nama Pasien:</label>
+                            <input type="text" id="patientName" class="form-control" placeholder="Cari nama pasien" required list="patientList">
+                            <datalist id="patientList"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceType">Jenis Layanan:</label>
+                            <input type="text" id="serviceType" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalCost">Total Biaya:</label>
+                            <input type="number" id="totalCost" class="form-control" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentStatus">Status Pembayaran:</label>
+                            <select id="paymentStatus" class="form-control" required>
+                                <option value="Lunas">Lunas</option>
+                                <option value="Belum Lunas">Belum Lunas</option>
+                            </select>
+                        </div>
+                        <div class="modal-buttons" style="justify-content: flex-start;">
+                            <button type="submit" class="btn btn-primary" id="saveTransactionBtn"><i class="fas fa-save"></i> Simpan Transaksi</button>
+                            <button type="button" class="btn btn-secondary" id="hideFormBtn"><i class="fas fa-times"></i> Tutup Form</button>
+                        </div>
+                    </form>
+                </div>
                 <div class="search-filter-section">
                     <div class="form-group">
                         <label for="transactionSearch">Cari Transaksi:</label>
@@ -895,46 +927,7 @@
                 </div>
             </div>
         </div>
-
-        <div class="card" id="transactionFormContainer">
-            <div class="card-header">
-                <h2 id="formCardTitle">Tambah Transaksi Baru</h2>
-                <button class="btn btn-secondary" id="hideFormBtn"><i class="fas fa-times"></i> Tutup Form</button>
-            </div>
-            <div class="card-body">
-                <form id="transactionForm">
-                    <input type="hidden" id="transactionId">
-                    <div class="form-group">
-                        <label for="transactionDate">Tanggal:</label>
-                        <input type="date" id="transactionDate" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="patientName">Nama Pasien:</label>
-                        <input type="text" id="patientName" class="form-control" placeholder="Cari nama pasien" required list="patientList">
-                        <datalist id="patientList"></datalist>
-                    </div>
-                    <div class="form-group">
-                        <label for="serviceType">Jenis Layanan:</label>
-                        <input type="text" id="serviceType" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="totalCost">Total Biaya:</label>
-                        <input type="number" id="totalCost" class="form-control" required min="0">
-                    </div>
-                    <div class="form-group">
-                        <label for="paymentStatus">Status Pembayaran:</label>
-                        <select id="paymentStatus" class="form-control" required>
-                            <option value="Lunas">Lunas</option>
-                            <option value="Belum Lunas">Belum Lunas</option>
-                        </select>
-                    </div>
-                    <div class="modal-buttons" style="justify-content: flex-start;">
-                        <button type="submit" class="btn btn-primary" id="saveTransactionBtn"><i class="fas fa-save"></i> Simpan Transaksi</button>
-                    </div>
-                </form>
-            </div>
         </div>
-    </div>
 
     <div id="viewTransactionModal" class="modal">
         <div class="modal-content">
@@ -1085,7 +1078,6 @@
             const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            // Mengambil semua tombol close dari kedua modal
             const closeModalBtns = document.querySelectorAll('.modal .close-button');
 
             // Filter inputs
@@ -1125,7 +1117,6 @@
 
             // Function to populate patient names for datalist
             function populatePatientDatalist() {
-                // Get patients data from localStorage
                 const patients = JSON.parse(localStorage.getItem('patients')) || [];
                 patientListDatalist.innerHTML = '';
                 patients.forEach(patient => {
@@ -1138,8 +1129,7 @@
             // Function to display transactions in table
             function displayTransactions(searchText = '', filterStatus = '', filterDate = '') {
                 tableBody.innerHTML = '';
-                // Always reload from localStorage to get the latest data
-                transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                transactions = JSON.parse(localStorage.getItem('transactions')) || []; // Reload from localStorage
 
                 const filteredTransactions = transactions.filter(transaction => {
                     const matchesSearch = transaction.id.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -1152,7 +1142,7 @@
 
                 filteredTransactions.forEach((transaction, index) => {
                     const row = tableBody.insertRow();
-                    row.dataset.id = transaction.id; // Store ID for actions
+                    row.dataset.id = transaction.id;
 
                     row.insertCell().textContent = (index + 1) + ".";
                     row.insertCell().textContent = transaction.id;
@@ -1172,7 +1162,6 @@
                         <button class="btn btn-danger btn-sm delete-btn" data-id="${transaction.id}"><i class="fas fa-trash"></i></button>
                     `;
                 });
-                // Attach listeners AFTER all rows are added
                 attachTableActionListeners();
             }
 
@@ -1186,18 +1175,15 @@
                 transactionFormContainer.style.display = 'none';
             }
 
-            // Event Listener for "Tambah Transaksi Baru" button
             addTransactionBtn.addEventListener('click', () => {
                 transactionForm.reset();
-                transactionIdInput.value = ''; // Clear ID for new transaction
+                transactionIdInput.value = '';
                 formCardTitle.textContent = 'Tambah Transaksi Baru';
                 showForm();
             });
 
-            // Event Listener for "Tutup Form" button
             hideFormBtn.addEventListener('click', hideForm);
 
-            // Handle form submission (Add/Edit)
             transactionForm.addEventListener('submit', function(event) {
                 event.preventDefault();
 
@@ -1229,16 +1215,12 @@
                 }
 
                 saveTransactionsToLocalStorage();
-                // Redisplay data with current filters applied
                 displayTransactions(transactionSearchInput.value, statusFilterInput.value, dateFilterInput.value);
                 hideForm();
                 transactionForm.reset();
             });
 
-            // Attach listeners for View, Edit, Delete buttons dynamically
             function attachTableActionListeners() {
-                // Ensure to remove existing listeners before adding new ones
-                // This prevents multiple event handlers attached to the same button
                 document.querySelectorAll('.view-btn').forEach(button => {
                     button.removeEventListener('click', handleViewClick);
                     button.addEventListener('click', handleViewClick);
@@ -1257,7 +1239,6 @@
                 const transactionId = this.dataset.id;
                 const transaction = transactions.find(t => t.id === transactionId);
                 if (transaction) {
-                    // Find index in original (unfiltered) transactions array
                     const originalIndex = transactions.findIndex(t => t.id === transactionId);
                     document.getElementById('viewNo').textContent = (originalIndex > -1 ? originalIndex + 1 : '') + ".";
                     document.getElementById('viewTransactionId').textContent = transaction.id;
@@ -1279,7 +1260,7 @@
                     patientNameInput.value = transaction.namaPasien;
                     serviceTypeInput.value = transaction.jenisLayanan;
                     totalCostInput.value = transaction.totalBiaya;
-                    paymentStatusInput.value = transaction.paymentStatus; // Perbaikan: menggunakan paymentStatus
+                    paymentStatusInput.value = transaction.statusPembayaran;
                     
                     formCardTitle.textContent = 'Edit Transaksi';
                     showForm();
@@ -1295,7 +1276,6 @@
                 if (currentTransactionIdToDelete) {
                     transactions = transactions.filter(t => t.id !== currentTransactionIdToDelete);
                     saveTransactionsToLocalStorage();
-                    // Redisplay data with current filters applied
                     displayTransactions(transactionSearchInput.value, statusFilterInput.value, dateFilterInput.value);
                     deleteConfirmationModal.style.display = 'none';
                     alert('Transaksi berhasil dihapus!');
@@ -1308,14 +1288,12 @@
                 currentTransactionIdToDelete = null;
             });
 
-            // Event listener for all close buttons (X on modal and "Tutup" button)
             closeModalBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     btn.closest('.modal').style.display = 'none';
                 });
             });
 
-            // Close modals when clicking outside
             window.addEventListener('click', function(event) {
                 if (event.target === viewTransactionModal) {
                     viewTransactionModal.style.display = 'none';
@@ -1325,7 +1303,6 @@
                 }
             });
 
-            // Filter logic (event listeners for search and filter inputs)
             transactionSearchInput.addEventListener('keyup', filterTable);
             statusFilterInput.addEventListener('change', filterTable);
             dateFilterInput.addEventListener('change', filterTable);
@@ -1339,7 +1316,6 @@
             }
 
             // --- Export Functions ---
-            // Event Listeners for export buttons
             exportPdfBtn.addEventListener('click', exportPdf);
             exportExcelBtn.addEventListener('click', exportExcel);
 
@@ -1347,7 +1323,6 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
 
-                // Get current filtered data for export
                 const currentFilteredTransactions = transactions.filter(transaction => {
                     const searchText = transactionSearchInput.value.toLowerCase();
                     const statusFilter = statusFilterInput.value;
@@ -1381,7 +1356,7 @@
                     head: [tableColumn],
                     body: tableRows,
                     startY: 20,
-                    headStyles: { fillColor: [29, 233, 182] }, // Header color consistent with primary-color
+                    headStyles: { fillColor: [29, 233, 182] },
                     didDrawPage: function(data) {
                         doc.text("Laporan Transaksi Pasien", 14, 15);
                     }
@@ -1391,7 +1366,6 @@
             }
 
             function exportExcel() {
-                // Get current filtered data for export
                 const currentFilteredTransactions = transactions.filter(transaction => {
                     const searchText = transactionSearchInput.value.toLowerCase();
                     const statusFilter = statusFilterInput.value;
@@ -1411,7 +1385,7 @@
                     "Tanggal": transaction.tanggal,
                     "Nama Pasien": transaction.namaPasien,
                     "Jenis Layanan": transaction.jenisLayanan,
-                    "Total Biaya": transaction.totalBiaya, // Keep as number for Excel processing
+                    "Total Biaya": transaction.totalBiaya,
                     "Status Pembayaran": transaction.statusPembayaran
                 }));
 
@@ -1423,9 +1397,9 @@
 
 
             // Initial setup on page load
-            hideForm(); // Ensure the form is hidden by default
-            displayTransactions(); // Load and display transactions (now from localStorage only)
-            populatePatientDatalist(); // Populate datalist for patient names
+            hideForm();
+            displayTransactions();
+            populatePatientDatalist();
         });
     </script>
 </body>
