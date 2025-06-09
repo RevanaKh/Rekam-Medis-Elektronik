@@ -843,12 +843,10 @@
         <div class="card">
             <div class="card-header">
                 <h2><i class="fas fa-receipt"></i> Daftar Transaksi</h2>
-                <div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;">
                     <button class="btn btn-primary" id="addTransactionBtn"><i class="fas fa-plus"></i> Tambah Transaksi Baru</button>
-                    <div class="report-buttons" style="margin-top: 10px;">
-                        <button class="report-button pdf" id="export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                        <button class="report-button excel" id="export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
-                    </div>
+                    <button class="report-button pdf" id="export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
+                    <button class="report-button excel" id="export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
                 </div>
             </div>
             <div class="card-body">
@@ -977,16 +975,13 @@
                 const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
                     const loggedInUser = JSON.parse(user);
-                    // Menghapus pengecekan 'welcomeUserElement' karena elemen ini sudah dihapus
-                    // if (welcomeUserElement) {
-                    //     welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
-                    // }
                     if (!allowedRoles.includes(loggedInUser.role)) {
                         alert('Anda tidak memiliki akses ke halaman ini.');
                         sessionStorage.clear();
                         window.location.href = '/Rekam-Medis-Elektronik/index.html';
                     }
                 } else {
+                    // Jika tidak ada user di sessionStorage, redirect ke halaman login
                     window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
             }
@@ -1001,6 +996,7 @@
             const menuIcon = document.querySelector('.sidebar-header .menu-icon');
             const mainContent = document.getElementById('main-content');
 
+            // Pastikan elemen ada sebelum menambahkan event listener
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('minimized');
@@ -1074,7 +1070,7 @@
             const hideFormBtn = document.getElementById('hideFormBtn');
             const transactionForm = document.getElementById('transactionForm');
             const formCardTitle = document.getElementById('formCardTitle');
-            const transactionTable = document.getElementById('transactionTable'); // Get the table element
+            const transactionTable = document.getElementById('transactionTable');
             const tableBody = transactionTable.querySelector('tbody');
 
             const transactionIdInput = document.getElementById('transactionId');
@@ -1089,7 +1085,8 @@
             const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const closeModalBtns = document.querySelectorAll('.modal .close-button'); // Selecting all close buttons
+            // Mengambil semua tombol close dari kedua modal
+            const closeModalBtns = document.querySelectorAll('.modal .close-button');
 
             // Filter inputs
             const transactionSearchInput = document.getElementById('transactionSearch');
@@ -1102,12 +1099,8 @@
             const exportExcelBtn = document.getElementById('export-excel-btn');
 
 
-           
-
-            // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
-            if (localStorage.getItem('transactions') === null || JSON.parse(localStorage.getItem('transactions')).length === 0) {
-                saveTransactionsToLocalStorage();
-            }
+            // Load data from localStorage or initialize as empty array
+            let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
             let currentTransactionIdToDelete = null;
 
@@ -1132,6 +1125,7 @@
 
             // Function to populate patient names for datalist
             function populatePatientDatalist() {
+                // Get patients data from localStorage
                 const patients = JSON.parse(localStorage.getItem('patients')) || [];
                 patientListDatalist.innerHTML = '';
                 patients.forEach(patient => {
@@ -1144,7 +1138,7 @@
             // Function to display transactions in table
             function displayTransactions(searchText = '', filterStatus = '', filterDate = '') {
                 tableBody.innerHTML = '';
-                // Reload transactions from localStorage to get the latest data
+                // Always reload from localStorage to get the latest data
                 transactions = JSON.parse(localStorage.getItem('transactions')) || [];
 
                 const filteredTransactions = transactions.filter(transaction => {
@@ -1192,6 +1186,7 @@
                 transactionFormContainer.style.display = 'none';
             }
 
+            // Event Listener for "Tambah Transaksi Baru" button
             addTransactionBtn.addEventListener('click', () => {
                 transactionForm.reset();
                 transactionIdInput.value = ''; // Clear ID for new transaction
@@ -1199,6 +1194,7 @@
                 showForm();
             });
 
+            // Event Listener for "Tutup Form" button
             hideFormBtn.addEventListener('click', hideForm);
 
             // Handle form submission (Add/Edit)
@@ -1239,10 +1235,11 @@
                 transactionForm.reset();
             });
 
-            // Attach listeners for View, Edit, Delete buttons
+            // Attach listeners for View, Edit, Delete buttons dynamically
             function attachTableActionListeners() {
+                // Ensure to remove existing listeners before adding new ones
+                // This prevents multiple event handlers attached to the same button
                 document.querySelectorAll('.view-btn').forEach(button => {
-                    // Remove existing listeners to prevent duplication
                     button.removeEventListener('click', handleViewClick);
                     button.addEventListener('click', handleViewClick);
                 });
@@ -1282,8 +1279,8 @@
                     patientNameInput.value = transaction.namaPasien;
                     serviceTypeInput.value = transaction.jenisLayanan;
                     totalCostInput.value = transaction.totalBiaya;
-                    paymentStatusInput.value = transaction.statusPembayaran;
-
+                    paymentStatusInput.value = transaction.paymentStatus; // Perbaikan: menggunakan paymentStatus
+                    
                     formCardTitle.textContent = 'Edit Transaksi';
                     showForm();
                 }
@@ -1311,12 +1308,14 @@
                 currentTransactionIdToDelete = null;
             });
 
+            // Event listener for all close buttons (X on modal and "Tutup" button)
             closeModalBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     btn.closest('.modal').style.display = 'none';
                 });
             });
 
+            // Close modals when clicking outside
             window.addEventListener('click', function(event) {
                 if (event.target === viewTransactionModal) {
                     viewTransactionModal.style.display = 'none';
@@ -1326,7 +1325,7 @@
                 }
             });
 
-            // Filter logic
+            // Filter logic (event listeners for search and filter inputs)
             transactionSearchInput.addEventListener('keyup', filterTable);
             statusFilterInput.addEventListener('change', filterTable);
             dateFilterInput.addEventListener('change', filterTable);
@@ -1340,6 +1339,7 @@
             }
 
             // --- Export Functions ---
+            // Event Listeners for export buttons
             exportPdfBtn.addEventListener('click', exportPdf);
             exportExcelBtn.addEventListener('click', exportExcel);
 
@@ -1347,8 +1347,8 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
 
-                // Dapatkan data tabel saat ini yang difilter
-                const filteredTransactions = transactions.filter(transaction => {
+                // Get current filtered data for export
+                const currentFilteredTransactions = transactions.filter(transaction => {
                     const searchText = transactionSearchInput.value.toLowerCase();
                     const statusFilter = statusFilterInput.value;
                     const dateFilter = dateFilterInput.value;
@@ -1364,7 +1364,7 @@
                 const tableColumn = ["No.", "ID Transaksi", "Tanggal", "Nama Pasien", "Jenis Layanan", "Total Biaya", "Status Pembayaran"];
                 const tableRows = [];
 
-                filteredTransactions.forEach((transaction, index) => {
+                currentFilteredTransactions.forEach((transaction, index) => {
                     const transactionData = [
                         (index + 1) + ".",
                         transaction.id,
@@ -1381,7 +1381,7 @@
                     head: [tableColumn],
                     body: tableRows,
                     startY: 20,
-                    headStyles: { fillColor: [29, 233, 182] }, // Warna header tabel sesuai primary-color
+                    headStyles: { fillColor: [29, 233, 182] }, // Header color consistent with primary-color
                     didDrawPage: function(data) {
                         doc.text("Laporan Transaksi Pasien", 14, 15);
                     }
@@ -1391,8 +1391,8 @@
             }
 
             function exportExcel() {
-                // Dapatkan data tabel saat ini yang difilter
-                const filteredTransactions = transactions.filter(transaction => {
+                // Get current filtered data for export
+                const currentFilteredTransactions = transactions.filter(transaction => {
                     const searchText = transactionSearchInput.value.toLowerCase();
                     const statusFilter = statusFilterInput.value;
                     const dateFilter = dateFilterInput.value;
@@ -1405,13 +1405,13 @@
                     return matchesSearch && matchesStatus && matchesDate;
                 });
 
-                const data = filteredTransactions.map((transaction, index) => ({
+                const data = currentFilteredTransactions.map((transaction, index) => ({
                     "No.": (index + 1) + ".",
                     "ID Transaksi": transaction.id,
                     "Tanggal": transaction.tanggal,
                     "Nama Pasien": transaction.namaPasien,
                     "Jenis Layanan": transaction.jenisLayanan,
-                    "Total Biaya": transaction.totalBiaya, // Simpan sebagai angka agar Excel bisa memprosesnya
+                    "Total Biaya": transaction.totalBiaya, // Keep as number for Excel processing
                     "Status Pembayaran": transaction.statusPembayaran
                 }));
 
@@ -1422,10 +1422,10 @@
             }
 
 
-            // Initial display and populate datalist
-            hideForm(); // Hide form on initial load
-            displayTransactions();
-            populatePatientDatalist();
+            // Initial setup on page load
+            hideForm(); // Ensure the form is hidden by default
+            displayTransactions(); // Load and display transactions (now from localStorage only)
+            populatePatientDatalist(); // Populate datalist for patient names
         });
     </script>
 </body>
