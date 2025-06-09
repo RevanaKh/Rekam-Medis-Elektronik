@@ -1062,8 +1062,15 @@
 
             // Generate unique patient ID in RM-XXX format
             function generatePatientId() {
-                lastPatientNumber++; // Increment the number for the next ID
-                return `RM-${lastPatientNumber.toString().padStart(3, '0')}`; // Format to RM-001, RM-002, etc.
+                // Ensure the number is unique by iterating if necessary (though unlikely with simple increment)
+                let newNumber = lastPatientNumber + 1;
+                let newId = `RM-${newNumber.toString().padStart(3, '0')}`;
+                while (patients.some(p => p.id === newId)) {
+                    newNumber++;
+                    newId = `RM-${newNumber.toString().padStart(3, '0')}`;
+                }
+                lastPatientNumber = newNumber; // Update lastPatientNumber only after finding a unique ID
+                return newId;
             }
 
             // Display patients in the table
@@ -1270,7 +1277,7 @@
                 rows.forEach(row => {
                     const cells = row.querySelectorAll('th, td');
                     if (cells.length > 0) {
-                        cells[cells.length - 1].remove();
+                        cells[cells.length - 1].remove(); // Remove the last cell (Aksi column)
                     }
                 });
 
@@ -1309,20 +1316,18 @@
             // Excel Export
             document.getElementById('export-excel-btn').addEventListener('click', function() {
                 const table = document.querySelector('.patient-table');
-                const wb = XLSX.utils.table_to_book(table, { sheet: "Data Pasien" });
+                // Clone the table to manipulate without affecting the displayed one
+                const tableCloneForExcel = table.cloneNode(true);
+                // Remove the "Aksi" column from the cloned table for Excel
+                const rowsForExcel = tableCloneForExcel.querySelectorAll('tr');
+                rowsForExcel.forEach(row => {
+                    const cells = row.querySelectorAll('th, td');
+                    if (cells.length > 0) {
+                        cells[cells.length - 1].remove(); // Remove the last cell (Aksi column)
+                    }
+                });
 
-                // Hapus kolom "Aksi" sebelum menulis ke Excel
-                const ws = wb.Sheets["Data Pasien"];
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let R = range.s.r; R <= range.e.r; ++R) {
-                    // Iterate backwards to remove the last column (Aksi)
-                    const cellRef = XLSX.utils.encode_cell({r: R, c: range.e.c});
-                    delete ws[cellRef]; // Delete the cell
-                }
-                // Update the sheet's range to exclude the last column
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c, range.e.r, range.e.c - 1);
-
-
+                const wb = XLSX.utils.table_to_book(tableCloneForExcel, { sheet: "Data Pasien" });
                 XLSX.writeFile(wb, 'data_pasien.xlsx');
             });
 
