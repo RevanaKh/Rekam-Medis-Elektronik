@@ -633,10 +633,7 @@
 
     <div class="main-content" id="main-content">
         <div class="header">
-            <h1>Laporan</h1>
-            <div class="user-info">
-                Selamat Datang, <span id="welcome-user"></span>!
-            </div>
+            <h1>Manajemen Laporan</h1>
         </div>
 
         <div id="laporan-pasien" class="content-section">
@@ -729,38 +726,6 @@
                             <th>Jenis Layanan</th>
                             <th>Total Biaya</th>
                             <th>Status Pembayaran</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="laporan-pemeriksaan" class="content-section">
-            <h3>Laporan Pemeriksaan Pasien</h3>
-            <div class="report-summary">
-                <div class="report-item">
-                    <span>Total Pemeriksaan:</span>
-                    <span id="total-pemeriksaan"></span>
-                </div>
-                <div class="report-item">
-                    <span>Pemeriksaan Baru Bulan Ini:</span>
-                    <span id="pemeriksaan-baru-bulan-ini"></span>
-                </div>
-            </div>
-            <div class="report-table-container">
-                <table id="pemeriksaanTable" class="report-table">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>ID Pemeriksaan</th>
-                            <th>Tanggal</th>
-                            <th>Nama Pasien</th>
-                            <th>Dokter</th>
-                            <th>Keluhan</th>
-                            <th>Diagnosa</th>
-                            <th>Tindakan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -948,54 +913,7 @@
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
-
-            // Patients Dummy Data (example)
-            generateDummyData('patients', [
-                { id: 'P001', namaLengkap: 'Budi Santoso', tanggalLahir: '1990-01-15', jenisKelamin: 'Laki-laki', alamat: 'Jl. Melati No.1', telepon: '081234567890' },
-                { id: 'P002', namaLengkap: 'Siti Aminah', tanggalLahir: '1985-05-20', jenisKelamin: 'Perempuan', alamat: 'Jl. Kenanga No.2', telepon: '081298765432' },
-                { id: 'P003', namaLengkap: 'Joko Susilo', tanggalLahir: '1992-03-10', jenisKelamin: 'Laki-laki', alamat: 'Jl. Dahlia No.3', telepon: '087811223344' },
-                { id: 'P004', namaLengkap: 'Ani Indah', tanggalLahir: '2000-07-25', jenisKelamin: 'Perempuan', alamat: 'Jl. Anggrek No.4', telepon: '085677889900' },
-                { id: 'P005', namaLengkap: 'Dewi Lestari', tanggalLahir: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-05`, jenisKelamin: 'Perempuan', alamat: 'Jl. Mawar No.5', telepon: '081122334455' } // New patient this month
-            ]);
-
-            // Doctors Dummy Data
-            generateDummyData('doctors', [
-                { id: 'D001', namaDokter: 'Dr. Ahmad Yani', poli: 'Umum', hariPraktek: 'Senin, Rabu, Jumat', jamMulai: '08:00', jamSelesai: '12:00', status: 'Aktif' },
-                { id: 'D002', namaDokter: 'Dr. Kartika Sari', poli: 'Gigi', hariPraktek: 'Selasa, Kamis', jamMulai: '09:00', jamSelesai: '13:00', status: 'Aktif' },
-                { id: 'D003', namaDokter: 'Dr. Budi Darma', poli: 'Anak', hariPraktek: 'Sabtu', jamMulai: '10:00', jamSelesai: '15:00', status: 'Tidak Aktif' }
-            ]);
-
-            // Transactions Dummy Data
-            generateDummyData('transactions', [
-                { id: 'T001', tanggal: '2023-01-01', namaPasien: 'Budi Santoso', jenisLayanan: 'Pemeriksaan Umum', totalBiaya: 50000, statusPembayaran: 'Lunas' },
-                { id: 'T002', tanggal: '2023-01-02', namaPasien: 'Siti Aminah', jenisLayanan: 'Cabut Gigi', totalBiaya: 150000, statusPembayaran: 'Lunas' },
-                { id: 'T003', tanggal: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`, namaPasien: 'Joko Susilo', jenisLayanan: 'Vaksinasi', totalBiaya: 100000, statusPembayaran: 'Lunas' },
-                { id: 'T004', tanggal: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-03`, namaPasien: 'Ani Indah', jenisLayanan: 'Pemeriksaan Gigi', totalBiaya: 80000, statusPembayaran: 'Belum Lunas' }
-            ]);
-
-            // Examinations Dummy Data
-            generateDummyData('examinations', [
-                { id: 'E001', tanggal: '2023-01-01', namaPasien: 'Budi Santoso', dokter: 'Dr. Ahmad Yani', keluhan: 'Batuk pilek', diagnosa: 'ISPA', tindakan: 'Resep Obat' },
-                { id: 'E002', tanggal: '2023-01-02', namaPasien: 'Siti Aminah', dokter: 'Dr. Kartika Sari', keluhan: 'Sakit gigi', diagnosa: 'Karies', tindakan: 'Cabut Gigi' },
-                { id: 'E003', tanggal: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-05`, namaPasien: 'Dewi Lestari', dokter: 'Dr. Ahmad Yani', keluhan: 'Demam', diagnosa: 'Demam Biasa', tindakan: 'Istirahat dan Obat' }
-            ]);
-
-            // Drugs Dummy Data
-            generateDummyData('drugs', [
-                { id: 'O001', namaObat: 'Paracetamol', jenis: 'Tablet', stok: 100, hargaSatuan: 5000, deskripsi: 'Pereda demam dan nyeri' },
-                { id: 'O002', namaObat: 'Amoxicillin', jenis: 'Kapsul', stok: 5, hargaSatuan: 7500, deskripsi: 'Antibiotik' }, // Critical stock
-                { id: 'O003', namaObat: 'Vitamin C', jenis: 'Tablet', stok: 200, hargaSatuan: 3000, deskripsi: 'Suplemen' },
-                { id: 'O004', namaObat: 'Obat Batuk Syrup', jenis: 'Sirup', stok: 8, hargaSatuan: 12000, deskripsi: 'Obat batuk' } // Critical stock
-            ]);
-
-            // Users Dummy Data
-            generateDummyData('users', [
-                { id: 'U001', nama: 'Admin Utama', email: 'admin@klinik.com', role: 'admin' },
-                { id: 'U002', nama: 'Pendaftaran 1', email: 'daftar1@klinik.com', role: 'pendaftaran' },
-                { id: 'U003', nama: 'Dokter A', email: 'dokter@klinik.com', role: 'dokter' },
-                { id: 'U004', nama: 'Apoteker X', email: 'apoteker@klinik.com', role: 'apoteker' }
-            ]);
-
+            
             // Populate Functions
             function populatePatientReport() {
                 const patients = JSON.parse(localStorage.getItem('patients')) || [];
