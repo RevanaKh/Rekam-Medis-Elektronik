@@ -19,17 +19,14 @@
             --light-color: #f4f4f4; /* Background umum */
             --danger-color: #f44336; /* Warna merah untuk danger */
             --success-color: #4CAF50;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
             --text-color: #333;
             --white: #fff;
             --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             --sidebar-width: 250px;
             --sidebar-minimized-width: 60px;
-            --border-color: #ddd; /* Added for table borders consistency */
-
-            /* Warna baru untuk tombol laporan sesuai gambar (disalin dari data_pasien.html) */
-            --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
-            --report-print-bg: #3498DB; /* Biru untuk Cetak */
-            --report-excel-bg: #27AE60; /* Hijau untuk Excel */
+            --border-color: #ddd;
         }
 
         * {
@@ -169,6 +166,7 @@
             width: 100%;
             height: 100%;
             stroke: currentColor;
+            fill: none;
         }
 
         .nav-text {
@@ -188,7 +186,7 @@
             color: var(--white);
         }
 
-        /* Logout Section - Modified */
+        /* Logout Section */
         .logout-section {
             padding: 0;
             text-align: center;
@@ -230,6 +228,7 @@
             width: 100%;
             height: 100%;
             stroke: currentColor;
+            fill: none;
         }
 
         .logout-text {
@@ -256,7 +255,7 @@
             margin-right: 0;
         }
 
-        /* Tombol Toggle untuk Desktop */
+        /* Toggle Button for Desktop */
         .toggle-btn {
             position: absolute;
             top: 20px;
@@ -284,7 +283,7 @@
             transform: translateX(-190px) rotate(180deg);
         }
 
-        /* Area Konten Utama */
+        /* Main Content Area */
         .main-content {
             flex-grow: 1;
             padding: 20px;
@@ -305,7 +304,7 @@
             width: calc(100% - var(--sidebar-minimized-width));
         }
 
-        /* Global styles for content */
+        /* Global styles for cards */
         .header {
             background-color: var(--white);
             padding: 15px 20px;
@@ -330,7 +329,7 @@
         }
 
         .card-header {
-            background-color: #000000;
+            background-color: #000000; /* Darker header for contrast */
             color: var(--white);
             padding: 15px 20px;
             display: flex;
@@ -340,9 +339,7 @@
 
         .card-header h2 {
             color: var(--white);
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 0;
+            margin: 0;
         }
 
         .card-body {
@@ -381,14 +378,14 @@
             background-color: var(--primary-dark);
         }
         .btn-info {
-            background-color: #17a2b8;
+            background-color: var(--info-color);
             color: var(--white);
         }
         .btn-info:hover {
             background-color: #138496;
         }
         .btn-warning {
-            background-color: #ffc107;
+            background-color: var(--warning-color);
             color: var(--secondary-color);
         }
         .btn-warning:hover {
@@ -400,6 +397,20 @@
         }
         .btn-danger:hover {
             background-color: #c82333;
+        }
+        .btn-success {
+            background-color: var(--success-color);
+            color: var(--white);
+        }
+        .btn-success:hover {
+            background-color: #449d48;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: var(--white);
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
         }
         .btn-sm {
             padding: 5px 10px;
@@ -418,7 +429,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 0;
-            min-width: 900px; /* Adjusted min-width for better display on smaller screens */
+            min-width: 850px; /* Adjust min-width to prevent squishing */
             background-color: var(--white);
         }
 
@@ -449,23 +460,21 @@
             gap: 5px;
         }
 
-        .search-add-container {
+        .search-filter-section {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 15px;
             margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
         }
 
-        .search-add-container .form-group {
+        .search-filter-section .form-group {
             flex: 1;
-            min-width: 200px;
+            min-width: 180px;
             margin-bottom: 0;
         }
 
-        .search-add-container .btn-primary {
-            min-width: 180px;
+        .search-filter-section .form-control {
+            border-radius: 4px;
         }
 
         .pagination {
@@ -545,70 +554,60 @@
         }
         .view-details strong {
             display: inline-block;
-            width: 150px; /* Adjust as needed for alignment */
+            width: 120px; /* Adjust as needed for alignment */
         }
 
-        /* CSS for PDF/Excel Print Buttons (from laporan.html for consistency) */
-        .report-buttons-container {
-            margin-top: 0px; /* Adjusted to fit layout better */
-            margin-bottom: 0px; /* Adjusted to fit layout better */
+        /* Form display toggle */
+        #transactionFormContainer {
+            display: none; /* Hidden by default */
+        }
+
+        /* PDF/Excel buttons (if needed for this page) */
+        .report-buttons {
+            margin-top: 20px;
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
         }
 
         .report-button {
+            background-color: var(--primary-color);
             color: var(--white);
+            padding: 8px 12px;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            box-shadow: var(--shadow);
+            font-size: 14px;
+            transition: background-color 0.2s ease;
         }
 
-        #export-pdf-btn {
-            background-color: var(--report-pdf-bg);
-        }
+        .report-button.pdf { background-color: #E74C3C; }
+        .report-button.excel { background-color: #27AE60; }
+        .report-button.print { background-color: #3498DB; }
 
-        #export-pdf-btn:hover {
-            background-color: #C0392B;
-            transform: translateY(-2px);
-        }
+        .report-button.pdf:hover { background-color: #C0392B; }
+        .report-button.excel:hover { background-color: #229954; }
+        .report-button.print:hover { background-color: #2196F3; }
 
-        #export-excel-btn {
-            background-color: var(--report-excel-bg);
-        }
-        #export-excel-btn:hover {
-            background-color: #229954;
-            transform: translateY(-2px);
-        }
-
-        #print-table-btn {
-            background-color: var(--report-print-bg);
-        }
-        #print-table-btn:hover {
-            background-color: #2980B9;
-            transform: translateY(-2px);
-        }
-
-        .report-button:active {
-            transform: translateY(0);
-        }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .mobile-toggle {
                 display: block;
+                z-index: 10000;
+                top: 10px;
+                left: 10px;
+                font-size: 1.8rem;
+                padding: 8px 12px;
             }
 
             .sidebar {
                 left: -250px;
+                position: fixed;
+                height: 100%;
+                z-index: 2000;
+                background-color: var(--primary-color);
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
             }
 
             .sidebar.active {
@@ -617,6 +616,9 @@
 
             .main-content {
                 margin-left: 0;
+                width: 100%;
+                align-items: flex-start;
+                padding: 15px;
             }
 
             .sidebar.minimized + .main-content {
@@ -633,32 +635,52 @@
 
             .header {
                 padding: 10px 15px;
+                margin-top: 60px; /* Add margin to prevent header from being hidden by mobile toggle */
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
             }
 
-            .card-body {
-                padding: 15px;
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
             }
 
-            .search-add-container {
+            .card-header .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .search-filter-section {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .transaction-table {
-                min-width: unset; /* Allow table to shrink on smaller screens */
+            .search-filter-section .form-group {
+                min-width: unset;
             }
 
-            .report-buttons-container {
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto; /* Ensure scrollbar on smaller screens */
+            }
+
+            .transaction-table {
+                min-width: 600px; /* Adjusted minimum width for mobile */
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+
+            .report-buttons {
                 flex-direction: column;
                 align-items: stretch;
             }
             .report-button {
                 width: 100%;
                 justify-content: center;
-            }
-
-            .modal-content {
-                width: 95%;
             }
         }
     </style>
@@ -778,20 +800,38 @@
     </div>
 
     <div class="main-content" id="main-content">
+        <div class="header">
+            <h1>Transaksi Pasien</h1>
+            <div class="user-info">
+                Selamat Datang, <span id="welcome-user"></span>!
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header">
-                <h2><i class="fas fa-exchange-alt"></i> Daftar Transaksi</h2>
-                <button class="btn btn-primary" id="toggleFormBtn"><i class="fas fa-plus"></i> Tambah Transaksi Baru</button>
+                <h2><i class="fas fa-receipt"></i> Daftar Transaksi</h2>
+                <button class="btn btn-primary" id="addTransactionBtn"><i class="fas fa-plus"></i> Tambah Transaksi Baru</button>
             </div>
             <div class="card-body">
-                <div class="search-add-container">
+                <div class="search-filter-section">
                     <div class="form-group">
-                        <label for="searchFilter">Cari Transaksi:</label>
-                        <input type="text" id="searchFilter" class="form-control" placeholder="Cari berdasarkan ID Transaksi atau Nama Pasien">
+                        <label for="transactionSearch">Cari Transaksi:</label>
+                        <input type="text" id="transactionSearch" class="form-control" placeholder="ID/Nama Pasien/Layanan">
                     </div>
-                    <div class="report-buttons-container">
-                        <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i>Unduh PDF</button>
-                        <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i>Unduh Excel</button>
+                    <div class="form-group">
+                        <label for="statusFilter">Filter Status:</label>
+                        <select id="statusFilter" class="form-control">
+                            <option value="">Semua Status</option>
+                            <option value="Lunas">Lunas</option>
+                            <option value="Belum Lunas">Belum Lunas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateFilter">Filter Tanggal:</label>
+                        <input type="date" id="dateFilter" class="form-control">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-info" id="applyFilterBtn"><i class="fas fa-filter"></i> Terapkan</button>
                     </div>
                 </div>
 
@@ -810,76 +850,67 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Data transaksi akan dimuat di sini secara dinamis -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
-
                 <div class="pagination">
-                    <!-- Pagination (demo only - not functional) -->
                     <button class="pagination-btn active">1</button>
                 </div>
             </div>
         </div>
 
-        <div id="transactionFormContainer" class="card" style="display: none;">
+        <div class="card" id="transactionFormContainer">
             <div class="card-header">
-                <h2 id="formTitle">Tambah Transaksi Baru</h2>
+                <h2 id="formCardTitle">Tambah Transaksi Baru</h2>
+                <button class="btn btn-secondary" id="hideFormBtn"><i class="fas fa-times"></i> Tutup Form</button>
             </div>
             <div class="card-body">
                 <form id="transactionForm">
                     <input type="hidden" id="transactionId">
                     <div class="form-group">
-                        <label for="tanggalTransaksi">Tanggal Transaksi:</label>
-                        <input type="date" id="tanggalTransaksi" class="form-control" required>
+                        <label for="transactionDate">Tanggal:</label>
+                        <input type="date" id="transactionDate" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="namaPasien">Nama Pasien:</label>
-                        <input type="text" id="namaPasien" class="form-control" required>
+                        <label for="patientName">Nama Pasien:</label>
+                        <input type="text" id="patientName" class="form-control" placeholder="Cari nama pasien" required list="patientList">
+                        <datalist id="patientList"></datalist>
                     </div>
                     <div class="form-group">
-                        <label for="jenisLayanan">Jenis Layanan:</label>
-                        <select id="jenisLayanan" class="form-control" required>
-                            <option value="">Pilih Jenis Layanan</option>
-                            <option value="Pemeriksaan Umum">Pemeriksaan Umum</option>
-                            <option value="Konsultasi Spesialis">Konsultasi Spesialis</option>
-                            <option value="Tindakan Medis Kecil">Tindakan Medis Kecil</option>
-                            <option value="Vaksinasi">Vaksinasi</option>
-                        </select>
+                        <label for="serviceType">Jenis Layanan:</label>
+                        <input type="text" id="serviceType" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="totalBiaya">Total Biaya (IDR):</label>
-                        <input type="number" id="totalBiaya" class="form-control" step="1000" min="0" required>
+                        <label for="totalCost">Total Biaya:</label>
+                        <input type="number" id="totalCost" class="form-control" required min="0">
                     </div>
                     <div class="form-group">
-                        <label for="statusPembayaran">Status Pembayaran:</label>
-                        <select id="statusPembayaran" class="form-control" required>
-                            <option value="Belum Dibayar">Belum Dibayar</option>
+                        <label for="paymentStatus">Status Pembayaran:</label>
+                        <select id="paymentStatus" class="form-control" required>
                             <option value="Lunas">Lunas</option>
-                            <option value="Cicilan">Cicilan</option>
+                            <option value="Belum Lunas">Belum Lunas</option>
                         </select>
                     </div>
-                    <div class="modal-buttons">
-                        <button type="button" class="btn btn-secondary" id="cancelFormBtn">Batal</button>
-                        <button type="submit" class="btn btn-primary" id="saveTransactionBtn">Simpan Transaksi</button>
+                    <div class="modal-buttons" style="justify-content: flex-start;">
+                        <button type="submit" class="btn btn-primary" id="saveTransactionBtn"><i class="fas fa-save"></i> Simpan Transaksi</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modals -->
     <div id="viewTransactionModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>Detail Transaksi</h2>
             <div class="view-details">
-                <p><strong>ID Transaksi:</strong> <span id="viewIdTransaksi"></span></p>
-                <p><strong>Tanggal:</strong> <span id="viewTanggalTransaksi"></span></p>
-                <p><strong>Nama Pasien:</strong> <span id="viewNamaPasien"></span></p>
-                <p><strong>Jenis Layanan:</strong> <span id="viewJenisLayanan"></span></p>
-                <p><strong>Total Biaya:</strong> <span id="viewTotalBiaya"></span></p>
-                <p><strong>Status Pembayaran:</strong> <span id="viewStatusPembayaran"></span></p>
+                <p><strong>No:</strong> <span id="viewNo"></span></p>
+                <p><strong>ID Transaksi:</strong> <span id="viewTransactionId"></span></p>
+                <p><strong>Tanggal:</strong> <span id="viewTransactionDate"></span></p>
+                <p><strong>Nama Pasien:</strong> <span id="viewPatientName"></span></p>
+                <p><strong>Jenis Layanan:</strong> <span id="viewServiceType"></span></p>
+                <p><strong>Total Biaya:</strong> <span id="viewTotalCost"></span></p>
+                <p><strong>Status Pembayaran:</strong> <span id="viewPaymentStatus"></span></p>
             </div>
             <div class="modal-buttons">
                 <button type="button" class="btn btn-secondary close-button">Tutup</button>
@@ -891,7 +922,7 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>Konfirmasi Hapus</h2>
-            <p>Apakah Anda yakin ingin menghapus data transaksi ini?</p>
+            <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
             <div class="modal-buttons">
                 <button type="button" class="btn btn-secondary" id="cancelDeleteBtn">Batal</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
@@ -931,9 +962,8 @@
             }
 
             // Jalankan pemeriksaan akses terlebih dahulu
-            checkAccess(['admin', 'apoteker']); // Admin dan Apoteker bisa akses
-            loadUserData(); // Load user data to display welcome message
-
+            checkAccess(['admin', 'pendaftaran']);
+            loadUserData(); // Panggil untuk memuat data pengguna setelah akses diperiksa
 
             // Sidebar and Mobile Menu Toggle
             const sidebar = document.getElementById('sidebar');
@@ -942,7 +972,6 @@
             const menuIcon = document.querySelector('.sidebar-header .menu-icon');
             const mainContent = document.getElementById('main-content');
 
-            // Toggle sidebar for desktop
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('minimized');
@@ -954,7 +983,6 @@
                 });
             }
 
-            // Toggle sidebar for mobile
             if (mobileToggle) {
                 mobileToggle.addEventListener('click', (event) => {
                     event.stopPropagation();
@@ -962,7 +990,6 @@
                 });
             }
 
-            // Toggle sidebar from inside
             if (menuIcon) {
                 menuIcon.addEventListener('click', () => {
                     if (window.innerWidth <= 768) {
@@ -978,19 +1005,27 @@
                 });
             }
 
-            // Close sidebar when clicking outside on mobile
             mainContent.addEventListener('click', () => {
                 if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
                 }
             });
 
-            // Prevent sidebar clicks from propagating to mainContent to close it
             sidebar.addEventListener('click', (event) => {
                 event.stopPropagation();
             });
 
-            // Adjust main content margin on window resize for desktop view
+            function initSidebar() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('minimized');
+                    sidebar.classList.remove('active');
+                    mainContent.style.marginLeft = '0';
+                } else {
+                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                }
+            }
+            initSidebar();
+
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 768) {
                     if (sidebar.classList.contains('minimized')) {
@@ -1004,84 +1039,100 @@
                 }
             });
 
-
-            // --- Transaction Management Logic ---
+            // --- Transaction Logic ---
             const transactionFormContainer = document.getElementById('transactionFormContainer');
+            const addTransactionBtn = document.getElementById('addTransactionBtn');
+            const hideFormBtn = document.getElementById('hideFormBtn');
             const transactionForm = document.getElementById('transactionForm');
-            const toggleFormBtn = document.getElementById('toggleFormBtn');
-            const cancelFormBtn = document.getElementById('cancelFormBtn');
+            const formCardTitle = document.getElementById('formCardTitle');
             const tableBody = document.querySelector('.transaction-table tbody');
-            const formTitle = document.getElementById('formTitle');
+
             const transactionIdInput = document.getElementById('transactionId');
-            const tanggalTransaksiInput = document.getElementById('tanggalTransaksi');
-            const namaPasienInput = document.getElementById('namaPasien');
-            const jenisLayananInput = document.getElementById('jenisLayanan');
-            const totalBiayaInput = document.getElementById('totalBiaya');
-            const statusPembayaranInput = document.getElementById('statusPembayaran');
-            const searchFilterInput = document.getElementById('searchFilter');
+            const transactionDateInput = document.getElementById('transactionDate');
+            const patientNameInput = document.getElementById('patientName');
+            const serviceTypeInput = document.getElementById('serviceType');
+            const totalCostInput = document.getElementById('totalCost');
+            const paymentStatusInput = document.getElementById('paymentStatus');
+            const patientListDatalist = document.getElementById('patientList');
 
             const viewTransactionModal = document.getElementById('viewTransactionModal');
             const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            let transactionIdToDelete = null;
+            const closeModalBtns = document.querySelectorAll('.modal .close-button');
 
-            
+            // Filter inputs
+            const transactionSearchInput = document.getElementById('transactionSearch');
+            const statusFilterInput = document.getElementById('statusFilter');
+            const dateFilterInput = document.getElementById('dateFilter');
+            const applyFilterBtn = document.getElementById('applyFilterBtn');
+
+
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('transactions') === null || JSON.parse(localStorage.getItem('transactions')).length === 0) {
                 saveTransactionsToLocalStorage();
             }
 
+            let currentTransactionIdToDelete = null;
 
-            // Save transactions to localStorage
+            // Function to save transactions to localStorage
             function saveTransactionsToLocalStorage() {
                 localStorage.setItem('transactions', JSON.stringify(transactions));
             }
 
-            // Generate unique transaction ID
+            // Function to generate unique ID
             function generateTransactionId() {
-                const prefix = 'TRX-';
-                const date = new Date();
-                const year = date.getFullYear().toString().slice(-2);
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const day = date.getDate().toString().padStart(2, '0');
-                const hour = date.getHours().toString().padStart(2, '0');
-                const minute = date.getMinutes().toString().padStart(2, '0');
-                const second = date.getSeconds().toString().padStart(2, '0');
-                return `${prefix}${year}${month}${day}${hour}${minute}${second}`;
+                return 'TRX-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
             }
 
-            // Display transactions in the table
-            function displayTransactions(searchTerm = '') {
-                tableBody.innerHTML = ''; // Clear existing rows
-                const filteredTransactions = transactions.filter(transaction =>
-                    transaction.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    transaction.namaPasien.toLowerCase().includes(searchTerm.toLowerCase())
-                );
+            // Function to format Rupiah
+            function formatRupiah(amount) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(amount);
+            }
+
+            // Function to populate patient names for datalist
+            function populatePatientDatalist() {
+                const patients = JSON.parse(localStorage.getItem('patients')) || [];
+                patientListDatalist.innerHTML = '';
+                patients.forEach(patient => {
+                    const option = document.createElement('option');
+                    option.value = patient.namaLengkap;
+                    patientListDatalist.appendChild(option);
+                });
+            }
+
+            // Function to display transactions in table
+            function displayTransactions(searchText = '', filterStatus = '', filterDate = '') {
+                tableBody.innerHTML = '';
+                // Reload transactions from localStorage to get the latest data
+                transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+                const filteredTransactions = transactions.filter(transaction => {
+                    const matchesSearch = transaction.id.toLowerCase().includes(searchText.toLowerCase()) ||
+                                          transaction.namaPasien.toLowerCase().includes(searchText.toLowerCase()) ||
+                                          transaction.jenisLayanan.toLowerCase().includes(searchText.toLowerCase());
+                    const matchesStatus = filterStatus === '' || transaction.statusPembayaran.toLowerCase() === filterStatus.toLowerCase();
+                    const matchesDate = filterDate === '' || transaction.tanggal === filterDate;
+                    return matchesSearch && matchesStatus && matchesDate;
+                });
 
                 filteredTransactions.forEach((transaction, index) => {
                     const row = tableBody.insertRow();
-                    row.dataset.id = transaction.id; // Store ID for easy access
+                    row.dataset.id = transaction.id; // Store ID for actions
 
-                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = (index + 1) + ".";
                     row.insertCell().textContent = transaction.id;
-                    row.insertCell().textContent = transaction.tanggalTransaksi;
+                    row.insertCell().textContent = transaction.tanggal;
                     row.insertCell().textContent = transaction.namaPasien;
                     row.insertCell().textContent = transaction.jenisLayanan;
-                    row.insertCell().textContent = transaction.totalBiaya.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+                    row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
                     const statusCell = row.insertCell();
                     statusCell.textContent = transaction.statusPembayaran;
-                    // Apply color based on status
-                    if (transaction.statusPembayaran === 'Lunas') {
-                        statusCell.style.color = 'green';
-                        statusCell.style.fontWeight = 'bold';
-                    } else if (transaction.statusPembayaran === 'Belum Dibayar') {
-                        statusCell.style.color = 'red';
-                        statusCell.style.fontWeight = 'bold';
-                    } else {
-                        statusCell.style.color = 'orange';
-                        statusCell.style.fontWeight = 'bold';
-                    }
+                    statusCell.style.color = transaction.statusPembayaran === 'Lunas' ? 'green' : 'red';
 
                     const actionCell = row.insertCell();
                     actionCell.classList.add('action-buttons');
@@ -1091,203 +1142,140 @@
                         <button class="btn btn-danger btn-sm delete-btn" data-id="${transaction.id}"><i class="fas fa-trash"></i></button>
                     `;
                 });
-                attachTransactionActionListeners(); // Re-attach listeners after updating table
+                attachTableActionListeners();
             }
 
-            // Attach event listeners for action buttons (view, edit, delete)
-            function attachTransactionActionListeners() {
-                document.querySelectorAll('.view-btn').forEach(button => {
-                    button.removeEventListener('click', handleViewTransaction); // Prevent duplicate listeners
-                    button.addEventListener('click', handleViewTransaction);
-                });
-                document.querySelectorAll('.edit-btn').forEach(button => {
-                    button.removeEventListener('click', handleEditTransaction);
-                    button.addEventListener('click', handleEditTransaction);
-                });
-                document.querySelectorAll('.delete-btn').forEach(button => {
-                    button.removeEventListener('click', handleDeleteTransactionClick);
-                    button.addEventListener('click', handleDeleteTransactionClick);
-                });
-            }
-
-            // Handle View Transaction
-            function handleViewTransaction() {
-                const transactionId = this.dataset.id;
-                const transaction = transactions.find(t => t.id === transactionId);
-                if (transaction) {
-                    document.getElementById('viewIdTransaksi').textContent = transaction.id;
-                    document.getElementById('viewTanggalTransaksi').textContent = transaction.tanggalTransaksi;
-                    document.getElementById('viewNamaPasien').textContent = transaction.namaPasien;
-                    document.getElementById('viewJenisLayanan').textContent = transaction.jenisLayanan;
-                    document.getElementById('viewTotalBiaya').textContent = transaction.totalBiaya.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-                    document.getElementById('viewStatusPembayaran').textContent = transaction.statusPembayaran;
-                    viewTransactionModal.style.display = 'flex';
-                }
-            }
-
-            // Handle Edit Transaction
-            function handleEditTransaction() {
-                const transactionId = this.dataset.id;
-                const transaction = transactions.find(t => t.id === transactionId);
-                if (transaction) {
-                    transactionIdInput.value = transaction.id;
-                    tanggalTransaksiInput.value = transaction.tanggalTransaksi;
-                    namaPasienInput.value = transaction.namaPasien;
-                    jenisLayananInput.value = transaction.jenisLayanan;
-                    totalBiayaInput.value = transaction.totalBiaya;
-                    statusPembayaranInput.value = transaction.statusPembayaran;
-                    formTitle.textContent = 'Edit Data Transaksi';
-                    showForm(true); // Show form for editing
-                }
-            }
-
-            // Handle Delete Transaction Click
-            function handleDeleteTransactionClick() {
-                transactionIdToDelete = this.dataset.id;
-                deleteConfirmationModal.style.display = 'flex';
-            }
-
-            // Confirm Delete Transaction
-            confirmDeleteBtn.addEventListener('click', function() {
-                if (transactionIdToDelete) {
-                    transactions = transactions.filter(t => t.id !== transactionIdToDelete);
-                    saveTransactionsToLocalStorage(); // Save changes after deletion
-                    displayTransactions(searchFilterInput.value); // Refresh table
-                    deleteConfirmationModal.style.display = 'none';
-                    alert('Data transaksi berhasil dihapus!');
-                    transactionIdToDelete = null; // Clear ID
-                }
-            });
-
-            // Show/Hide form functions
-            function showForm(isEdit = false) {
+            // Show/Hide Form
+            function showForm() {
                 transactionFormContainer.style.display = 'block';
-                if (!isEdit) {
-                    transactionForm.reset();
-                    transactionIdInput.value = ''; // Clear ID for new transaction
-                    formTitle.textContent = 'Tambah Transaksi Baru';
-                    transactionIdInput.value = generateTransactionId(); // Generate new ID
-                    tanggalTransaksiInput.valueAsDate = new Date(); // Set default date to today
-                }
-                // Scroll to form
                 transactionFormContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
             function hideForm() {
                 transactionFormContainer.style.display = 'none';
-                transactionForm.reset();
-                transactionIdInput.value = ''; // Clear ID
             }
 
-            // Save Transaction (Add/Edit)
+            addTransactionBtn.addEventListener('click', () => {
+                transactionForm.reset();
+                transactionIdInput.value = ''; // Clear ID for new transaction
+                formCardTitle.textContent = 'Tambah Transaksi Baru';
+                showForm();
+            });
+
+            hideFormBtn.addEventListener('click', hideForm);
+
+            // Handle form submission (Add/Edit)
             transactionForm.addEventListener('submit', function(event) {
                 event.preventDefault();
 
-                const id = transactionIdInput.value || generateTransactionId(); // Use existing ID or generate new
+                let id = transactionIdInput.value;
+                const isEditing = !!id;
+
+                if (!isEditing) {
+                    id = generateTransactionId();
+                }
+
                 const newTransaction = {
                     id: id,
-                    tanggalTransaksi: tanggalTransaksiInput.value,
-                    namaPasien: namaPasienInput.value,
-                    jenisLayanan: jenisLayananInput.value,
-                    totalBiaya: parseFloat(totalBiayaInput.value),
-                    statusPembayaran: statusPembayaranInput.value
+                    tanggal: transactionDateInput.value,
+                    namaPasien: patientNameInput.value,
+                    jenisLayanan: serviceTypeInput.value,
+                    totalBiaya: parseFloat(totalCostInput.value),
+                    statusPembayaran: paymentStatusInput.value
                 };
 
-                const existingIndex = transactions.findIndex(t => t.id === id);
-                if (existingIndex > -1) {
-                    // Update existing transaction
-                    transactions[existingIndex] = newTransaction;
-                    alert('Data transaksi berhasil diperbarui!');
-                } else {
-                    // Add new transaction
-                    transactions.push(newTransaction);
-                    alert('Transaksi baru berhasil ditambahkan!');
-                }
-
-                saveTransactionsToLocalStorage(); // Save changes
-                displayTransactions(searchFilterInput.value); // Refresh table
-                hideForm(); // Hide form after saving
-            });
-
-
-            // PDF Export
-            document.getElementById('export-pdf-btn').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                const table = document.querySelector('.transaction-table');
-
-                // Hide action column before PDF export
-                const actionCells = document.querySelectorAll('.transaction-table th:last-child, .transaction-table td:last-child');
-                actionCells.forEach(cell => {
-                    cell.style.display = 'none';
-                });
-
-                doc.autoTable({
-                    html: table,
-                    startY: 20,
-                    headStyles: { fillColor: [29, 233, 182] }, // primary-color
-                    didDrawPage: function(data) {
-                        doc.text("Laporan Transaksi Pasien", 14, 15);
+                if (isEditing) {
+                    const existingIndex = transactions.findIndex(t => t.id === id);
+                    if (existingIndex > -1) {
+                        transactions[existingIndex] = newTransaction;
+                        alert('Transaksi berhasil diperbarui!');
                     }
-                });
-
-                doc.save('Laporan_Transaksi_Pasien.pdf');
-
-                // Restore action column display
-                actionCells.forEach(cell => {
-                    cell.style.display = '';
-                });
-            });
-
-            // Excel Export
-            document.getElementById('export-excel-btn').addEventListener('click', function() {
-                const table = document.querySelector('.transaction-table');
-                const wb = XLSX.utils.table_to_book(table, { sheet: "Data Transaksi" });
-                XLSX.writeFile(wb, 'Laporan_Transaksi_Pasien.xlsx');
-            });
-
-            // Print Table
-            document.getElementById('print-table-btn').addEventListener('click', function() {
-                const table = document.querySelector('.transaction-table').cloneNode(true); // Clone the table
-                const actionColumnIndex = Array.from(table.rows[0].cells).findIndex(th => th.textContent === 'Aksi');
-
-                // If 'Aksi' column exists, remove it
-                if (actionColumnIndex !== -1) {
-                    Array.from(table.rows).forEach(row => {
-                        if (row.cells[actionColumnIndex]) {
-                            row.deleteCell(actionColumnIndex);
-                        }
-                    });
+                } else {
+                    transactions.push(newTransaction);
+                    alert('Transaksi berhasil ditambahkan!');
                 }
 
-                const printWindow = window.open('', '', 'height=600,width=800');
-                printWindow.document.write('<html><head><title>Print Transaksi Pasien</title>');
-                // Copy necessary styles for printing
-                printWindow.document.write('<style>');
-                printWindow.document.write(`
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
-                    th { background-color: #1de9b6; color: white; font-weight: bold; }
-                    h1 { color: #00b686; }
-                `);
-                printWindow.document.write('</style>');
-                printWindow.document.write('</head><body>');
-                printWindow.document.write('<h1>Laporan Transaksi Pasien</h1>');
-                printWindow.document.write(table.outerHTML);
-                printWindow.document.close();
-                printWindow.print();
+                saveTransactionsToLocalStorage();
+                displayTransactions(transactionSearchInput.value, statusFilterInput.value, dateFilterInput.value);
+                hideForm();
+                transactionForm.reset();
             });
 
+            // Attach listeners for View, Edit, Delete buttons
+            function attachTableActionListeners() {
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.removeEventListener('click', handleViewClick); // Prevent duplicate listeners
+                    button.addEventListener('click', handleViewClick);
+                });
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.removeEventListener('click', handleEditClick);
+                    button.addEventListener('click', handleEditClick);
+                });
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.removeEventListener('click', handleDeleteClick);
+                    button.addEventListener('click', handleDeleteClick);
+                });
+            }
 
-            // Close modals when clicking on the close button
-            document.querySelectorAll('.modal .close-button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.closest('.modal').style.display = 'none';
+            function handleViewClick() {
+                const transactionId = this.dataset.id;
+                const transaction = transactions.find(t => t.id === transactionId);
+                if (transaction) {
+                    document.getElementById('viewNo').textContent = transactions.indexOf(transaction) + 1 + ".";
+                    document.getElementById('viewTransactionId').textContent = transaction.id;
+                    document.getElementById('viewTransactionDate').textContent = transaction.tanggal;
+                    document.getElementById('viewPatientName').textContent = transaction.namaPasien;
+                    document.getElementById('viewServiceType').textContent = transaction.jenisLayanan;
+                    document.getElementById('viewTotalCost').textContent = formatRupiah(transaction.totalBiaya);
+                    document.getElementById('viewPaymentStatus').textContent = transaction.statusPembayaran;
+                    viewTransactionModal.style.display = 'flex';
+                }
+            }
+
+            function handleEditClick() {
+                const transactionId = this.dataset.id;
+                const transaction = transactions.find(t => t.id === transactionId);
+                if (transaction) {
+                    transactionIdInput.value = transaction.id;
+                    transactionDateInput.value = transaction.tanggal;
+                    patientNameInput.value = transaction.namaPasien;
+                    serviceTypeInput.value = transaction.jenisLayanan;
+                    totalCostInput.value = transaction.totalBiaya;
+                    paymentStatusInput.value = transaction.statusPembayaran;
+
+                    formCardTitle.textContent = 'Edit Transaksi';
+                    showForm();
+                }
+            }
+
+            function handleDeleteClick() {
+                currentTransactionIdToDelete = this.dataset.id;
+                deleteConfirmationModal.style.display = 'flex';
+            }
+
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (currentTransactionIdToDelete) {
+                    transactions = transactions.filter(t => t.id !== currentTransactionIdToDelete);
+                    saveTransactionsToLocalStorage();
+                    displayTransactions(transactionSearchInput.value, statusFilterInput.value, dateFilterInput.value);
+                    deleteConfirmationModal.style.display = 'none';
+                    alert('Transaksi berhasil dihapus!');
+                    currentTransactionIdToDelete = null;
+                }
+            });
+
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteConfirmationModal.style.display = 'none';
+                currentTransactionIdToDelete = null;
+            });
+
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    viewTransactionModal.style.display = 'none';
+                    deleteConfirmationModal.style.display = 'none';
                 });
             });
 
-            // Close modals when clicking outside
             window.addEventListener('click', function(event) {
                 if (event.target === viewTransactionModal) {
                     viewTransactionModal.style.display = 'none';
@@ -1297,10 +1285,22 @@
                 }
             });
 
-            // Initial display (hide form by default, show it when 'Tambah Transaksi Baru' is clicked)
-            // transactionFormContainer.style.display = 'none'; // Tambahkan baris ini
-            hideForm(); 
+            // Filter logic
+            transactionSearchInput.addEventListener('keyup', filterTable);
+            statusFilterInput.addEventListener('change', filterTable);
+            dateFilterInput.addEventListener('change', filterTable);
+            applyFilterBtn.addEventListener('click', filterTable);
+
+            function filterTable() {
+                const searchText = transactionSearchInput.value.toLowerCase();
+                const statusFilter = statusFilterInput.value;
+                const dateFilter = dateFilterInput.value;
+                displayTransactions(searchText, statusFilter, dateFilter);
+            }
+
+            // Initial display and populate datalist
             displayTransactions();
+            populatePatientDatalist();
         });
     </script>
 </body>
