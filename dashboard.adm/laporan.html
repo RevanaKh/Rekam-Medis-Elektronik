@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+
     <style>
         /* Variabel CSS (dari t-pasien.html untuk konsistensi) */
         :root {
@@ -18,575 +19,541 @@
             --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
             --light-color: #f4f4f4; /* Background umum */
             --danger-color: #f44336; /* Warna merah untuk danger */
-            --success-color: #4CAF50;
-            --text-color: #333;
-            --white: #fff;
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --success-color: #4CAF50; /* Warna hijau untuk sukses */
+            --warning-color: #ff9800; /* Warna kuning untuk peringatan */
+            --text-color: #333; /* Warna teks umum */
+            --border-color: #ddd; /* Warna border tabel dan elemen lain */
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             --sidebar-width: 250px;
-            --sidebar-minimized-width: 60px;
-            --border-color: #ddd; /* Added for table borders consistency */
-
-            /* Warna baru untuk tombol laporan sesuai gambar */
-            --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
-            --report-print-bg: #3498DB; /* Biru untuk Cetak */
-            --report-excel-bg: #27AE60; /* Hijau untuk Excel */
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --sidebar-minimized-width: 70px;
         }
 
         body {
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--light-color);
+            color: var(--text-color);
             display: flex;
             min-height: 100vh;
-            background-color: var(--light-color);
-            overflow-x: hidden; /* Mencegah scrollbar horizontal yang tidak diinginkan di body */
+            overflow-x: hidden;
         }
 
-        /* Mobile Toggle outside sidebar */
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            font-size: 2rem;
-            color: var(--secondary-color);
-            cursor: pointer;
-            z-index: 1100;
-            padding: 5px 10px;
-            background-color: var(--primary-dark);
-            border-radius: 5px;
-            box-shadow: var(--shadow);
-            line-height: 1;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .sidebar.active ~ .mobile-toggle {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-
-        /* Sidebar/Navigasi Utama */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
-            color: var(--secondary-color);
-            transition: all 0.3s ease;
-            flex-shrink: 0;
+            color: white;
+            padding-top: 20px;
             position: fixed;
             height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 1000;
             display: flex;
             flex-direction: column;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-color) 2px 0 5px;
+            z-index: 1000;
         }
 
         .sidebar.minimized {
             width: var(--sidebar-minimized-width);
         }
 
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background-color: var(--primary-dark);
-            color: var(--white);
-            font-size: 1.5rem;
-            white-space: nowrap;
-            overflow: hidden;
-            position: relative;
-            justify-content: flex-start;
-            gap: 10px;
+        .sidebar.minimized .logo h2 {
+            display: none;
         }
 
-        .sidebar.minimized .sidebar-header {
-            justify-content: center;
-            padding: 20px 0;
-        }
-
-        .menu-icon {
-            font-size: 2rem;
-            cursor: pointer;
-            line-height: 1;
-            padding: 0 5px;
-            color: var(--secondary-color);
-        }
-
-        .sidebar.minimized .menu-icon {
-            font-size: 1.5rem;
-        }
-
-        .menu-text {
-            font-size: 1.5rem;
-            opacity: 1;
-            transition: opacity 0.2s ease;
-            color: var(--secondary-color);
-        }
-
-        .sidebar.minimized .menu-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-            visibility: hidden;
-        }
-
-        .nav-list {
-            list-style: none;
+        .sidebar.minimized .logo i {
+            margin: 0;
             padding: 0;
-            margin-top: 20px;
-            flex-grow: 1;
-        }
-
-        .nav-item {
-            position: relative;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: var(--secondary-color);
-            text-decoration: none;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .nav-icon {
-            margin-right: 10px;
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-
-        .nav-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: currentColor;
-        }
-
-        .nav-text {
-            opacity: 1;
-            transition: opacity 0.2s ease;
-        }
-
-        .sidebar.minimized .nav-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-            visibility: hidden;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: var(--primary-dark);
-            color: var(--white);
-        }
-
-        /* Logout Section - Modified */
-        .logout-section {
-            padding: 0;
+            font-size: 2em;
             text-align: center;
             width: 100%;
-            flex-shrink: 0;
-            margin-top: auto;
         }
 
-        .logout-link {
-            background-color: var(--secondary-color);
-            color: var(--white);
-            text-align: center;
-            border-radius: 0;
-            display: flex;
-            align-items: center;
+        .sidebar.minimized ul li a span {
+            display: none;
+        }
+
+        .sidebar.minimized ul li a {
             justify-content: center;
             padding: 15px 0;
-            text-decoration: none;
-            transition: background-color 0.2s ease;
-            gap: 8px;
-            width: 100%;
-            border-top: 1px solid var(--secondary-color);
-            border-bottom: 1px solid var(--secondary-color);
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-
-        .logout-link:hover {
-            background-color: #222;
-        }
-
-        .logout-icon {
-            width: 24px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-
-        .logout-icon svg {
-            width: 100%;
-            height: 100%;
-            stroke: currentColor;
-        }
-
-        .logout-text {
-            opacity: 1;
-            transition: opacity 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .sidebar.minimized .logout-link {
-            padding: 15px 0;
-            width: 100%;
-            height: auto;
-            border-radius: 0;
-            justify-content: center;
-        }
-
-        .sidebar.minimized .logout-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-            visibility: hidden;
-        }
-        .sidebar.minimized .logout-icon {
-            margin-right: 0;
-        }
-
-        /* Tombol Toggle untuk Desktop */
-        .toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: -20px;
-            background-color: var(--primary-dark);
-            color: var(--white);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            z-index: 1001;
-            transition: transform 0.3s ease;
-        }
-
-        .toggle-btn i {
-            font-size: 1.2rem;
         }
 
         .sidebar.minimized .toggle-btn {
-            transform: translateX(-190px) rotate(180deg);
+            align-self: center;
         }
 
-        /* Area Konten Utama */
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+
+        .logo i {
+            font-size: 2.5em;
+            margin-right: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            font-size: 1.5em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: var(--primary-dark);
+        }
+
+        .logout-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid var(--primary-dark);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: auto;
+        }
+
+        .logout-btn:hover {
+            background-color: #555;
+        }
+
         .main-content {
             flex-grow: 1;
-            padding: 20px;
-            transition: margin-left 0.3s ease;
             margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width)); /* Menggunakan calc untuk responsivitas */
-            overflow-y: auto;
-            overflow-x: hidden; /* Penting untuk mencegah scrollbar horizontal di main-content */
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Memusatkan konten secara horizontal di dalam main-content */
+            transition: margin-left 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            width: calc(100% - var(--sidebar-width));
         }
 
-        .sidebar.minimized + .main-content {
+        .main-content.sidebar-minimized {
             margin-left: var(--sidebar-minimized-width);
             width: calc(100% - var(--sidebar-minimized-width));
         }
 
-        /* Global styles for content */
-        .header {
-            background-color: var(--white);
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 1200px; /* Batasi lebar maksimum */
-        }
-
-        /* Enhanced Card Styles - Start */
-        .card {
-            background-color: var(--white);
-            border-radius: 8px; /* Lebih rounded */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Bayangan lebih dalam */
-            margin-bottom: 30px; /* Spasi antar card */
-            overflow: hidden;
-            width: 100%;
-            max-width: 1200px;
-            border: 1px solid #e0e0e0; /* Border tipis */
-        }
-
-        .card-header {
-            background-color: #000000;
-            color: var(--white);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .card-header h2 {
-            color: var(--white);
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 0;
-            font-size: 1.4rem; /* Ukuran font lebih besar */
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-body {
+        header {
+            background-color: white;
             padding: 20px;
-        }
-
-        .card-summary {
-            background-color: #f0fdf9; /* Latar belakang untuk summary */
-            border: 1px solid var(--primary-color);
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px; /* Spasi antara summary dan tabel */
+            border-radius: 8px;
+            box-shadow: var(--shadow-color) 0 2px 4px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            font-size: 1.1em;
-            color: var(--text-color);
         }
 
-        .card-summary-item {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .card-summary-label {
-            font-weight: normal;
-            color: #555;
-            font-size: 0.9em;
-        }
-
-        .card-summary-value {
-            font-weight: bold;
+        header h1 {
+            margin: 0;
             color: var(--primary-dark);
-            font-size: 1.3em;
-        }
-        /* Enhanced Card Styles - End */
-
-
-        .form-group {
-            margin-bottom: 15px;
         }
 
-        .form-control {
-            width: 100%;
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
             padding: 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
+            align-self: flex-start;
+            margin-left: auto;
+            display: block;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
 
         .btn {
             padding: 10px 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: inline-flex;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+            display: flex;
             align-items: center;
             gap: 5px;
-            white-space: nowrap;
         }
+
+        .btn i {
+            margin-right: 5px; /* Adjust as needed */
+        }
+
         .btn-primary {
             background-color: var(--primary-color);
-            color: var(--white);
+            color: white;
         }
+
         .btn-primary:hover {
             background-color: var(--primary-dark);
         }
-        .btn-info {
-            background-color: #17a2b8;
-            color: var(--white);
-        }
-        .btn-info:hover {
-            background-color: #138496;
-        }
-        .btn-warning {
-            background-color: #ffc107;
-            color: var(--secondary-color);
-        }
-        .btn-warning:hover {
-            background-color: #e0a800;
-        }
+
         .btn-danger {
             background-color: var(--danger-color);
-            color: var(--white);
+            color: white;
         }
+
         .btn-danger:hover {
-            background-color: #c82333;
-        }
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
+            background-color: #d32f2f;
         }
 
-        .table-responsive {
-            margin-top: 20px;
-            overflow-x: auto;
+        .btn-info {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #0c7cd5;
+        }
+
+        .dashboard-cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+        }
+
+        .card {
+            background-color: white;
+            padding: 20px;
             border-radius: 8px;
-            box-shadow: var(--shadow);
-            width: 100%;
+            box-shadow: var(--shadow-color) 0 2px 4px;
+            flex: 1; /* Allow cards to grow and shrink */
+            min-width: 200px; /* Minimum width before wrapping */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        .report-table {
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-dark);
+            font-size: 1.2em;
+        }
+
+        .card p {
+            margin: 5px 0 0;
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-color) 0 2px 4px;
+            overflow-x: auto; /* For responsive tables */
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0;
-            min-width: 800px; /* Minimal width tabel untuk menjaga layout pada desktop */
-            background-color: var(--white);
+            margin-top: 20px;
         }
 
-        .report-table th, .report-table td {
+        th, td {
             border: 1px solid var(--border-color);
-            padding: 12px 15px;
+            padding: 12px;
             text-align: left;
-            font-size: 0.9em;
-            white-space: nowrap; /* Prevent text wrapping in cells */
+            white-space: nowrap; /* Prevent wrapping in cells */
         }
 
-        .report-table th {
+        th {
             background-color: var(--primary-color);
-            color: var(--white);
+            color: white;
             font-weight: bold;
         }
 
-        .report-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
+        tr:nth-child(even) {
+            background-color: var(--light-color);
         }
 
-        .report-table tbody tr:hover {
-            background-color: #f1f1f1;
+        tr:hover {
+            background-color: #e9e9e9;
         }
 
-        /* CSS for Global PDF/Excel Buttons */
-        .global-report-buttons-container {
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 20px;
+        .filter-controls {
             display: flex;
-            gap: 15px;
             flex-wrap: wrap;
-            justify-content: flex-end; /* Pindahkan tombol ke kanan */
-            padding: 0 20px; /* Sesuaikan padding agar sejajar dengan card */
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: var(--shadow-color) 0 1px 3px;
         }
 
-        .global-report-button {
-            color: var(--white);
-            border: none;
-            padding: 10px 15px;
+        .filter-controls label {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .filter-controls input[type="text"],
+        .filter-controls input[type="date"],
+        .filter-controls select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
             border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-size: 1em;
+            width: 100%; /* Full width within its flex item */
+            box-sizing: border-box;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px; /* Ensure filters don't get too small */
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end; /* Align buttons to the bottom of the filter group */
+        }
+
+        /* New Sidebar structure styles (from data_pasien.html for consistency) */
+        .sidebar-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            padding: 20px 0;
+            background-color: var(--primary-dark); /* Darker shade for header */
+            margin-bottom: 20px;
+        }
+
+        .menu-icon {
+            font-size: 2em;
+            color: white;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: white;
             text-decoration: none;
-            box-shadow: var(--shadow);
+            transition: background-color 0.3s ease, padding-left 0.3s ease;
         }
 
-        #export-all-pdf-btn {
-            background-color: var(--report-pdf-bg);
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: var(--primary-dark);
+            padding-left: 25px;
         }
 
-        #export-all-pdf-btn:hover {
-            background-color: #C0392B;
-            transform: translateY(-2px);
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        #export-all-excel-btn {
-            background-color: var(--report-excel-bg);
-        }
-        #export-all-excel-btn:hover {
-            background-color: #229954;
-            transform: translateY(-2px);
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: white;
         }
 
-        /* Responsive adjustments */
+        .nav-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logout-section {
+            margin-top: auto; /* Pushes logout to the bottom */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: opacity 0.3s ease;
+        }
+
+        .logout-link:hover {
+            opacity: 0.8;
+        }
+
+        .logout-icon {
+            margin-right: 15px;
+        }
+
+        /* Sidebar minimized state */
+        .sidebar.minimized .nav-text,
+        .sidebar.minimized .sidebar-header,
+        .sidebar.minimized .logout-text {
+            display: none;
+        }
+
+        .sidebar.minimized .nav-link {
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .sidebar.minimized .nav-icon {
+            margin-right: 0;
+        }
+
+        .sidebar.minimized .toggle-btn {
+            transform: rotate(180deg); /* Rotate arrow when minimized */
+        }
+
+        .sidebar.minimized {
+            width: var(--sidebar-minimized-width);
+        }
+
+        .sidebar.minimized .toggle-btn {
+            /* Adjust positioning if needed for minimized state */
+            align-self: center; /* Center the toggle button */
+            margin-left: 0; /* Remove auto margin */
+            margin-bottom: 20px; /* Add some space at the bottom if needed */
+        }
+
+        /* Sidebar toggle button specific to this new design */
+        .sidebar .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            z-index: 1003;
+        }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none; /* Hidden by default on desktop */
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1002; /* Above sidebar and content */
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: var(--shadow-color) 0 2px 5px;
+        }
+
+
+        /* Media Queries for Responsiveness */
         @media (max-width: 768px) {
-            .mobile-toggle {
-                display: block;
-            }
-
             .sidebar {
-                left: -250px;
-                width: var(--sidebar-width);
+                width: 0;
+                left: -250px; /* Hide off-screen */
+                transition: all 0.3s ease-in-out;
             }
 
             .sidebar.active {
-                left: 0;
+                width: var(--sidebar-width);
+                left: 0; /* Slide in */
             }
 
             .main-content {
                 margin-left: 0;
                 width: 100%;
-                padding: 15px;
             }
 
-            .sidebar.minimized + .main-content {
-                margin-left: 0;
+            .mobile-toggle {
+                display: block; /* Show mobile toggle button */
             }
 
-            .toggle-btn {
-                display: none;
-            }
-
-            body {
-                flex-direction: column;
-            }
-
-            .header {
-                padding: 10px 15px;
+            header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
+                gap: 15px;
             }
 
-            .card-body {
-                padding: 15px;
-            }
-
-            .global-report-buttons-container {
+            .actions {
+                width: 100%;
                 flex-direction: column;
                 align-items: stretch;
-                justify-content: center; /* Pusatkan tombol pada mobile */
-                padding: 0 15px; /* Sesuaikan padding mobile */
             }
-            .global-report-button {
+
+            .actions button, .actions input {
                 width: 100%;
-                justify-content: center;
+            }
+
+            .dashboard-cards {
+                flex-direction: column;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                min-width: unset; /* Remove min-width on mobile */
+                width: 100%;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .filter-buttons .btn {
+                width: 100%;
             }
         }
     </style>
@@ -612,52 +579,55 @@
                             <polyline points="9 22 9 12 15 12 15 22"></polyline>
                         </svg>
                     </div>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="t-pasien.html" class="nav-link">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="8.5" cy="7" r="4"></circle>
-                            <polyline points="17 11 19 13 23 9"></polyline>
-                        </svg>
-                    </div>
-                    <span class="nav-text">Transaksi Pasien</span>
+                    <div class="nav-text">Home</div>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="data_pasien.html" class="nav-link">
                     <div class="nav-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-7-4 1.67-2.66 4.33-4 7-4s5.33 1.34 7 4c-1.67 2.66-4.33 4-7 4z"></path>
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
                         </svg>
                     </div>
-                    <span class="nav-text">Data Pasien</span>
+                    <div class="nav-text">Data Pasien</div>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="jadwal_dokter.html" class="nav-link">
                     <div class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 3v6a6 0 0 0 12 0V3"></path>
+                            <circle cx="12" cy="14" r="4"></circle>
+                            <line x1="12" y1="18" x2="12" y2="21"></line>
+                            <line x1="9" y1="21" x2="15" y2="21"></line>
                         </svg>
                     </div>
-                    <span class="nav-text">Jadwal Dokter</span>
+                    <div class="nav-text">Jadwal Praktek Dokter</div>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="data_obat.html" class="nav-link">
                     <div class="nav-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="9" x2="15" y2="9"></line>
+                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                            <line x1="9" y1="19" x2="15" y2="19"></line>
                         </svg>
                     </div>
-                    <span class="nav-text">Data Obat</span>
+                    <div class="nav-text">Data Obat</div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="t-pasien.html" class="nav-link">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="nav-text">Transaksi Pasien</div>
                 </a>
             </li>
             <li class="nav-item">
@@ -667,555 +637,399 @@
                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                             <circle cx="8.5" cy="7" r="4"></circle>
                             <line x1="20" y1="8" x2="20" y2="14"></line>
-                            <line x1="23" y1="11" x2="17" y2="11"></line>
+                            <line x1="17" y1="11" x2="23" y2="11"></line>
                         </svg>
                     </div>
-                    <span class="nav-text">Tambah Akun</span>
+                    <div class="nav-text">Tambah Akun</div>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="laporan.html" class="nav-link active">
                     <div class="nav-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="14" y="2" width="8" height="20" rx="2" ry="2"></rect>
-                            <path d="M2 7h10v12H2V7z"></path>
-                            <path d="M7 2v20"></path>
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
                     </div>
-                    <span class="nav-text">Laporan</span>
+                    <div class="nav-text">Laporan</div>
                 </a>
             </li>
         </ul>
         <div class="logout-section">
-            <a href="index.html" class="logout-link">
+            <a href="/Rekam-Medis-Elektronik/index.html" class="logout-link">
                 <div class="logout-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="17 16 22 12 17 8"></polyline>
-                        <line x1="22" y1="12" x2="10" y2="12"></line>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
                 </div>
-                <span class="logout-text">Logout</span>
+                <div class="logout-text">LOG OUT</div>
             </a>
         </div>
     </div>
 
-    <div class="main-content" id="main-content">
-        <div class="header">
-            <h1>Laporan</h1>
-        </div>
-
-        <div class="global-report-buttons-container">
-            <button id="export-all-pdf-btn" class="global-report-button">
-                <i class="fas fa-file-pdf"></i> Export Semua PDF
-            </button>
-            <button id="export-all-excel-btn" class="global-report-button">
-                <i class="fas fa-file-excel"></i> Export Semua Excel
-            </button>
-        </div>
-
-        <div class="card" id="card-pasien">
-            <div class="card-header">
-                <h2><i class="fas fa-users"></i> Laporan Data Pasien</h2>
+    <div class="main-content" id="mainContent">
+        <header>
+            <h1>Laporan Pasien</h1>
+            <div class="actions">
+                <button class="btn btn-info" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                <button class="btn btn-primary" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
             </div>
-            <div class="card-body">
-                <div class="card-summary">
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Total Pasien:</span>
-                        <span class="card-summary-value" id="total-patients">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Pasien Pria:</span>
-                        <span class="card-summary-value" id="male-patients">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Pasien Wanita:</span>
-                        <span class="card-summary-value" id="female-patients">0</span>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="report-table" id="pasien-table">
-                        <thead>
-                            <tr>
-                                <th>ID Pasien</th>
-                                <th>Nama</th>
-                                <th>Tanggal Lahir</th>
-                                <th>Alamat</th>
-                                <th>Telepon</th>
-                                <th>Jenis Kelamin</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
+        </header>
+
+        <div class="dashboard-cards">
+            <div class="card">
+                <h3>Total Pasien</h3>
+                <p id="totalPatients">0</p>
+            </div>
+            <div class="card">
+                <h3>Pasien Laki-laki</h3>
+                <p id="malePatients">0</p>
+            </div>
+            <div class="card">
+                <h3>Pasien Perempuan</h3>
+                <p id="femalePatients">0</p>
             </div>
         </div>
 
-        <div class="card" id="card-transaksi">
-            <div class="card-header">
-                <h2><i class="fas fa-exchange-alt"></i> Laporan Transaksi Pasien</h2>
+        <div class="filter-controls">
+            <div class="filter-group">
+                <label for="searchFilter">Cari:</label>
+                <input type="text" id="searchFilter" placeholder="Nama, Alamat, ID Pasien...">
             </div>
-            <div class="card-body">
-                <div class="card-summary">
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Total Transaksi:</span>
-                        <span class="card-summary-value" id="total-transactions">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Total Pendapatan:</span>
-                        <span class="card-summary-value" id="total-revenue">Rp 0</span>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="report-table" id="transaksi-table">
-                        <thead>
-                            <tr>
-                                <th>ID Transaksi</th>
-                                <th>ID Pasien</th>
-                                <th>Nama Pasien</th>
-                                <th>ID Dokter</th>
-                                <th>Nama Dokter</th>
-                                <th>Tanggal Transaksi</th>
-                                <th>Layanan</th>
-                                <th>Total Biaya</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
+            <div class="filter-group">
+                <label for="genderFilter">Jenis Kelamin:</label>
+                <select id="genderFilter">
+                    <option value="">Semua</option>
+                    <option value="Laki-laki">Laki-laki</option>
+                    <option value="Perempuan">Perempuan</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="startDateFilter">Tanggal Lahir Dari:</label>
+                <input type="date" id="startDateFilter">
+            </div>
+            <div class="filter-group">
+                <label for="endDateFilter">Tanggal Lahir Sampai:</label>
+                <input type="date" id="endDateFilter">
+            </div>
+            <div class="filter-buttons">
+                <button class="btn btn-primary" id="applyFiltersBtn"><i class="fas fa-filter"></i> Terapkan Filter</button>
+                <button class="btn btn-danger" id="resetFiltersBtn"><i class="fas fa-redo"></i> Reset Filter</button>
             </div>
         </div>
 
-        <div class="card" id="card-dokter">
-            <div class="card-header">
-                <h2><i class="fas fa-user-md"></i> Laporan Jadwal Dokter</h2>
-            </div>
-            <div class="card-body">
-                <div class="card-summary">
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Total Dokter:</span>
-                        <span class="card-summary-value" id="total-doctors">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Jumlah Jadwal:</span>
-                        <span class="card-summary-value" id="total-schedules">0</span>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="report-table" id="dokter-table">
-                        <thead>
-                            <tr>
-                                <th>ID Dokter</th>
-                                <th>Nama Dokter</th>
-                                <th>Spesialisasi</th>
-                                <th>Hari Praktek</th>
-                                <th>Waktu Mulai</th>
-                                <th>Waktu Selesai</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>ID Pasien</th>
+                        <th>Nama Pasien</th>
+                        <th>Jenis Kelamin</th>
+                        <th>Tanggal Lahir</th>
+                        <th>Alamat</th>
+                        <th>No. Telepon</th>
+                        <th>Riwayat Penyakit</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                    </tbody>
+            </table>
         </div>
-
-        <div class="card" id="card-obat">
-            <div class="card-header">
-                <h2><i class="fas fa-pills"></i> Laporan Data Obat</h2>
-            </div>
-            <div class="card-body">
-                <div class="card-summary">
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Total Jenis Obat:</span>
-                        <span class="card-summary-value" id="total-obats">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Total Stok Obat:</span>
-                        <span class="card-summary-value" id="total-stock-obats">0</span>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="report-table" id="obat-table">
-                        <thead>
-                            <tr>
-                                <th>ID Obat</th>
-                                <th>Nama Obat</th>
-                                <th>Jenis</th>
-                                <th>Stok</th>
-                                <th>Harga</th>
-                                <th>Expired Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="card" id="card-users">
-            <div class="card-header">
-                <h2><i class="fas fa-users-cog"></i> Laporan Data Akun Pengguna</h2>
-            </div>
-            <div class="card-body">
-                <div class="card-summary">
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Total Akun:</span>
-                        <span class="card-summary-value" id="total-users">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Admin:</span>
-                        <span class="card-summary-value" id="admin-users">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Dokter:</span>
-                        <span class="card-summary-value" id="doctor-users">0</span>
-                    </div>
-                    <div class="card-summary-item">
-                        <span class="card-summary-label">Resepsionis:</span>
-                        <span class="card-summary-value" id="receptionist-users">0</span>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="report-table" id="users-table">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Nama Lengkap</th>
-                                <th>Role</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('main-content');
-            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const toggleSidebarBtn = document.getElementById('sidebar-toggle');
             const mobileToggle = document.getElementById('mobile-toggle');
+            const mainContent = document.getElementById('mainContent');
 
-            // Function to load data from localStorage
-            function loadData(key) {
-                const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : [];
-            }
+            const reportTableBody = document.getElementById('reportTableBody');
+            const totalPatientsSpan = document.getElementById('totalPatients');
+            const malePatientsSpan = document.getElementById('malePatients');
+            const femalePatientsSpan = document.getElementById('femalePatients');
 
-            // Load data from localStorage (no more dummy data initialization here)
-            let patients = loadData('patients');
-            let transactions = loadData('transactions');
-            let obats = loadData('obats');
-            let doctors = loadData('doctors'); // Doctors are now expected from localStorage
-            let users = loadData('users');     // Users are now expected from localStorage
+            const searchFilterInput = document.getElementById('searchFilter');
+            const genderFilterSelect = document.getElementById('genderFilter');
+            const startDateFilterInput = document.getElementById('startDateFilter');
+            const endDateFilterInput = document.getElementById('endDateFilter');
+            const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
 
-            // Function to format currency
-            function formatCurrency(amount) {
-                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
-            }
+            const exportPdfBtn = document.getElementById('exportPdfBtn');
+            const exportExcelBtn = document.getElementById('exportExcelBtn');
 
-            // Populate Report Tables
-            function populateReportTables() {
-                // Pasien Report
-                const pasienTableBody = document.querySelector('#pasien-table tbody');
-                pasienTableBody.innerHTML = ''; // Clear existing data
-                let malePatients = 0;
-                let femalePatients = 0;
+            let allPatientsData = []; // Variabel untuk menyimpan semua data pasien yang dimuat
 
-                patients.forEach(patient => {
-                    const row = pasienTableBody.insertRow();
-                    row.insertCell().textContent = patient.id;
-                    row.insertCell().textContent = patient.nama;
-                    row.insertCell().textContent = patient.tanggalLahir;
-                    row.insertCell().textContent = patient.alamat;
-                    row.insertCell().textContent = patient.telepon;
-                    row.insertCell().textContent = patient.jenisKelamin;
-
-                    if (patient.jenisKelamin === 'Laki-laki') {
-                        malePatients++;
-                    } else if (patient.jenisKelamin === 'Perempuan') {
-                        femalePatients++;
+            // Fungsi untuk memuat dan memproses data dari data_pasien.xlsx
+            async function loadAndProcessExcelData() {
+                try {
+                    const response = await fetch('data_pasien.xlsx');
+                    if (!response.ok) {
+                        // Jika file tidak ditemukan (status 404), kembalikan array kosong
+                        if (response.status === 404) {
+                            console.warn("File 'data_pasien.xlsx' tidak ditemukan. Menginisialisasi dengan data kosong.");
+                            return [];
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                });
-                document.getElementById('total-patients').textContent = patients.length;
-                document.getElementById('male-patients').textContent = malePatients;
-                document.getElementById('female-patients').textContent = femalePatients;
-
-
-                // Transaksi Report
-                const transaksiTableBody = document.querySelector('#transaksi-table tbody');
-                transaksiTableBody.innerHTML = ''; // Clear existing data
-                let totalRevenue = 0;
-
-                transactions.forEach(transaction => {
-                    const row = transaksiTableBody.insertRow();
-                    row.insertCell().textContent = transaction.id;
-                    row.insertCell().textContent = transaction.patientId;
-                    row.insertCell().textContent = transaction.patientName;
-                    row.insertCell().textContent = transaction.doctorId;
-                    row.insertCell().textContent = transaction.doctorName;
-                    row.insertCell().textContent = transaction.date;
-                    row.insertCell().textContent = transaction.service;
-                    row.insertCell().textContent = formatCurrency(transaction.totalCost);
-                    totalRevenue += parseFloat(transaction.totalCost);
-                });
-                document.getElementById('total-transactions').textContent = transactions.length;
-                document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
-
-                // Dokter Report
-                const dokterTableBody = document.querySelector('#dokter-table tbody');
-                dokterTableBody.innerHTML = ''; // Clear existing data
-                let totalSchedules = 0;
-
-                // Flatten the doctors data to include schedules for each doctor
-                doctors.forEach(doctor => {
-                    doctor.jadwal.forEach(schedule => {
-                        const row = dokterTableBody.insertRow();
-                        row.insertCell().textContent = doctor.id;
-                        row.insertCell().textContent = doctor.nama;
-                        row.insertCell().textContent = doctor.spesialisasi;
-                        row.insertCell().textContent = schedule.hari;
-                        row.insertCell().textContent = schedule.jamMulai;
-                        row.insertCell().textContent = schedule.jamSelesai;
-                        totalSchedules++;
-                    });
-                });
-                document.getElementById('total-doctors').textContent = doctors.length;
-                document.getElementById('total-schedules').textContent = totalSchedules;
-
-                // Obat Report
-                const obatTableBody = document.querySelector('#obat-table tbody');
-                obatTableBody.innerHTML = ''; // Clear existing data
-                let totalStockObats = 0;
-
-                obats.forEach(obat => {
-                    const row = obatTableBody.insertRow();
-                    row.insertCell().textContent = obat.id;
-                    row.insertCell().textContent = obat.nama;
-                    row.insertCell().textContent = obat.jenis;
-                    row.insertCell().textContent = obat.stok;
-                    row.insertCell().textContent = formatCurrency(obat.harga);
-                    row.insertCell().textContent = obat.expiredDate;
-                    totalStockObats += parseInt(obat.stok);
-                });
-                document.getElementById('total-obats').textContent = obats.length;
-                document.getElementById('total-stock-obats').textContent = totalStockObats;
-
-                // Users Report
-                const usersTableBody = document.querySelector('#users-table tbody');
-                usersTableBody.innerHTML = ''; // Clear existing data
-                let adminUsers = 0;
-                let doctorUsers = 0;
-                let receptionistUsers = 0;
-
-                users.forEach(user => {
-                    const row = usersTableBody.insertRow();
-                    row.insertCell().textContent = user.username;
-                    row.insertCell().textContent = user.fullName;
-                    row.insertCell().textContent = user.role;
-
-                    if (user.role === 'admin') {
-                        adminUsers++;
-                    } else if (user.role === 'dokter') {
-                        doctorUsers++;
-                    } else if (user.role === 'resepsionis') {
-                        receptionistUsers++;
-                    }
-                });
-                document.getElementById('total-users').textContent = users.length;
-                document.getElementById('admin-users').textContent = adminUsers;
-                document.getElementById('doctor-users').textContent = doctorUsers;
-                document.getElementById('receptionist-users').textContent = receptionistUsers;
-            }
-
-            // Sidebar toggle functionality (Desktop)
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('minimized');
-                if (sidebar.classList.contains('minimized')) {
-                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    const arrayBuffer = await response.arrayBuffer();
+                    const data = new Uint8Array(arrayBuffer);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    // Menggunakan { header: 1 } untuk mendapatkan array of arrays, lalu manual mapping
+                    // atau langsung { header: 0 } untuk mendapatkan array of objects dengan header sebagai key
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet); // Ini akan menggunakan baris pertama sebagai header/key
+                    return jsonData;
+                } catch (error) {
+                    console.error("Error loading or processing Excel data:", error);
+                    alert("Terjadi kesalahan saat memuat data dari Excel. Pastikan data_pasien.xlsx ada dan tidak rusak.");
+                    return [];
                 }
-            });
+            }
 
-            // Mobile toggle functionality
-            mobileToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('active');
-            });
+            // Fungsi untuk menampilkan data pasien di tabel laporan dan mengupdate ringkasan
+            async function populateReportTables(filteredData = null) {
+                // Jika filteredData tidak disediakan, muat semua data
+                if (filteredData === null) {
+                    allPatientsData = await loadAndProcessExcelData();
+                    filteredData = allPatientsData;
+                }
 
-            // Export to PDF for a specific table (e.g., pasien-table)
-            function exportTableToPdf(tableId, title) {
+                reportTableBody.innerHTML = ''; // Kosongkan tabel
+                let totalMale = 0;
+                let totalFemale = 0;
+
+                if (filteredData.length === 0) {
+                    reportTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Tidak ada data pasien yang tersedia atau sesuai filter.</td></tr>';
+                } else {
+                    filteredData.forEach((patient, index) => {
+                        const row = reportTableBody.insertRow();
+                        row.insertCell().textContent = index + 1; // No.
+                        row.insertCell().textContent = patient['ID Pasien'] || '';
+                        row.insertCell().textContent = patient['Nama Pasien'] || '';
+                        row.insertCell().textContent = patient['Jenis Kelamin'] || '';
+                        row.insertCell().textContent = patient['Tanggal Lahir'] || '';
+                        row.insertCell().textContent = patient['Alamat'] || '';
+                        row.insertCell().textContent = patient['No Telepon'] || '';
+                        row.insertCell().textContent = patient['Riwayat Penyakit'] || '';
+
+                        // Hitung jenis kelamin untuk ringkasan
+                        if (patient['Jenis Kelamin'] === 'Laki-laki') {
+                            totalMale++;
+                        } else if (patient['Jenis Kelamin'] === 'Perempuan') {
+                            totalFemale++;
+                        }
+                    });
+                }
+
+                // Update ringkasan
+                totalPatientsSpan.textContent = filteredData.length;
+                malePatientsSpan.textContent = totalMale;
+                femalePatientsSpan.textContent = totalFemale;
+            }
+
+            // Fungsi untuk menerapkan filter
+            function applyFilters() {
+                const searchTerm = searchFilterInput.value.toLowerCase();
+                const genderFilter = genderFilterSelect.value;
+                const startDateStr = startDateFilterInput.value;
+                const endDateStr = endDateFilterInput.value;
+
+                const filtered = allPatientsData.filter(patient => {
+                    const patientName = patient['Nama Pasien'] ? patient['Nama Pasien'].toLowerCase() : '';
+                    const patientAddress = patient['Alamat'] ? patient['Alamat'].toLowerCase() : '';
+                    const patientId = patient['ID Pasien'] ? String(patient['ID Pasien']).toLowerCase() : '';
+                    const patientGender = patient['Jenis Kelamin'];
+                    const patientBirthDateStr = patient['Tanggal Lahir']; // Format YYYY-MM-DD
+
+                    // Filter berdasarkan pencarian (nama, alamat, ID)
+                    const matchesSearch = patientName.includes(searchTerm) ||
+                                          patientAddress.includes(searchTerm) ||
+                                          patientId.includes(searchTerm);
+
+                    // Filter berdasarkan jenis kelamin
+                    const matchesGender = genderFilter === '' || patientGender === genderFilter;
+
+                    // Filter berdasarkan tanggal lahir
+                    let matchesDate = true;
+                    if (startDateStr && patientBirthDateStr) {
+                        matchesDate = matchesDate && patientBirthDateStr >= startDateStr;
+                    }
+                    if (endDateStr && patientBirthDateStr) {
+                        matchesDate = matchesDate && patientBirthDateStr <= endDateStr;
+                    }
+
+                    return matchesSearch && matchesGender && matchesDate;
+                });
+
+                populateReportTables(filtered);
+            }
+
+            // Fungsi untuk mereset filter
+            function resetFilters() {
+                searchFilterInput.value = '';
+                genderFilterSelect.value = '';
+                startDateFilterInput.value = '';
+                endDateFilterInput.value = '';
+                populateReportTables(); // Muat ulang semua data
+            }
+
+            // Fungsi untuk Export PDF
+            async function exportPdf() {
                 const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'a4');
-                const table = document.getElementById(tableId);
+                const doc = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
 
-                // Get table headers
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText);
+                // Get table data
+                const table = document.getElementById('reportTableBody');
+                const rows = Array.from(table.rows);
 
-                // Get table rows
-                const data = Array.from(table.querySelectorAll('tbody tr')).map(row =>
-                    Array.from(row.querySelectorAll('td')).map(td => td.innerText)
-                );
+                // Prepare table headers
+                const headers = Array.from(document.querySelectorAll('#reportTableBody ~ table thead th'))
+                                .map(th => th.textContent.trim());
 
-                doc.text(title, 40, 40); // Title of the report
+                // Prepare table data for jsPDF-AutoTable
+                const data = rows.map(row => {
+                    const cells = Array.from(row.cells);
+                    return cells.map(cell => cell.textContent.trim());
+                });
+
+                // Add title
+                doc.setFontSize(18);
+                doc.text("Laporan Data Pasien", 105, 20, null, null, "center");
+
+                // Add summary information
+                doc.setFontSize(12);
+                doc.text(`Total Pasien: ${totalPatientsSpan.textContent}`, 10, 30);
+                doc.text(`Laki-laki: ${malePatientsSpan.textContent}`, 10, 37);
+                doc.text(`Perempuan: ${femalePatientsSpan.textContent}`, 10, 44);
+
+                // Add filter information if applied
+                let filterInfo = "Filter: ";
+                if (searchFilterInput.value) filterInfo += `Cari: "${searchFilterInput.value}" `;
+                if (genderFilterSelect.value) filterInfo += `Jenis Kelamin: "${genderFilterSelect.value}" `;
+                if (startDateFilterInput.value) filterInfo += `Dari Tgl Lahir: ${startDateFilterInput.value} `;
+                if (endDateFilterInput.value) filterInfo += `Sampai Tgl Lahir: ${endDateFilterInput.value} `;
+                if (filterInfo === "Filter: ") filterInfo += "Tidak Ada";
+                doc.text(filterInfo, 10, 51);
+
+
+                // Add table
                 doc.autoTable({
+                    startY: 60, // Start table below title and summary
                     head: [headers],
                     body: data,
-                    startY: 60,
-                    theme: 'grid',
-                    styles: {
-                        fontSize: 8,
-                        cellPadding: 6,
-                        halign: 'left',
-                        valign: 'middle'
-                    },
+                    theme: 'striped', // 'striped', 'grid', 'plain'
                     headStyles: {
-                        fillColor: [29, 233, 182], // --primary-color in RGB
+                        fillColor: [29, 233, 182], // Primary color (RGB)
                         textColor: [255, 255, 255],
                         fontStyle: 'bold'
                     },
                     alternateRowStyles: {
-                        fillColor: [249, 249, 249] // #f9f9f9
+                        fillColor: [244, 244, 244] // Light color for even rows
                     },
-                    tableLineColor: [221, 221, 221], // --border-color
-                    tableLineWidth: 0.75,
-                    margin: { top: 50, left: 20, right: 20, bottom: 20 },
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 3
+                    },
+                    columnStyles: {
+                        // Example: Adjust width for 'Alamat' column
+                        5: { cellWidth: 40 }, // Assuming Alamat is the 6th column (index 5)
+                        7: { cellWidth: 40 } // Assuming Riwayat Penyakit is the 8th column (index 7)
+                    }
                 });
-                doc.save(`${title.toLowerCase().replace(/ /g, '_')}.pdf`);
+
+                doc.save('Laporan_Data_Pasien.pdf');
             }
 
-            // Export to Excel for a specific table (e.g., pasien-table)
-            function exportTableToExcel(tableId, sheetName = 'Sheet1') {
-                const table = document.getElementById(tableId);
-                const ws = XLSX.utils.table_to_sheet(table);
+            // Fungsi untuk Export Excel
+            async function exportExcel() {
+                const ws = XLSX.utils.json_to_sheet(allPatientsData.filter(patient => {
+                    // Re-apply the current filters to get only the data shown in the table
+                    const searchTerm = searchFilterInput.value.toLowerCase();
+                    const genderFilter = genderFilterSelect.value;
+                    const startDateStr = startDateFilterInput.value;
+                    const endDateStr = endDateFilterInput.value;
 
-                // Remove the last column (Aksi) if it exists before exporting
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                if (range.e.c > 0) { // Check if there's at least one column
-                    const lastHeaderCell = XLSX.utils.encode_cell({r: range.s.r, c: range.e.c});
-                    if (ws[lastHeaderCell] && ws[lastHeaderCell].v === 'Aksi') { // Assuming 'Aksi' is the last column header
-                        for (let R = range.s.r; R <= range.e.r; ++R) {
-                            delete ws[XLSX.utils.encode_cell({r: R, c: range.e.c})];
-                        }
-                        // Update the sheet's range to exclude the last column
-                        ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c, range.e.r, range.e.c - 1);
+                    const patientName = patient['Nama Pasien'] ? patient['Nama Pasien'].toLowerCase() : '';
+                    const patientAddress = patient['Alamat'] ? patient['Alamat'].toLowerCase() : '';
+                    const patientId = patient['ID Pasien'] ? String(patient['ID Pasien']).toLowerCase() : '';
+                    const patientGender = patient['Jenis Kelamin'];
+                    const patientBirthDateStr = patient['Tanggal Lahir'];
+
+                    const matchesSearch = patientName.includes(searchTerm) ||
+                                          patientAddress.includes(searchTerm) ||
+                                          patientId.includes(searchTerm);
+                    const matchesGender = genderFilter === '' || patientGender === genderFilter;
+                    let matchesDate = true;
+                    if (startDateStr && patientBirthDateStr) {
+                        matchesDate = matchesDate && patientBirthDateStr >= startDateStr;
                     }
-                }
+                    if (endDateStr && patientBirthDateStr) {
+                        matchesDate = matchesDate && patientBirthDateStr <= endDateStr;
+                    }
+                    return matchesSearch && matchesGender && matchesDate;
+                }).map(p => {
+                    // Define exact columns and their order for the Excel export
+                    return {
+                        'ID Pasien': p['ID Pasien'],
+                        'Nama Pasien': p['Nama Pasien'],
+                        'Jenis Kelamin': p['Jenis Kelamin'],
+                        'Tanggal Lahir': p['Tanggal Lahir'],
+                        'Alamat': p['Alamat'],
+                        'No. Telepon': p['No Telepon'],
+                        'Riwayat Penyakit': p['Riwayat Penyakit']
+                    };
+                }));
 
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, sheetName);
-                XLSX.writeFile(wb, `${sheetName.toLowerCase().replace(/ /g, '_')}.xlsx`);
+                XLSX.utils.book_append_sheet(wb, ws, "Laporan Pasien");
+                XLSX.writeFile(wb, 'Laporan_Data_Pasien.xlsx');
+                alert("Data berhasil diekspor ke Excel!");
             }
 
-            // Event listeners for individual card export buttons (if needed, otherwise remove)
-            // You had these in previous iterations, keeping them commented if you want to re-add
-            // document.getElementById('export-pasien-pdf').addEventListener('click', () => exportTableToPdf('pasien-table', 'Laporan Data Pasien'));
-            // document.getElementById('export-pasien-excel').addEventListener('click', () => exportTableToExcel('pasien-table', 'Data Pasien'));
-            // ... similar for other tables
 
-            // Global Export All PDF Button
-            document.getElementById('export-all-pdf-btn').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'a4');
-                let startY = 40; // Initial Y position
-
-                const addTableToPdf = (tableId, title, currentDoc, startYPos) => {
-                    const table = document.getElementById(tableId);
-                    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText);
-                    const data = Array.from(table.querySelectorAll('tbody tr')).map(row =>
-                        Array.from(row.querySelectorAll('td')).map(td => td.innerText)
-                    );
-
-                    // Check if there's enough space for the new table title and some rows, if not, add a new page
-                    if (startYPos > doc.internal.pageSize.height - 100) { // Arbitrary threshold
-                        currentDoc.addPage();
-                        startYPos = 40; // Reset startY for the new page
-                    }
-
-                    currentDoc.text(title, 40, startYPos);
-                    startYPos += 20; // Space for title
-
-                    currentDoc.autoTable({
-                        head: [headers],
-                        body: data,
-                        startY: startYPos,
-                        theme: 'grid',
-                        styles: {
-                            fontSize: 8,
-                            cellPadding: 6,
-                            halign: 'left',
-                            valign: 'middle'
-                        },
-                        headStyles: {
-                            fillColor: [29, 233, 182], // --primary-color in RGB
-                            textColor: [255, 255, 255],
-                            fontStyle: 'bold'
-                        },
-                        alternateRowStyles: {
-                            fillColor: [249, 249, 249] // #f9f9f9
-                        },
-                        tableLineColor: [221, 221, 221], // --border-color
-                        tableLineWidth: 0.75,
-                        margin: { left: 20, right: 20 },
-                        didDrawPage: function(data) {
-                            startYPos = data.cursor.y + 20; // Update startY for the next table/element
-                        }
-                    });
-                    return currentDoc.autoTable.previous.finalY + 20; // Return final Y position after the table
-                };
-
-                startY = addTableToPdf('pasien-table', 'Laporan Data Pasien', doc, startY);
-                startY = addTableToPdf('transaksi-table', 'Laporan Transaksi Pasien', doc, startY);
-                startY = addTableToPdf('dokter-table', 'Laporan Jadwal Dokter', doc, startY);
-                startY = addTableToPdf('obat-table', 'Laporan Data Obat', doc, startY);
-                startY = addTableToPdf('users-table', 'Laporan Data Akun Pengguna', doc, startY);
-
-                doc.save('semua_laporan.pdf');
-            });
-
-            // Global Export All Excel Button
-            document.getElementById('export-all-excel-btn').addEventListener('click', function() {
-                const wb = XLSX.utils.book_new();
-
-                const addSheet = (tableId, sheetName) => {
-                    const table = document.getElementById(tableId);
-                    const ws = XLSX.utils.table_to_sheet(table);
-
-                    // Remove the last column (Aksi) if it exists before exporting
-                    const range = XLSX.utils.decode_range(ws['!ref']);
-                    if (range.e.c > 0) { // Check if there's at least one column
-                        const lastHeaderCell = XLSX.utils.encode_cell({r: range.s.r, c: range.e.c});
-                        if (ws[lastHeaderCell] && ws[lastHeaderCell].v === 'Aksi') { // Assuming 'Aksi' is the last column header
-                            for (let R = range.s.r; R <= range.e.r; ++R) {
-                                delete ws[XLSX.utils.encode_cell({r: R, c: range.e.c})];
-                            }
-                            // Update the sheet's range to exclude the last column
-                            ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c, range.e.r, range.e.c - 1);
+            // Event Listeners
+            if (toggleSidebarBtn && sidebar && mainContent) {
+                toggleSidebarBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+                    mainContent.classList.toggle('sidebar-minimized');
+                    if (window.innerWidth > 768) {
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        } else {
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
                         }
                     }
-                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-                };
+                    const icon = toggleSidebarBtn.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('fa-chevron-left');
+                        icon.classList.toggle('fa-chevron-right');
+                    }
+                });
+            }
 
-                addSheet('pasien-table', 'Data Pasien');
-                addSheet('transaksi-table', 'Transaksi Pasien');
-                addSheet('dokter-table', 'Jadwal Dokter');
-                addSheet('obat-table', 'Data Obat');
-                addSheet('users-table', 'Akun Pengguna');
+            if (mobileToggle && sidebar) {
+                mobileToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
 
-                XLSX.writeFile(wb, 'semua_laporan.xlsx');
-            });
+            applyFiltersBtn.addEventListener('click', applyFilters);
+            resetFiltersBtn.addEventListener('click', resetFilters);
+            exportPdfBtn.addEventListener('click', exportPdf);
+            exportExcelBtn.addEventListener('click', exportExcel);
 
             // Inisialisasi aplikasi
-            function init() {
-                populateReportTables();
+            async function init() {
+                await populateReportTables(); // Muat data awal saat halaman dimuat
 
                 // Check screen width on load and apply initial sidebar state
                 if (window.innerWidth <= 768) {
