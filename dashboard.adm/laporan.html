@@ -20,16 +20,19 @@
             --light-color: #f4f4f4; /* Background umum */
             --danger-color: #f44336; /* Warna merah untuk danger */
             --success-color: #4CAF50;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
             --text-color: #333;
             --white: #fff;
             --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             --sidebar-width: 250px;
             --sidebar-minimized-width: 60px;
+            --border-color: #ddd;
 
-            /* Warna baru untuk tombol laporan sesuai gambar (disalin dari data_pasien.html dan t-pasien.html) */
+            /* Warna baru untuk tombol laporan sesuai gambar */
             --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
+            --report-print-bg: #3498DB; /* Biru untuk Cetak */
             --report-excel-bg: #27AE60; /* Hijau untuk Excel */
-            --report-print-bg: #3498DB; /* Biru untuk Print (tetap didefinisikan meskipun tombol dihapus) */
         }
 
         * {
@@ -42,34 +45,33 @@
         body {
             display: flex;
             min-height: 100vh;
-            background-color: var(--light-color); /* Mencegah scroll horizontal pada body */
+            background-color: var(--light-color);
             overflow-x: hidden;
         }
 
         /* Mobile Toggle outside sidebar */
         .mobile-toggle {
-            display: none; /* Hidden by default, shown on mobile */
+            display: none;
             position: fixed;
             top: 15px;
             left: 15px;
             font-size: 2rem;
             color: var(--secondary-color);
             cursor: pointer;
-            z-index: 1100; /* Higher than sidebar for mobile visibility */
+            z-index: 1100;
             padding: 5px 10px;
             background-color: var(--primary-dark);
             border-radius: 5px;
             box-shadow: var(--shadow);
-            line-height: 1; /* Align text vertically */
-            transition: opacity 0.3s ease, visibility 0.3s ease; /* For hiding effect */
+            line-height: 1;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        .sidebar.active ~ .mobile-toggle { /* Hide mobile toggle when sidebar is active */
+        .sidebar.active ~ .mobile-toggle {
             opacity: 0;
             visibility: hidden;
-            pointer-events: none; /* Prevent interaction when hidden */
+            pointer-events: none;
         }
-
 
         /* Sidebar/Navigasi Utama */
         .sidebar {
@@ -78,18 +80,18 @@
             color: var(--secondary-color);
             transition: all 0.3s ease;
             flex-shrink: 0;
-            position: fixed; /* Sidebar tetap di posisi */
-            height: 100%; /* Tinggi penuh */
-            overflow-y: auto; /* Memungkinkan scroll jika konten banyak */
-            overflow-x: hidden; /* **Penting: Mencegah scroll horizontal di dalam sidebar** */
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 1000; /* Pastikan sidebar di atas konten lain */
+            z-index: 1000;
             display: flex;
             flex-direction: column;
         }
 
         .sidebar.minimized {
-            width: var(--sidebar-minimized-width); /* Lebar saat diminimalisir */
+            width: var(--sidebar-minimized-width);
         }
 
         .sidebar-header {
@@ -100,27 +102,27 @@
             color: var(--white);
             font-size: 1.5rem;
             white-space: nowrap;
-            overflow: hidden; /* **Penting: Memastikan konten header tidak melebihi batas** */
+            overflow: hidden;
             position: relative;
-            justify-content: flex-start; /* Ensure items start from left */
+            justify-content: flex-start;
             gap: 10px;
         }
 
         .sidebar.minimized .sidebar-header {
-            justify-content: center; /* Center menu icon when minimized */
-            padding: 20px 0; /* Adjust padding for minimized state */
+            justify-content: center;
+            padding: 20px 0;
         }
 
         .menu-icon {
             font-size: 2rem;
             cursor: pointer;
-            line-height: 1; /* Ensure proper alignment */
-            padding: 0 5px; /* Add some padding around the icon */
+            line-height: 1;
+            padding: 0 5px;
             color: var(--secondary-color);
         }
 
         .sidebar.minimized .menu-icon {
-            font-size: 1.5rem; /* Smaller icon when minimized */
+            font-size: 1.5rem;
         }
 
         .menu-text {
@@ -133,7 +135,7 @@
         .sidebar.minimized .menu-text {
             opacity: 0;
             width: 0;
-            overflow: hidden; /* **Penting: Menyembunyikan teks menu yang tumpah saat minimized** */
+            overflow: hidden;
             visibility: hidden;
         }
 
@@ -141,7 +143,7 @@
             list-style: none;
             padding: 0;
             margin-top: 20px;
-            flex-grow: 1; /* Allow nav list to grow */
+            flex-grow: 1;
         }
 
         .nav-item {
@@ -155,28 +157,21 @@
             color: var(--secondary-color);
             text-decoration: none;
             transition: background-color 0.2s ease, color 0.2s ease;
-            white-space: nowrap; /* Keep text on single line */
-            overflow: hidden; /* **Penting: Menyembunyikan konten link yang tumpah** */
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .nav-icon {
             margin-right: 10px;
-            width: 24px; /* Fixed width for SVG icon */
-            height: 24px; /* Fixed height for SVG icon */
+            width: 24px;
+            height: 24px;
             flex-shrink: 0;
         }
 
         .nav-icon svg {
             width: 100%;
             height: 100%;
-            stroke: currentColor; /* Inherit color from parent */
-        }
-
-        .sidebar.minimized .nav-icon {
-            margin-right: 0; /* No margin when minimized */
-            justify-content: center;
-            display: flex;
-            width: 100%; /* Take full width of minimized item */
+            stroke: currentColor;
         }
 
         .nav-text {
@@ -187,7 +182,7 @@
         .sidebar.minimized .nav-text {
             opacity: 0;
             width: 0;
-            overflow: hidden; /* **Penting: Menyembunyikan teks nav yang tumpah saat minimized** */
+            overflow: hidden;
             visibility: hidden;
         }
 
@@ -196,36 +191,36 @@
             color: var(--white);
         }
 
-        /* Logout Section - Modified */
+        /* Logout Section */
         .logout-section {
-            padding: 0; /* Remove padding here, move it to the link */
+            padding: 0;
             text-align: center;
             width: 100%;
-            flex-shrink: 0; /* Don't allow it to shrink */
-            margin-top: auto; /* Push to the bottom */
+            flex-shrink: 0;
+            margin-top: auto;
         }
 
         .logout-link {
-            background-color: var(--secondary-color); /* Black background */
+            background-color: var(--secondary-color);
             color: var(--white);
             text-align: center;
-            border-radius: 0; /* No border radius */
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px 0; /* Full height padding */
+            padding: 15px 0;
             text-decoration: none;
             transition: background-color 0.2s ease;
             gap: 8px;
             width: 100%;
-            border-top: 1px solid var(--secondary-color); /* Black border on top */
-            border-bottom: 1px solid var(--secondary-color); /* Black border on bottom */
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
-            overflow: hidden; /* **Penting: Menyembunyikan konten logout link yang tumpah** */
+            border-top: 1px solid var(--secondary-color);
+            border-bottom: 1px solid var(--secondary-color);
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .logout-link:hover {
-            background-color: #222; /* Slightly lighter black on hover */
+            background-color: #222;
         }
 
         .logout-icon {
@@ -237,7 +232,7 @@
         .logout-icon svg {
             width: 100%;
             height: 100%;
-            stroke: currentColor; /* Inherit color, will be white from parent */
+            stroke: currentColor;
         }
 
         .logout-text {
@@ -247,28 +242,28 @@
         }
 
         .sidebar.minimized .logout-link {
-            padding: 15px 0; /* Keep padding for minimal icon */
-            width: 100%; /* Still full width of minimized sidebar */
-            height: auto; /* Auto height to fit content */
-            border-radius: 0; /* No border radius */
+            padding: 15px 0;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
             justify-content: center;
         }
 
         .sidebar.minimized .logout-text {
             opacity: 0;
             width: 0;
-            overflow: hidden; /* **Penting: Menyembunyikan teks logout yang tumpah saat minimized** */
+            overflow: hidden;
             visibility: hidden;
         }
         .sidebar.minimized .logout-icon {
             margin-right: 0;
         }
 
-        /* Tombol Toggle untuk Desktop (remains the same) */
+        /* Toggle Button for Desktop */
         .toggle-btn {
             position: absolute;
             top: 20px;
-            right: -20px; /* Posisikan di luar sidebar */
+            right: -20px;
             background-color: var(--primary-dark);
             color: var(--white);
             border: none;
@@ -280,7 +275,7 @@
             align-items: center;
             cursor: pointer;
             box-shadow: var(--shadow);
-            z-index: 1001; /* Di atas sidebar */
+            z-index: 1001;
             transition: transform 0.3s ease;
         }
 
@@ -289,20 +284,23 @@
         }
 
         .sidebar.minimized .toggle-btn {
-            transform: translateX(-190px) rotate(180deg); /* Sesuaikan posisi dan putar ikon */
+            transform: translateX(-190px) rotate(180deg);
         }
 
-        /* Area Konten Utama */
+        /* Main Content Area */
         .main-content {
             flex-grow: 1;
             padding: 20px;
             transition: margin-left 0.3s ease;
-            margin-left: var(--sidebar-width); /* Initial margin for sidebar */
-            width: calc(100% - var(--sidebar-width)); /* Adjust width to fill remaining space */
-            overflow-y: auto; /* Memungkinkan scroll untuk konten utama */
-            overflow-x: hidden; /* **Penting: Mencegah scroll horizontal pada main content** */
-            position: relative; /* Add this to create a stacking context */
-            z-index: 1; /* Ensure main content is below sidebar when sidebar is active */
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .sidebar.minimized + .main-content {
@@ -310,25 +308,122 @@
             width: calc(100% - var(--sidebar-minimized-width));
         }
 
-        /* Content Sections (remains the same) */
+        /* Global styles for content */
+        .header {
+            background-color: var(--white);
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Specific styles for new report sections */
         .content-section {
             background-color: var(--white);
-            padding: 30px;
-            border-radius: 8px;
+            border-radius: 5px;
             box-shadow: var(--shadow);
             margin-bottom: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
         }
 
         .content-section h3 {
-            color: var(--primary-dark);
-            margin-bottom: 20px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
             border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
         }
 
-        /* Styling for the new icon buttons */
-        .icon-button {
-            color: var(--white); /* White text/icon for all report buttons */
+        .report-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .report-item {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            flex: 1;
+            min-width: 180px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .report-item span:first-child {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .report-item span:last-child {
+            font-size: 1.5em;
+            color: var(--primary-dark);
+            font-weight: bold;
+        }
+
+        .report-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+            min-width: 800px; /* Lebar tabel tetap */
+            background-color: var(--white);
+        }
+
+        .report-table th, .report-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        .report-table th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .report-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .report-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Report Buttons specific styles */
+        .report-buttons-container {
+            margin-bottom: 20px; /* Add margin below buttons */
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .report-button {
+            color: var(--white);
             border: none;
             padding: 10px 15px;
             border-radius: 5px;
@@ -342,201 +437,82 @@
             box-shadow: var(--shadow);
         }
 
-        /* Specific colors for PDF and Print buttons */
-        #export-all-pdf-btn { /* Menggunakan ID yang sesuai dengan elemen di HTML */
-            background-color: var(--report-pdf-bg); /* Red for PDF */
+        #export-pdf-btn {
+            background-color: var(--report-pdf-bg);
         }
 
-        #export-all-pdf-btn:hover {
-            background-color: #C0392B; /* Darker red on hover */
+        #export-pdf-btn:hover {
+            background-color: #C0392B;
             transform: translateY(-2px);
         }
 
-        #export-all-excel-btn { /* Gaya untuk tombol Excel */
+        #export-excel-btn {
             background-color: var(--report-excel-bg);
         }
-        #export-all-excel-btn:hover {
-            background-color: #229954; /* Darker green */
+        #export-excel-btn:hover {
+            background-color: #229954;
             transform: translateY(-2px);
-        }
-
-        /* Tombol print dihapus, jadi tidak perlu gaya spesifik lagi */
-        /* #print-all-btn { 
-            background-color: var(--report-print-bg);
-        }
-        #print-all-btn:hover {
-            background-color: #2980B9;
-            transform: translateY(-2px);
-        } */
-
-
-        .icon-button:active {
-            transform: translateY(0);
-        }
-
-        .icon-button svg {
-            width: 20px; /* Adjust icon size */
-            height: 20px;
-            fill: currentColor; /* For filled icons, takes color from parent (white) */
-        }
-
-        /* Container for report buttons */
-        .report-buttons-container {
-            margin-top: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
-        }
-
-        /* Styles for the new HTML tables for reports */
-        .report-table-container {
-            margin-top: 20px;
-            overflow-x: auto; /* Enable horizontal scroll for tables on small screens */
-        }
-
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            min-width: 600px; /* Minimal lebar tabel untuk mencegah tumpah */
-        }
-
-        .report-table th, .report-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            font-size: 0.9em;
-        }
-
-        .report-table th {
-            background-color: var(--primary-color);
-            color: var(--white);
-            font-weight: bold;
-        }
-
-        .report-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .report-table tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        /* Summary Report Item Styles */
-        .report-summary {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .report-item {
-            background-color: var(--light-color);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-            flex: 1;
-            min-width: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .report-item span:first-child {
-            font-weight: bold;
-            color: var(--primary-dark);
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-
-        .report-item span:last-child {
-            font-size: 1.8em;
-            color: var(--secondary-color);
         }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .mobile-toggle {
-                display: block; /* Show on mobile */
-                z-index: 10000; /* Ensure it's always on top */
+                display: block;
             }
 
             .sidebar {
-                left: -250px; /* Hide sidebar off-screen */
-                position: fixed; /* Ensure it stays off-screen */
-                height: 100%;
-                z-index: 2000; /* Higher than main content */
-                background-color: var(--primary-color); /* Ensure background for visual separation */
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2); /* Add shadow for depth */
+                left: -250px;
+                width: var(--sidebar-width);
             }
 
             .sidebar.active {
-                left: 0; /* Slide in when active */
+                left: 0;
             }
 
             .main-content {
-                margin-left: 0; /* No margin on mobile */
-                width: 100%; /* Full width */
-                position: relative; /* Crucial for z-index to work against sidebar */
-                z-index: 1; /* Main content below active sidebar */
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
             }
 
             .sidebar.minimized + .main-content {
-                margin-left: 0; /* No margin on mobile even if sidebar is technically minimized */
+                margin-left: 0;
             }
 
             .toggle-btn {
-                display: none; /* Hide desktop toggle on mobile */
+                display: none;
             }
 
             body {
-                flex-direction: column; /* Stack elements vertically */
+                flex-direction: column;
+            }
+
+            .header {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .card-body { /* This might not be used if .card is replaced with .content-section */
+                padding: 15px;
             }
 
             .report-buttons-container {
-                flex-direction: column; /* Stack buttons vertically on small screens */
-                align-items: stretch; /* Stretch buttons to full width */
+                flex-direction: column;
+                align-items: stretch;
             }
-            .report-buttons-container .icon-button {
-                width: 100%; /* Full width button */
-                justify-content: center; /* Center content in full width buttons */
+            .report-button {
+                width: 100%;
+                justify-content: center;
             }
-        }
 
-        /* CSS for printing - hide sidebar and buttons */
-        @media print {
-            body {
-                display: block; /* Allow normal flow for printing */
+            .report-summary {
+                flex-direction: column;
+                align-items: stretch;
             }
-            .sidebar, .mobile-toggle, .toggle-btn, .report-buttons-container {
-                display: none !important; /* Hide sidebar and buttons when printing */
-            }
-            .main-content {
-                margin-left: 0 !important; /* No margin when printing */
-                width: 100% !important; /* Full width for content */
-                padding: 0 !important; /* Adjust padding for print */
-                box-shadow: none !important; /* Remove shadow */
-            }
-            .content-section {
-                padding: 15px !important; /* Smaller padding for print */
-                box-shadow: none !important; /* Remove shadow */
-                border: 1px solid #eee; /* Light border for sections */
-                margin-bottom: 10px !important;
-            }
-            .report-table th, .report-table td {
-                padding: 5px !important;
-                font-size: 0.8em !important;
-            }
-            /* Ensure text color is black for printing */
-            h1, h3, p, span, th, td {
-                color: #000 !important;
-            }
-            /* Remove background colors for efficiency in printing */
-            .sidebar, .main-content, .content-section, .report-table th, .report-table tr:nth-child(even) {
-                background-color: transparent !important;
+            .report-item {
+                min-width: unset; /* Remove min-width for full width on mobile */
             }
         }
     </style>
@@ -656,18 +632,13 @@
     </div>
 
     <div class="main-content" id="main-content">
-        <h1>Manajemen Laporan</h1>
-
-        <div class="report-buttons-container">
-            <button class="icon-button" id="export-all-pdf-btn">
-                <i class="fas fa-file-pdf"></i> Unduh Semua Laporan (PDF)
-            </button>
-            <button class="icon-button" id="export-all-excel-btn">
-                <i class="fas fa-file-excel"></i> Unduh Semua Laporan (Excel)
-            </button>
-            <!-- Tombol Cetak Semua Laporan dihapus -->
+        <div class="header">
+            <h1>Laporan</h1>
+            <div class="user-info">
+                Selamat Datang, <span id="welcome-user"></span>!
+            </div>
         </div>
-        
+
         <div id="laporan-pasien" class="content-section">
             <h3>Laporan Data Pasien</h3>
             <div class="report-summary">
@@ -680,20 +651,25 @@
                     <span id="pasien-baru-bulan-ini"></span>
                 </div>
             </div>
+            <div class="report-buttons-container">
+                <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
+                <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+            </div>
             <div class="report-table-container">
                 <table id="pasienTable" class="report-table">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>ID Pasien</th>
-                            <th>Nama Pasien</th>
+                            <th>Nama Lengkap</th>
+                            <th>Tanggal Lahir</th>
+                            <th>Jenis Kelamin</th>
                             <th>Alamat</th>
                             <th>Telepon</th>
-                            <th>Tanggal Lahir</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data pasien akan dimuat di sini -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -706,14 +682,15 @@
                     <span id="total-dokter"></span>
                 </div>
                 <div class="report-item">
-                    <span>Dokter Aktif:</span> <!-- Ubah teks untuk lebih jelas -->
-                    <span id="dokter-aktif"></span> <!-- Ubah ID untuk mencerminkan "aktif" -->
+                    <span>Dokter Aktif:</span>
+                    <span id="dokter-aktif"></span>
                 </div>
             </div>
             <div class="report-table-container">
                 <table id="dokterTable" class="report-table">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>ID Dokter</th>
                             <th>Nama Dokter</th>
                             <th>Poli</th>
@@ -724,8 +701,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data dokter akan dimuat di sini -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -746,6 +722,7 @@
                 <table id="transaksiPasienTable" class="report-table">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>ID Transaksi</th>
                             <th>Tanggal</th>
                             <th>Nama Pasien</th>
@@ -755,8 +732,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data transaksi pasien akan dimuat di sini -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -777,6 +753,7 @@
                 <table id="pemeriksaanTable" class="report-table">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>ID Pemeriksaan</th>
                             <th>Tanggal</th>
                             <th>Nama Pasien</th>
@@ -787,8 +764,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data pemeriksaan akan dimuat di sini -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -801,7 +777,7 @@
                     <span id="total-jenis-obat"></span>
                 </div>
                 <div class="report-item">
-                    <span>Stok Obat Kritis (< 10 unit):</span>
+                    <span>Stok Obat Kritis (&lt; 10 unit):</span>
                     <span id="obat-kritis"></span>
                 </div>
             </div>
@@ -809,6 +785,7 @@
                 <table id="obatTable" class="report-table">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>ID Obat</th>
                             <th>Nama Obat</th>
                             <th>Jenis</th>
@@ -818,8 +795,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data obat akan dimuat di sini -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -848,6 +824,7 @@
                 <table id="usersTable" class="report-table">
                     <thead>
                         <tr>
+                            <th>No.</th>
                             <th>ID User</th>
                             <th>Nama</th>
                             <th>Email</th>
@@ -855,8 +832,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data pengguna akan dimuat di sini -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -865,165 +841,37 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Fungsi untuk memuat data pengguna dari sessionStorage dan menampilkannya
+            // User and Access Control
             function loadUserData() {
-                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
-                    const loggedInUser = JSON.parse(user); // Parse JSON string
-                    // Update welcome message (assuming there is a welcome-user element in the main header)
-                    const welcomeUserElement = document.getElementById('welcome-user'); 
+                    const loggedInUser = JSON.parse(user);
+                    const welcomeUserElement = document.getElementById('welcome-user');
                     if (welcomeUserElement) {
-                        // Tampilkan nama jika ada, jika tidak, tampilkan email
                         welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
                     }
                 } else {
-                    // Redirect jika tidak ada data user di sessionStorage
                     window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
             }
 
-            // Fungsi untuk memeriksa akses berdasarkan peran
             function checkAccess(allowedRoles) {
-                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
-                    const loggedInUser = JSON.parse(user); // Parse JSON string
-                    if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
+                    const loggedInUser = JSON.parse(user);
+                    if (!allowedRoles.includes(loggedInUser.role)) {
                         alert('Anda tidak memiliki akses ke halaman ini.');
-                        sessionStorage.clear(); // Hapus sesi jika tidak punya akses
-                        window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Redirect ke login
+                        sessionStorage.clear();
+                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
                     }
                 } else {
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Belum login
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
             }
 
             // Jalankan pemeriksaan akses terlebih dahulu
-            checkAccess(['admin']); // Hanya 'admin' role yang bisa mengakses halaman ini
-            loadUserData(); // Load user data to display welcome message
-
-
-            // Populate HTML tables with data and update summary numbers
-            function populateReportTables() {
-                const currentMonth = new Date().getMonth();
-                const currentYear = new Date().getFullYear();
-
-                // Muat ulang data dari localStorage setiap kali fungsi dipanggil
-                const pasienData = JSON.parse(localStorage.getItem('patients')) || [];
-                const dokterData = JSON.parse(localStorage.getItem('doctors')) || [];
-                const transaksiPasienData = JSON.parse(localStorage.getItem('transactions')) || [];
-                const pemeriksaanData = JSON.parse(localStorage.getItem('medicalRecords')) || [];
-                const obatData = JSON.parse(localStorage.getItem('obat')) || [];
-                const userData = JSON.parse(localStorage.getItem('users')) || [];
-
-                // Laporan Data Pasien
-                const pasienTableBody = document.querySelector('#pasienTable tbody');
-                pasienTableBody.innerHTML = '';
-                pasienData.forEach(p => {
-                    const row = pasienTableBody.insertRow();
-                    row.insertCell().textContent = p.idPasien;
-                    row.insertCell().textContent = p.namaPasien;
-                    row.insertCell().textContent = p.alamat;
-                    row.insertCell().textContent = p.telepon;
-                    row.insertCell().textContent = p.tanggalLahir;
-                });
-                document.getElementById('total-pasien').textContent = pasienData.length;
-                const newPatientsThisMonth = pasienData.filter(p => {
-                    // Menggunakan tanggalLahir sebagai perkiraan tanggal registrasi
-                    const regDate = new Date(p.tanggalLahir); 
-                    return regDate.getMonth() === currentMonth && regDate.getFullYear() === currentYear;
-                }).length;
-                document.getElementById('pasien-baru-bulan-ini').textContent = newPatientsThisMonth;
-
-                // Laporan Data Dokter
-                const dokterTableBody = document.querySelector('#dokterTable tbody');
-                dokterTableBody.innerHTML = '';
-                dokterData.forEach(d => {
-                    const row = dokterTableBody.insertRow();
-                    row.insertCell().textContent = d.id;
-                    row.insertCell().textContent = d.namaDokter;
-                    row.insertCell().textContent = d.poli.charAt(0).toUpperCase() + d.poli.slice(1); // Kapitalisasi Poli
-                    row.insertCell().textContent = d.hari.charAt(0).toUpperCase() + d.hari.slice(1); // Kapitalisasi Hari
-                    row.insertCell().textContent = d.jamMulai;
-                    row.insertCell().textContent = d.jamSelesai;
-                    row.insertCell().innerHTML = `<span style="color: ${d.status === 'Aktif' ? 'green' : 'red'};">${d.status}</span>`;
-                });
-                document.getElementById('total-dokter').textContent = dokterData.length;
-                // Hitung dokter aktif secara akurat
-                const activeDoctorsCount = dokterData.filter(d => d.status === 'Aktif').length;
-                document.getElementById('dokter-aktif').textContent = activeDoctorsCount;
-
-
-                // Laporan Transaksi Pasien
-                const transaksiPasienTableBody = document.querySelector('#transaksiPasienTable tbody');
-                transaksiPasienTableBody.innerHTML = '';
-                let totalPendapatan = 0;
-                transaksiPasienData.forEach(t => {
-                    const row = transaksiPasienTableBody.insertRow();
-                    row.insertCell().textContent = t.id;
-                    row.insertCell().textContent = t.tanggalTransaksi;
-                    row.insertCell().textContent = t.namaPasien;
-                    row.insertCell().textContent = t.jenisLayanan;
-                    row.insertCell().textContent = t.totalBiaya.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-                    row.insertCell().textContent = t.statusPembayaran;
-                    totalPendapatan += t.totalBiaya;
-                });
-                document.getElementById('total-transaksi').textContent = transaksiPasienData.length;
-                document.getElementById('total-pendapatan').textContent = totalPendapatan.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-
-
-                // Laporan Pemeriksaan Pasien
-                const pemeriksaanTableBody = document.querySelector('#pemeriksaanTable tbody');
-                pemeriksaanTableBody.innerHTML = '';
-                pemeriksaanData.forEach(p => {
-                    const row = pemeriksaanTableBody.insertRow();
-                    row.insertCell().textContent = p.idRekamMedis;
-                    row.insertCell().textContent = p.tanggal;
-                    row.insertCell().textContent = p.pasien;
-                    row.insertCell().textContent = p.dokter;
-                    row.insertCell().textContent = p.keluhan;
-                    row.insertCell().textContent = p.diagnosa;
-                    row.insertCell().textContent = p.tindakan;
-                });
-                document.getElementById('total-pemeriksaan').textContent = pemeriksaanData.length;
-                const newPemeriksaanThisMonth = pemeriksaanData.filter(p => {
-                    const recDate = new Date(p.tanggal);
-                    return recDate.getMonth() === currentMonth && recDate.getFullYear() === currentYear;
-                }).length;
-                document.getElementById('pemeriksaan-baru-bulan-ini').textContent = newPemeriksaanThisMonth;
-
-
-                // Laporan Stok & Penggunaan Obat
-                const obatTableBody = document.querySelector('#obatTable tbody');
-                obatTableBody.innerHTML = '';
-                obatData.forEach(o => {
-                    const row = obatTableBody.insertRow();
-                    row.insertCell().textContent = o.id;
-                    row.insertCell().textContent = o.namaObat;
-                    row.insertCell().textContent = o.jenis;
-                    row.insertCell().textContent = o.stok;
-                    row.insertCell().textContent = o.harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
-                    row.insertCell().textContent = o.deskripsi;
-                });
-                document.getElementById('total-jenis-obat').textContent = obatData.length;
-                const criticalStockCount = obatData.filter(o => o.stok < 10).length;
-                document.getElementById('obat-kritis').textContent = criticalStockCount;
-
-
-                // Laporan Pengguna Sistem
-                const usersTableBody = document.querySelector('#usersTable tbody');
-                usersTableBody.innerHTML = '';
-                userData.forEach(u => {
-                    const row = usersTableBody.insertRow();
-                    row.insertCell().textContent = u.id;
-                    row.insertCell().textContent = u.nama;
-                    row.insertCell().textContent = u.email;
-                    row.insertCell().textContent = u.role;
-                });
-                document.getElementById('total-pengguna').textContent = userData.length;
-                document.getElementById('admin-count').textContent = userData.filter(u => u.role === 'admin').length;
-                document.getElementById('dokter-count').textContent = userData.filter(u => u.role === 'dokter').length;
-                document.getElementById('apoteker-count').textContent = userData.filter(u => u.role === 'apoteker').length;
-            }
+            checkAccess(['admin', 'pendaftaran', 'dokter', 'apoteker']); // Admin, Pendaftaran, Dokter, Apoteker bisa akses
+            loadUserData();
 
             // Sidebar and Mobile Menu Toggle
             const sidebar = document.getElementById('sidebar');
@@ -1032,16 +880,9 @@
             const menuIcon = document.querySelector('.sidebar-header .menu-icon');
             const mainContent = document.getElementById('main-content');
 
-            // New Buttons (for overall report actions)
-            const exportAllPdfBtn = document.getElementById('export-all-pdf-btn');
-            const exportAllExcelBtn = document.getElementById('export-all-excel-btn');
-            // const printAllBtn = document.getElementById('print-all-btn'); // Dihapus
-
-            // Toggle sidebar for desktop
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('minimized');
-                    // Adjust main content margin based on sidebar state
                     if (sidebar.classList.contains('minimized')) {
                         mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
                     } else {
@@ -1050,23 +891,18 @@
                 });
             }
 
-            // Toggle sidebar for mobile (using the new mobile-toggle outside sidebar)
             if (mobileToggle) {
                 mobileToggle.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent this click from propagating to mainContent and closing sidebar
+                    event.stopPropagation();
                     sidebar.classList.toggle('active');
                 });
             }
 
-            // Toggle sidebar from inside (using the new menu-icon inside sidebar-header)
             if (menuIcon) {
                 menuIcon.addEventListener('click', () => {
-                    // For mobile, this should close the sidebar if open
                     if (window.innerWidth <= 768) {
                         sidebar.classList.remove('active');
-                    }
-                    // For desktop, this toggles minimization
-                    else {
+                    } else {
                         sidebar.classList.toggle('minimized');
                         if (sidebar.classList.contains('minimized')) {
                             mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
@@ -1077,120 +913,409 @@
                 });
             }
 
-            // Close sidebar when clicking outside on mobile
             mainContent.addEventListener('click', () => {
                 if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
                 }
             });
 
-            // Prevent sidebar clicks from propagating to mainContent to close it
             sidebar.addEventListener('click', (event) => {
                 event.stopPropagation();
             });
 
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                    sidebar.classList.remove('active');
+                } else {
+                    mainContent.style.marginLeft = '0';
+                }
+            });
 
-            // --- Overall PDF Export (Captures entire main-content) ---
-            if (exportAllPdfBtn) {
-                exportAllPdfBtn.addEventListener('click', async function() {
-                    // Hide elements not to be included in PDF
-                    const elementsToHide = [sidebar, mobileToggle, sidebarToggle, exportAllPdfBtn, exportAllExcelBtn]; // printAllBtn dihapus
-                    const originalDisplays = elementsToHide.map(el => {
-                        if(el) {
-                            const originalDisplay = el.style.display;
-                            el.style.display = 'none';
-                            return originalDisplay;
-                        }
-                        return null;
-                    });
-                    
-                    const mainContentArea = document.querySelector('.main-content');
-                    const originalMainContentMargin = mainContentArea.style.marginLeft;
-                    const originalMainContentWidth = mainContentArea.style.width;
+            // --- Laporan Logic ---
 
-                    mainContentArea.style.marginLeft = '0';
-                    mainContentArea.style.width = '100%';
-                    mainContentArea.style.alignItems = 'flex-start'; // Align content to left for PDF capture
+            // Dummy Data Initialization (if not present in localStorage)
+            function generateDummyData(key, defaultData) {
+                if (!localStorage.getItem(key)) {
+                    localStorage.setItem(key, JSON.stringify(defaultData));
+                }
+            }
 
-                    // Use html2canvas to capture the entire main-content
-                    const canvas = await html2canvas(mainContentArea, {
-                        scale: 2, // Increase scale for better resolution
-                        useCORS: true, // If you have external images/resources
-                        windowWidth: mainContentArea.scrollWidth,
-                        windowHeight: mainContentArea.scrollHeight,
-                        x: 0,
-                        y: 0,
-                        logging: false, // Disable logging for cleaner console
-                    });
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
 
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4'); 
+            // Patients Dummy Data (example)
+            generateDummyData('patients', [
+                { id: 'P001', namaLengkap: 'Budi Santoso', tanggalLahir: '1990-01-15', jenisKelamin: 'Laki-laki', alamat: 'Jl. Melati No.1', telepon: '081234567890' },
+                { id: 'P002', namaLengkap: 'Siti Aminah', tanggalLahir: '1985-05-20', jenisKelamin: 'Perempuan', alamat: 'Jl. Kenanga No.2', telepon: '081298765432' },
+                { id: 'P003', namaLengkap: 'Joko Susilo', tanggalLahir: '1992-03-10', jenisKelamin: 'Laki-laki', alamat: 'Jl. Dahlia No.3', telepon: '087811223344' },
+                { id: 'P004', namaLengkap: 'Ani Indah', tanggalLahir: '2000-07-25', jenisKelamin: 'Perempuan', alamat: 'Jl. Anggrek No.4', telepon: '085677889900' },
+                { id: 'P005', namaLengkap: 'Dewi Lestari', tanggalLahir: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-05`, jenisKelamin: 'Perempuan', alamat: 'Jl. Mawar No.5', telepon: '081122334455' } // New patient this month
+            ]);
 
-                    const imgWidth = 210; // A4 width in mm
-                    const pageHeight = 297; // A4 height in mm
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = 0;
+            // Doctors Dummy Data
+            generateDummyData('doctors', [
+                { id: 'D001', namaDokter: 'Dr. Ahmad Yani', poli: 'Umum', hariPraktek: 'Senin, Rabu, Jumat', jamMulai: '08:00', jamSelesai: '12:00', status: 'Aktif' },
+                { id: 'D002', namaDokter: 'Dr. Kartika Sari', poli: 'Gigi', hariPraktek: 'Selasa, Kamis', jamMulai: '09:00', jamSelesai: '13:00', status: 'Aktif' },
+                { id: 'D003', namaDokter: 'Dr. Budi Darma', poli: 'Anak', hariPraktek: 'Sabtu', jamMulai: '10:00', jamSelesai: '15:00', status: 'Tidak Aktif' }
+            ]);
 
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+            // Transactions Dummy Data
+            generateDummyData('transactions', [
+                { id: 'T001', tanggal: '2023-01-01', namaPasien: 'Budi Santoso', jenisLayanan: 'Pemeriksaan Umum', totalBiaya: 50000, statusPembayaran: 'Lunas' },
+                { id: 'T002', tanggal: '2023-01-02', namaPasien: 'Siti Aminah', jenisLayanan: 'Cabut Gigi', totalBiaya: 150000, statusPembayaran: 'Lunas' },
+                { id: 'T003', tanggal: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`, namaPasien: 'Joko Susilo', jenisLayanan: 'Vaksinasi', totalBiaya: 100000, statusPembayaran: 'Lunas' },
+                { id: 'T004', tanggal: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-03`, namaPasien: 'Ani Indah', jenisLayanan: 'Pemeriksaan Gigi', totalBiaya: 80000, statusPembayaran: 'Belum Lunas' }
+            ]);
 
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
+            // Examinations Dummy Data
+            generateDummyData('examinations', [
+                { id: 'E001', tanggal: '2023-01-01', namaPasien: 'Budi Santoso', dokter: 'Dr. Ahmad Yani', keluhan: 'Batuk pilek', diagnosa: 'ISPA', tindakan: 'Resep Obat' },
+                { id: 'E002', tanggal: '2023-01-02', namaPasien: 'Siti Aminah', dokter: 'Dr. Kartika Sari', keluhan: 'Sakit gigi', diagnosa: 'Karies', tindakan: 'Cabut Gigi' },
+                { id: 'E003', tanggal: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-05`, namaPasien: 'Dewi Lestari', dokter: 'Dr. Ahmad Yani', keluhan: 'Demam', diagnosa: 'Demam Biasa', tindakan: 'Istirahat dan Obat' }
+            ]);
+
+            // Drugs Dummy Data
+            generateDummyData('drugs', [
+                { id: 'O001', namaObat: 'Paracetamol', jenis: 'Tablet', stok: 100, hargaSatuan: 5000, deskripsi: 'Pereda demam dan nyeri' },
+                { id: 'O002', namaObat: 'Amoxicillin', jenis: 'Kapsul', stok: 5, hargaSatuan: 7500, deskripsi: 'Antibiotik' }, // Critical stock
+                { id: 'O003', namaObat: 'Vitamin C', jenis: 'Tablet', stok: 200, hargaSatuan: 3000, deskripsi: 'Suplemen' },
+                { id: 'O004', namaObat: 'Obat Batuk Syrup', jenis: 'Sirup', stok: 8, hargaSatuan: 12000, deskripsi: 'Obat batuk' } // Critical stock
+            ]);
+
+            // Users Dummy Data
+            generateDummyData('users', [
+                { id: 'U001', nama: 'Admin Utama', email: 'admin@klinik.com', role: 'admin' },
+                { id: 'U002', nama: 'Pendaftaran 1', email: 'daftar1@klinik.com', role: 'pendaftaran' },
+                { id: 'U003', nama: 'Dokter A', email: 'dokter@klinik.com', role: 'dokter' },
+                { id: 'U004', nama: 'Apoteker X', email: 'apoteker@klinik.com', role: 'apoteker' }
+            ]);
+
+            // Populate Functions
+            function populatePatientReport() {
+                const patients = JSON.parse(localStorage.getItem('patients')) || [];
+                const tableBody = document.querySelector('#pasienTable tbody');
+                const totalPasienSpan = document.getElementById('total-pasien');
+                const pasienBaruBulanIniSpan = document.getElementById('pasien-baru-bulan-ini');
+
+                tableBody.innerHTML = '';
+                let newPatientsThisMonth = 0;
+
+                patients.forEach((patient, index) => {
+                    // Check if tanggalLahir is a valid date string and in the current month/year
+                    const patientDOB = new Date(patient.tanggalLahir);
+                    if (!isNaN(patientDOB) && patientDOB.getMonth() === currentMonth && patientDOB.getFullYear() === currentYear) {
+                        newPatientsThisMonth++;
                     }
 
-                    pdf.save('Laporan_Menyeluruh_Klinik.pdf');
-
-                    // Restore original display styles
-                    elementsToHide.forEach((el, index) => {
-                        if(el) el.style.display = originalDisplays[index];
-                    });
-                    mainContentArea.style.marginLeft = originalMainContentMargin;
-                    mainContentArea.style.width = originalMainContentWidth;
-                    mainContentArea.style.alignItems = ''; // Restore original alignment
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = patient.id;
+                    row.insertCell().textContent = patient.namaLengkap;
+                    row.insertCell().textContent = patient.tanggalLahir;
+                    row.insertCell().textContent = patient.jenisKelamin;
+                    row.insertCell().textContent = patient.alamat;
+                    row.insertCell().textContent = patient.telepon;
                 });
+
+                totalPasienSpan.textContent = patients.length;
+                pasienBaruBulanIniSpan.textContent = newPatientsThisMonth;
+
+                if (patients.length === 0) {
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 7;
+                    noDataCell.textContent = "Tidak ada data pasien untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                }
             }
 
-            // --- Overall Excel Export (Combines all tables into one Excel file) ---
-            if (exportAllExcelBtn) {
-                exportAllExcelBtn.addEventListener('click', () => {
-                    const wb = XLSX.utils.book_new();
+            function populateDoctorReport() {
+                const doctors = JSON.parse(localStorage.getItem('doctors')) || [];
+                const tableBody = document.querySelector('#dokterTable tbody');
+                const totalDokterSpan = document.getElementById('total-dokter');
+                const dokterAktifSpan = document.getElementById('dokter-aktif');
 
-                    // Add Pasien data
-                    const ws_pasien = XLSX.utils.table_to_sheet(document.getElementById('pasienTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_pasien, "Data Pasien");
+                tableBody.innerHTML = '';
+                let activeDoctors = 0;
 
-                    // Add Dokter data
-                    const ws_dokter = XLSX.utils.table_to_sheet(document.getElementById('dokterTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_dokter, "Data Dokter");
-
-                    // Add Transaksi Pasien data
-                    const ws_transaksi = XLSX.utils.table_to_sheet(document.getElementById('transaksiPasienTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_transaksi, "Transaksi Pasien");
-
-                    // Add Pemeriksaan data
-                    const ws_pemeriksaan = XLSX.utils.table_to_sheet(document.getElementById('pemeriksaanTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_pemeriksaan, "Pemeriksaan Pasien");
-
-                    // Add Obat data
-                    const ws_obat = XLSX.utils.table_to_sheet(document.getElementById('obatTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_obat, "Stok Obat");
-
-                    // Add Pengguna data
-                    const ws_pengguna = XLSX.utils.table_to_sheet(document.getElementById('usersTable'));
-                    XLSX.utils.book_append_sheet(wb, ws_pengguna, "Pengguna Sistem");
-
-                    XLSX.writeFile(wb, 'Laporan_Menyeluruh_Klinik.xlsx');
+                doctors.forEach((doctor, index) => {
+                    if (doctor.status === 'Aktif') {
+                        activeDoctors++;
+                    }
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = doctor.id;
+                    row.insertCell().textContent = doctor.namaDokter;
+                    row.insertCell().textContent = doctor.poli;
+                    row.insertCell().textContent = doctor.hariPraktek;
+                    row.insertCell().textContent = doctor.jamMulai;
+                    row.insertCell().textContent = doctor.jamSelesai;
+                    row.insertCell().textContent = doctor.status;
                 });
+
+                totalDokterSpan.textContent = doctors.length;
+                dokterAktifSpan.textContent = activeDoctors;
+
+                if (doctors.length === 0) {
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 8;
+                    noDataCell.textContent = "Tidak ada data dokter untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                }
             }
 
-            // Inisialisasi aplikasi
+            function populateTransactionReport() {
+                const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+                const tableBody = document.querySelector('#transaksiPasienTable tbody');
+                const totalTransaksiSpan = document.getElementById('total-transaksi');
+                const totalPendapatanSpan = document.getElementById('total-pendapatan');
+
+                tableBody.innerHTML = '';
+                let totalRevenue = 0;
+
+                transactions.forEach((transaction, index) => {
+                    totalRevenue += transaction.totalBiaya;
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = transaction.id;
+                    row.insertCell().textContent = transaction.tanggal;
+                    row.insertCell().textContent = transaction.namaPasien;
+                    row.insertCell().textContent = transaction.jenisLayanan;
+                    row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
+                    row.insertCell().textContent = transaction.statusPembayaran;
+                });
+
+                totalTransaksiSpan.textContent = transactions.length;
+                totalPendapatanSpan.textContent = formatRupiah(totalRevenue);
+
+                if (transactions.length === 0) {
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 7;
+                    noDataCell.textContent = "Tidak ada data transaksi untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                }
+            }
+
+            function populateExaminationReport() {
+                const examinations = JSON.parse(localStorage.getItem('examinations')) || [];
+                const tableBody = document.querySelector('#pemeriksaanTable tbody');
+                const totalPemeriksaanSpan = document.getElementById('total-pemeriksaan');
+                const pemeriksaanBaruBulanIniSpan = document.getElementById('pemeriksaan-baru-bulan-ini');
+
+                tableBody.innerHTML = '';
+                let newExaminationsThisMonth = 0;
+
+                examinations.forEach((exam, index) => {
+                    const examDate = new Date(exam.tanggal);
+                    if (!isNaN(examDate) && examDate.getMonth() === currentMonth && examDate.getFullYear() === currentYear) {
+                        newExaminationsThisMonth++;
+                    }
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = exam.id;
+                    row.insertCell().textContent = exam.tanggal;
+                    row.insertCell().textContent = exam.namaPasien;
+                    row.insertCell().textContent = exam.dokter;
+                    row.insertCell().textContent = exam.keluhan;
+                    row.insertCell().textContent = exam.diagnosa;
+                    row.insertCell().textContent = exam.tindakan;
+                });
+
+                totalPemeriksaanSpan.textContent = examinations.length;
+                pemeriksaanBaruBulanIniSpan.textContent = newExaminationsThisMonth;
+
+                if (examinations.length === 0) {
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 8;
+                    noDataCell.textContent = "Tidak ada data pemeriksaan untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                }
+            }
+
+            function populateDrugReport() {
+                const drugs = JSON.parse(localStorage.getItem('drugs')) || [];
+                const tableBody = document.querySelector('#obatTable tbody');
+                const totalJenisObatSpan = document.getElementById('total-jenis-obat');
+                const obatKritisSpan = document.getElementById('obat-kritis');
+
+                tableBody.innerHTML = '';
+                let criticalStockCount = 0;
+
+                drugs.forEach((drug, index) => {
+                    if (drug.stok < 10) { // Define critical stock threshold
+                        criticalStockCount++;
+                    }
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = drug.id;
+                    row.insertCell().textContent = drug.namaObat;
+                    row.insertCell().textContent = drug.jenis;
+                    row.insertCell().textContent = drug.stok;
+                    row.insertCell().textContent = formatRupiah(drug.hargaSatuan);
+                    row.insertCell().textContent = drug.deskripsi;
+                });
+
+                totalJenisObatSpan.textContent = drugs.length;
+                obatKritisSpan.textContent = criticalStockCount;
+
+                if (drugs.length === 0) {
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 7;
+                    noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                }
+            }
+
+            function populateUserReport() {
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const tableBody = document.querySelector('#usersTable tbody');
+                const totalPenggunaSpan = document.getElementById('total-pengguna');
+                const adminCountSpan = document.getElementById('admin-count');
+                const dokterCountSpan = document.getElementById('dokter-count');
+                const apotekerCountSpan = document.getElementById('apoteker-count');
+
+                tableBody.innerHTML = '';
+                let adminCount = 0;
+                let dokterCount = 0;
+                let apotekerCount = 0;
+
+                users.forEach((user, index) => {
+                    if (user.role === 'admin') adminCount++;
+                    if (user.role === 'dokter') dokterCount++;
+                    if (user.role === 'apoteker') apotekerCount++;
+
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = user.id;
+                    row.insertCell().textContent = user.nama;
+                    row.insertCell().textContent = user.email;
+                    row.insertCell().textContent = user.role;
+                });
+
+                totalPenggunaSpan.textContent = users.length;
+                adminCountSpan.textContent = adminCount;
+                dokterCountSpan.textContent = dokterCount;
+                apotekerCountSpan.textContent = apotekerCount;
+
+                if (users.length === 0) {
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 5;
+                    noDataCell.textContent = "Tidak ada data pengguna untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                }
+            }
+
+            // Function to format Rupiah
+            function formatRupiah(amount) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(amount);
+            }
+
+            // Central function to populate all tables
+            function populateAllReportTables() {
+                populatePatientReport();
+                populateDoctorReport();
+                populateTransactionReport();
+                populateExaminationReport();
+                populateDrugReport();
+                populateUserReport();
+            }
+
+            // PDF Export for Patient Data (specific to pasienTable)
+            document.getElementById('export-pdf-btn').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'letter');
+                const table = document.getElementById('pasienTable'); // Target specific table
+
+                doc.autoTable({
+                    html: table,
+                    startY: 60,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [29, 233, 182],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 8,
+                        valign: 'middle',
+                        overflow: 'linebreak'
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 30, halign: 'center' }, // No.
+                        1: { cellWidth: 70 }, // ID Pasien
+                        2: { cellWidth: 100 }, // Nama Lengkap
+                        3: { cellWidth: 70 }, // Tanggal Lahir
+                        4: { cellWidth: 60, halign: 'center' }, // Jenis Kelamin
+                        5: { cellWidth: 'auto' }, // Alamat
+                        6: { cellWidth: 70 } // Telepon
+                    },
+                    didDrawPage: function(data) {
+                        doc.text("Laporan Data Pasien", data.settings.marginLeft, 40);
+                    }
+                });
+
+                doc.save('laporan_data_pasien.pdf');
+            });
+
+            // Excel Export for Patient Data (specific to pasienTable)
+            document.getElementById('export-excel-btn').addEventListener('click', function() {
+                const table = document.getElementById('pasienTable'); // Target specific table
+                const ws = XLSX.utils.table_to_sheet(table);
+
+                // Remove the "No." column for Excel export
+                // Assuming "No." is the first column (index 0)
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                for (let row = range.s.r; row <= range.e.r; row++) {
+                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })]; // Delete the cell at column 0
+                }
+                // Adjust the sheet's range to reflect the removed column
+                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
+
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Pasien");
+                XLSX.writeFile(wb, "laporan_data_pasien.xlsx");
+            });
+
+
+            // Initial display and sidebar setup
             function init() {
-                populateReportTables();
+                populateAllReportTables();
 
                 // Check screen width on load and apply initial sidebar state
                 if (window.innerWidth <= 768) {
@@ -1205,20 +1330,6 @@
 
             // Run initialization
             init();
-
-            // Adjust main content margin on window resize for desktop view
-            window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
-                    if (sidebar.classList.contains('minimized')) {
-                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                    } else {
-                        mainContent.style.marginLeft = 'var(--sidebar-width)';
-                    }
-                    sidebar.classList.remove('active'); // Ensure mobile active class is removed on resize to desktop
-                } else {
-                    mainContent.style.marginLeft = '0';
-                }
-            });
         });
     </script>
 </body>
