@@ -913,669 +913,332 @@
             </div>
         </main>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebar-toggle');
-            const mainContent = document.getElementById('main-content');
-            const mobileToggle = document.getElementById('mobile-toggle');
-
-            // --- Sidebar Toggle Logic ---
-            sidebarToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('minimized');
-                if (sidebar.classList.contains('minimized')) {
-                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                    sidebarToggle.querySelector('i').classList.replace('fa-chevron-left', 'fa-chevron-right');
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                    sidebarToggle.querySelector('i').classList.replace('fa-chevron-right', 'fa-chevron-left');
-                }
-            });
-
-            mobileToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
-
-            // Close sidebar when clicking outside on mobile
-            mainContent.addEventListener('click', (event) => {
-                if (sidebar.classList.contains('active') && !sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
-                    sidebar.classList.remove('active');
-                }
-            });
-
-            // Handle responsive behavior for sidebar
-            window.addEventListener('resize', () => {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('minimized');
-                    mainContent.style.marginLeft = '0';
-                    sidebarToggle.style.display = 'none'; // Hide desktop toggle on mobile
-                } else {
-                    sidebar.classList.remove('active');
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                    sidebarToggle.style.display = 'flex'; // Show desktop toggle
-                }
-            });
-
-            // --- User Info ---
-            const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-            if (loggedInUser) {
-                document.getElementById('welcome-user').textContent = `Selamat datang, ${loggedInUser.username}!`;
-            } else {
-                window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Redirect if not logged in
-            }
-
-            // --- Helper Functions ---
-            function formatRupiah(number) {
-                return new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0
-                }).format(number);
-            }
-
-            // --- Laporan Logic ---
-            const today = new Date();
-            const currentMonth = today.getMonth();
-            const currentYear = today.getFullYear();
-
-            // New elements for transaction report
-            const totalPendapatanLunasSpan = document.getElementById('total-pendapatan-lunas');
-            const totalPendapatanBelumLunasSpan = document.getElementById('total-pendapatan-belum-lunas');
-
-            const showAllBtn = document.getElementById('show-all-transactions');
-            const showPaidBtn = document.getElementById('show-paid-transactions');
-            const showUnpaidBtn = document.getElementById('show-unpaid-transactions');
-
-            const allTableContainer = document.getElementById('allTransactionsTableContainer');
-            const paidTableContainer = document.getElementById('paidTransactionsTableContainer');
-            const unpaidTableContainer = document.getElementById('unpaidTransactionsTableContainer');
-
-            const transaksiLunasTableBody = document.querySelector('#transaksiLunasTable tbody');
-            const transaksiBelumLunasTableBody = document.querySelector('#transaksiBelumLunasTable tbody');
-
-            // Helper function to show/hide tables
-            function showTable(tableContainerId) {
-                allTableContainer.style.display = 'none';
-                paidTableContainer.style.display = 'none';
-                unpaidTableContainer.style.display = 'none';
-
-                document.getElementById(tableContainerId).style.display = 'block';
-
-                // Update active button styling
-                showAllBtn.classList.remove('active');
-                showPaidBtn.classList.remove('active');
-                showUnpaidBtn.classList.remove('active');
-                if (tableContainerId === 'allTransactionsTableContainer') {
-                    showAllBtn.classList.add('active');
-                } else if (tableContainerId === 'paidTransactionsTableContainer') {
-                    showPaidBtn.classList.add('active');
-                } else if (tableContainerId === 'unpaidTransactionsTableContainer') {
-                    showUnpaidBtn.classList.add('active');
-                }
-            }
-
-
-            function populatePatientReport() {
-                const patients = JSON.parse(localStorage.getItem('patients')) || [];
-                const tableBody = document.querySelector('#pasienTable tbody');
-                const totalPasienSpan = document.getElementById('total-pasien');
-                const pasienBaruBulanIniSpan = document.getElementById('pasien-baru-bulan-ini');
-
-                tableBody.innerHTML = '';
-                let newPatientsThisMonth = 0;
-
-                if (patients.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 7;
-                    noDataCell.textContent = "Tidak ada data pasien untuk ditampilkan.";
-                    noDataCell.style.textAlign = "center";
-                    noDataCell.style.padding = "20px";
-                    noDataCell.style.fontStyle = "italic";
-                    noDataCell.style.color = "#555";
-                } else {
-                    patients.forEach((patient, index) => {
-                        const row = tableBody.insertRow();
-                        row.insertCell().textContent = index + 1 + ".";
-                        row.insertCell().textContent = patient.id;
-                        row.insertCell().textContent = patient.namaLengkap;
-                        row.insertCell().textContent = patient.tanggalLahir;
-                        row.insertCell().textContent = patient.jenisKelamin;
-                        row.insertCell().textContent = patient.alamat;
-                        row.insertCell().textContent = patient.telepon;
-
-                        const registrationDate = new Date(patient.tanggalRegistrasi);
-                        if (registrationDate.getMonth() === currentMonth && registrationDate.getFullYear() === currentYear) {
-                            newPatientsThisMonth++;
-                        }
-                    });
-                }
-
-                totalPasienSpan.textContent = patients.length;
-                pasienBaruBulanIniSpan.textContent = newPatientsThisMonth;
-            }
-
-            function populateDoctorReport() {
-                const doctors = JSON.parse(localStorage.getItem('doctors')) || [];
-                const tableBody = document.querySelector('#dokterTable tbody');
-                const totalDokterSpan = document.getElementById('total-dokter');
-                const dokterAktifSpan = document.getElementById('dokter-aktif');
-
-                tableBody.innerHTML = '';
-                let activeDoctors = 0;
-
-                if (doctors.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 8;
-                    noDataCell.textContent = "Tidak ada data dokter untuk ditampilkan.";
-                    noDataCell.style.textAlign = "center";
-                    noDataCell.style.padding = "20px";
-                    noDataCell.style.fontStyle = "italic";
-                    noDataCell.style.color = "#555";
-                } else {
-                    doctors.forEach((doctor, index) => {
-                        const row = tableBody.insertRow();
-                        row.insertCell().textContent = index + 1 + ".";
-                        row.insertCell().textContent = doctor.id;
-                        row.insertCell().textContent = doctor.nama;
-                        row.insertCell().textContent = doctor.poli;
-                        row.insertCell().textContent = doctor.hariPraktek.join(', ');
-                        row.insertCell().textContent = doctor.jamMulai;
-                        row.insertCell().textContent = doctor.jamSelesai;
-                        row.insertCell().textContent = doctor.status;
-
-                        if (doctor.status === 'Aktif') {
-                            activeDoctors++;
-                        }
-                    });
-                }
-
-                totalDokterSpan.textContent = doctors.length;
-                dokterAktifSpan.textContent = activeDoctors;
-            }
-
-            function populateTransactionReport() {
-                const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-                const tableBodyAll = document.querySelector('#transaksiPasienTable tbody'); // For 'Semua Transaksi'
-
-                const totalTransaksiSpan = document.getElementById('total-transaksi');
-
-                // Clear previous data
-                tableBodyAll.innerHTML = '';
-                transaksiLunasTableBody.innerHTML = '';
-                transaksiBelumLunasTableBody.innerHTML = '';
-
-                let totalRevenueLunas = 0;
-                let totalRevenueBelumLunas = 0;
-                let indexLunas = 0; // Separate index for 'Lunas' table
-                let indexBelumLunas = 0; // Separate index for 'Belum Lunas' table
-
-                if (transactions.length === 0) {
-                    const noDataRowAll = tableBodyAll.insertRow();
-                    const noDataCellAll = noDataRowAll.insertCell();
-                    noDataCellAll.colSpan = 7;
-                    noDataCellAll.textContent = "Tidak ada data transaksi untuk ditampilkan.";
-                    noDataCellAll.style.textAlign = "center";
-                    noDataCellAll.style.padding = "20px";
-                    noDataCellAll.style.fontStyle = "italic";
-                    noDataCellAll.style.color = "#555";
-
-                    const noDataRowPaid = transaksiLunasTableBody.insertRow();
-                    const noDataCellPaid = noDataRowPaid.insertCell();
-                    noDataCellPaid.colSpan = 7;
-                    noDataCellPaid.textContent = "Tidak ada data transaksi lunas untuk ditampilkan.";
-                    noDataCellPaid.style.textAlign = "center";
-                    noDataCellPaid.style.padding = "20px";
-                    noDataCellPaid.style.fontStyle = "italic";
-                    noDataCellPaid.style.color = "#555";
-
-                    const noDataRowUnpaid = transaksiBelumLunasTableBody.insertRow();
-                    const noDataCellUnpaid = noDataRowUnpaid.insertCell();
-                    noDataCellUnpaid.colSpan = 7;
-                    noDataCellUnpaid.textContent = "Tidak ada data transaksi belum lunas untuk ditampilkan.";
-                    noDataCellUnpaid.style.textAlign = "center";
-                    noDataCellUnpaid.style.padding = "20px";
-                    noDataCellUnpaid.style.fontStyle = "italic";
-                    noDataCellUnpaid.style.color = "#555";
-
-                } else {
-                    transactions.forEach((transaction, index) => {
-                        // Populate 'Semua Transaksi' table
-                        const rowAll = tableBodyAll.insertRow();
-                        rowAll.insertCell().textContent = index + 1 + ".";
-                        rowAll.insertCell().textContent = transaction.id;
-                        rowAll.insertCell().textContent = transaction.tanggal;
-                        rowAll.insertCell().textContent = transaction.namaPasien;
-                        rowAll.insertCell().textContent = transaction.jenisLayanan;
-                        rowAll.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                        rowAll.insertCell().textContent = transaction.statusPembayaran;
-
-                        // Apply red color for 'Belum Lunas'
-                        if (transaction.statusPembayaran === 'Belum Lunas') {
-                            rowAll.style.color = 'red';
-                            rowAll.style.fontWeight = 'bold';
-                            totalRevenueBelumLunas += transaction.totalBiaya;
-
-                            // Populate 'Belum Lunas' table
-                            const rowUnpaid = transaksiBelumLunasTableBody.insertRow();
-                            rowUnpaid.insertCell().textContent = ++indexBelumLunas + "."; // Increment and use for numbering
-                            rowUnpaid.insertCell().textContent = transaction.id;
-                            rowUnpaid.insertCell().textContent = transaction.tanggal;
-                            rowUnpaid.insertCell().textContent = transaction.namaPasien;
-                            rowUnpaid.insertCell().textContent = transaction.jenisLayanan;
-                            rowUnpaid.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                            rowUnpaid.insertCell().textContent = transaction.statusPembayaran;
-                            rowUnpaid.style.color = 'red';
-                            rowUnpaid.style.fontWeight = 'bold';
-                        } else if (transaction.statusPembayaran === 'Lunas') {
-                            totalRevenueLunas += transaction.totalBiaya;
-
-                            // Populate 'Lunas' table
-                            const rowPaid = transaksiLunasTableBody.insertRow();
-                            rowPaid.insertCell().textContent = ++indexLunas + "."; // Increment and use for numbering
-                            rowPaid.insertCell().textContent = transaction.id;
-                            rowPaid.insertCell().textContent = transaction.tanggal;
-                            rowPaid.insertCell().textContent = transaction.namaPasien;
-                            rowPaid.insertCell().textContent = transaction.jenisLayanan;
-                            rowPaid.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                            rowPaid.insertCell().textContent = transaction.statusPembayaran;
-                        }
-                    });
-
-                    // Handle no data for 'Lunas' if all transactions are 'Belum Lunas'
-                    if (transaksiLunasTableBody.rows.length === 0) {
-                        const noDataRowPaid = transaksiLunasTableBody.insertRow();
-                        const noDataCellPaid = noDataRowPaid.insertCell();
-                        noDataCellPaid.colSpan = 7;
-                        noDataCellPaid.textContent = "Tidak ada data transaksi lunas untuk ditampilkan.";
-                        noDataCellPaid.style.textAlign = "center";
-                        noDataCellPaid.style.padding = "20px";
-                        noDataCellPaid.style.fontStyle = "italic";
-                        noDataCellPaid.style.color = "#555";
-                    }
-
-                    // Handle no data for 'Belum Lunas' if all transactions are 'Lunas'
-                    if (transaksiBelumLunasTableBody.rows.length === 0) {
-                        const noDataRowUnpaid = transaksiBelumLunasTableBody.insertRow();
-                        const noDataCellUnpaid = noDataRowUnpaid.insertCell();
-                        noDataCellUnpaid.colSpan = 7;
-                        noDataCellUnpaid.textContent = "Tidak ada data transaksi belum lunas untuk ditampilkan.";
-                        noDataCellUnpaid.style.textAlign = "center";
-                        noDataCellUnpaid.style.padding = "20px";
-                        noDataCellUnpaid.style.fontStyle = "italic";
-                        noDataCellUnpaid.style.color = "#555";
-                    }
-                }
-
-
-                totalTransaksiSpan.textContent = transactions.length;
-                totalPendapatanLunasSpan.textContent = formatRupiah(totalRevenueLunas);
-                totalPendapatanBelumLunasSpan.textContent = formatRupiah(totalRevenueBelumLunas);
-            }
-
-            function populateObatReport() {
-                const medicines = JSON.parse(localStorage.getItem('medicines')) || [];
-                const tableBody = document.querySelector('#obatTable tbody');
-                const totalJenisObatSpan = document.getElementById('total-jenis-obat');
-                const obatKritisSpan = document.getElementById('obat-kritis');
-
-                tableBody.innerHTML = '';
-                let criticalStockCount = 0;
-
-                if (medicines.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 7;
-                    noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
-                    noDataCell.style.textAlign = "center";
-                    noDataCell.style.padding = "20px";
-                    noDataCell.style.fontStyle = "italic";
-                    noDataCell.style.color = "#555";
-                } else {
-                    medicines.forEach((medicine, index) => {
-                        const row = tableBody.insertRow();
-                        row.insertCell().textContent = index + 1 + ".";
-                        row.insertCell().textContent = medicine.id;
-                        row.insertCell().textContent = medicine.namaObat;
-                        row.insertCell().textContent = medicine.jenis;
-                        row.insertCell().textContent = medicine.stok;
-                        row.insertCell().textContent = formatRupiah(medicine.hargaSatuan);
-                        row.insertCell().textContent = medicine.deskripsi;
-
-                        if (medicine.stok < 10) {
-                            criticalStockCount++;
-                            row.style.color = 'red'; // Highlight critical stock
-                            row.style.fontWeight = 'bold';
-                        }
-                    });
-                }
-
-                totalJenisObatSpan.textContent = medicines.length;
-                obatKritisSpan.textContent = criticalStockCount;
-            }
-
-            function populateUsersReport() {
-                const users = JSON.parse(localStorage.getItem('users')) || [];
-                const tableBody = document.querySelector('#usersTable tbody');
-                const totalPenggunaSpan = document.getElementById('total-pengguna');
-                const adminCountSpan = document.getElementById('admin-count');
-                const dokterCountSpan = document.getElementById('dokter-count');
-                const apotekerCountSpan = document.getElementById('apoteker-count');
-
-                tableBody.innerHTML = '';
-                let adminCount = 0;
-                let dokterCount = 0;
-                let apotekerCount = 0;
-
-                if (users.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 5;
-                    noDataCell.textContent = "Tidak ada data pengguna untuk ditampilkan.";
-                    noDataCell.style.textAlign = "center";
-                    noDataCell.style.padding = "20px";
-                    noDataCell.style.fontStyle = "italic";
-                    noDataCell.style.color = "#555";
-                } else {
-                    users.forEach((user, index) => {
-                        const row = tableBody.insertRow();
-                        row.insertCell().textContent = index + 1 + ".";
-                        row.insertCell().textContent = user.id;
-                        row.insertCell().textContent = user.username; // Assuming username is the name
-                        row.insertCell().textContent = user.email;
-                        row.insertCell().textContent = user.role;
-
-                        if (user.role === 'admin') {
-                            adminCount++;
-                        } else if (user.role === 'dokter') {
-                            dokterCount++;
-                        } else if (user.role === 'apoteker') {
-                            apotekerCount++;
-                        }
-                    });
-                }
-
-
-                totalPenggunaSpan.textContent = users.length;
-                adminCountSpan.textContent = adminCount;
-                dokterCountSpan.textContent = dokterCount;
-                apotekerCountSpan.textContent = apotekerCount;
-            }
-
-
-            function populateAllReportTables() {
-                populatePatientReport();
-                populateDoctorReport();
-                populateTransactionReport();
-                populateObatReport(); // Call to populate the new medicine report
-                populateUsersReport(); // Call to populate the new users report
-            }
-
-            // --- Global Export Functions ---
-
-            document.getElementById('download-all-pdf-btn').addEventListener('click', function () {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'letter');
-                const margin = 40; // Default margin
-                let yPos = margin;
-
-                const addHeaderAndFooter = (doc, pageNumber) => {
-                    doc.setFontSize(10);
-                    doc.setTextColor(100);
-                    doc.text("Klinik Sehat Selalu", margin, doc.internal.pageSize.height - 20);
-                    doc.text(`Halaman ${pageNumber}`, doc.internal.pageSize.width - margin - 30, doc.internal.pageSize.height - 20);
-                };
-
-                const addPage = (doc, title) => {
-                    if (yPos > margin) { // Add new page if it's not the very first content
-                        doc.addPage();
-                    }
-                    yPos = margin; // Reset yPos for new page
-                    addHeaderAndFooter(doc, doc.internal.getNumberOfPages());
-                    doc.setFontSize(18);
-                    doc.setTextColor(var_secondary_color || '#333'); // Use secondary color or default
-                    doc.text(title, margin, yPos + 20);
-                    yPos += 50; // Space after title
-                };
-
-                // Helper to get table data
-                const getTableData = (tableId) => {
-                    const table = document.getElementById(tableId);
-                    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                    const data = [];
-                    table.querySelectorAll('tbody tr').forEach(row => {
-                        if (row.querySelector('td[colspan]')) { // Skip "No data" row
-                            return;
-                        }
-                        const rowData = Array.from(row.querySelectorAll('td')).map(td => td.textContent);
-                        data.push(rowData);
-                    });
-                    return { headers, data };
-                };
-
-                // 1. Laporan Data Pasien
-                addPage(doc, "Laporan Data Pasien");
-                const pasienData = getTableData('pasienTable');
-                doc.autoTable({
-                    startY: yPos,
-                    head: [pasienData.headers],
-                    body: pasienData.data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) { // Remove 'No.' column from PDF table
-                            data.cell.content = '';
-                        }
-                    },
-                    didDrawPage: function (data) {
-                        yPos = data.cursor.y + margin; // Update yPos for next content
-                    }
-                });
-
-                // 2. Laporan Data Dokter
-                addPage(doc, "Laporan Data Dokter");
-                const dokterData = getTableData('dokterTable');
-                doc.autoTable({
-                    startY: yPos,
-                    head: [dokterData.headers],
-                    body: dokterData.data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                    },
-                    didDrawPage: function (data) {
-                        yPos = data.cursor.y + margin;
-                    }
-                });
-
-                // 3. Laporan Transaksi Pasien (Semua Transaksi)
-                addPage(doc, "Laporan Transaksi Pasien (Semua)");
-                const transaksiAllData = getTableData('transaksiPasienTable');
-                doc.autoTable({
-                    startY: yPos,
-                    head: [transaksiAllData.headers],
-                    body: transaksiAllData.data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                        // Apply red color to 'Belum Lunas' status
-                        if (data.column.index === 6 && data.cell.text.includes('Belum Lunas')) {
-                            data.cell.styles.textColor = [255, 0, 0];
-                            data.cell.styles.fontStyle = 'bold';
-                        }
-                    },
-                    didDrawPage: function (data) {
-                        yPos = data.cursor.y + margin;
-                    }
-                });
-
-                // 4. Laporan Transaksi Pasien (Lunas)
-                addPage(doc, "Laporan Transaksi Pasien (Lunas)");
-                const transaksiLunasData = getTableData('transaksiLunasTable');
-                doc.autoTable({
-                    startY: yPos,
-                    head: [transaksiLunasData.headers],
-                    body: transaksiLunasData.data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                    },
-                    didDrawPage: function (data) {
-                        yPos = data.cursor.y + margin;
-                    }
-                });
-
-                // 5. Laporan Transaksi Pasien (Belum Lunas)
-                addPage(doc, "Laporan Transaksi Pasien (Belum Lunas)");
-                const transaksiBelumLunasData = getTableData('transaksiBelumLunasTable');
-                doc.autoTable({
-                    startY: yPos,
-                    head: [transaksiBelumLunasData.headers],
-                    body: transaksiBelumLunasData.data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                        // Apply red color to 'Belum Lunas' status
-                        if (data.column.index === 6 && data.cell.text.includes('Belum Lunas')) {
-                            data.cell.styles.textColor = [255, 0, 0];
-                            data.cell.styles.fontStyle = 'bold';
-                        }
-                    },
-                    didDrawPage: function (data) {
-                        yPos = data.cursor.y + margin;
-                    }
-                });
-
-                // 6. Laporan Stok & Penggunaan Obat
-                addPage(doc, "Laporan Stok & Penggunaan Obat");
-                const obatData = getTableData('obatTable');
-                doc.autoTable({
-                    startY: yPos,
-                    head: [obatData.headers],
-                    body: obatData.data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                        // Apply red color for critical stock
-                        if (data.column.index === 4 && parseInt(data.cell.text) < 10) {
-                            data.cell.styles.textColor = [255, 0, 0];
-                            data.cell.styles.fontStyle = 'bold';
-                        }
-                    },
-                    didDrawPage: function (data) {
-                        yPos = data.cursor.y + margin;
-                    }
-                });
-
-                // 7. Laporan Pengguna Sistem
-                addPage(doc, "Laporan Pengguna Sistem");
-                const userData = getTableData('usersTable');
-                doc.autoTable({
-                    startY: yPos,
-                    head: [userData.headers],
-                    body: userData.data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                    }
-                });
-
-                doc.save('seluruh_laporan_klinik.pdf');
-            });
-
-            document.getElementById('download-all-excel-btn').addEventListener('click', function () {
-                const wb = XLSX.utils.book_new();
-
-                // Helper to add sheet from table
-                const addSheetFromTable = (tableId, sheetName) => {
-                    const table = document.getElementById(tableId);
-                    if (!table) {
-                        console.warn(`Table with ID ${tableId} not found.`);
-                        return;
-                    }
-                    const ws = XLSX.utils.table_to_sheet(table);
-
-                    // Remove "No." column (index 0) if it exists
-                    if (ws['!ref']) {
-                        const range = XLSX.utils.decode_range(ws['!ref']);
-                        for (let row = range.s.r; row <= range.e.r; row++) {
-                            // Check if cell exists before deleting
-                            const cellAddress = XLSX.utils.encode_cell({ r: row, c: 0 });
-                            if (ws[cellAddress]) {
-                                delete ws[cellAddress];
-                            }
-                        }
-                        // Adjust the sheet's range to reflect the removed column
-                        ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-                    }
-
-
-                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-                };
-
-                addSheetFromTable('pasienTable', 'Data Pasien');
-                addSheetFromTable('dokterTable', 'Data Dokter');
-                addSheetFromTable('transaksiPasienTable', 'Semua Transaksi');
-                addSheetFromTable('transaksiLunasTable', 'Transaksi Lunas');
-                addSheetFromTable('transaksiBelumLunasTable', 'Transaksi Belum Lunas');
-                addSheetFromTable('obatTable', 'Stok Obat');
-                addSheetFromTable('usersTable', 'Pengguna Sistem');
-
-                XLSX.writeFile(wb, "seluruh_laporan_klinik.xlsx");
-            });
-
-            // Event Listeners for Transaction Report Filters
-            showAllBtn.addEventListener('click', () => showTable('allTransactionsTableContainer'));
-            showPaidBtn.addEventListener('click', () => showTable('paidTransactionsTableContainer'));
-            showUnpaidBtn.addEventListener('click', () => showTable('unpaidTransactionsTableContainer'));
-
-
-            // Initial display and sidebar setup
-            function init() {
-                populateAllReportTables();
-                showTable('allTransactionsTableContainer'); // Show 'Semua Transaksi' by default
-
-                // Check screen width on load and apply initial sidebar state
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('minimized'); // Ensure not minimized on mobile
-                    sidebar.classList.remove('active'); // Ensure hidden by default
-                    mainContent.style.marginLeft = '0';
-                } else {
-                    sidebar.classList.remove('active'); // Ensure not active on desktop
-                    mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
-                }
-            }
-
-            // Run initialization
-            init();
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const mainContent = document.getElementById('main-content');
+    const mobileToggle = document.getElementById('mobile-toggle');
+
+    // Get report table containers
+    // Anda harus memastikan elemen-elemen ini ada di HTML halaman laporan Anda
+    const patientTableContainer = document.getElementById('patientReportTableContainer');
+    const medicineTableContainer = document.getElementById('medicineReportTableContainer');
+    const doctorScheduleTableContainer = document.getElementById('doctorScheduleReportTableContainer');
+    const userAccountTableContainer = document = document.getElementById('userAccountReportTableContainer');
+    const allTransactionsTableContainer = document.getElementById('allTransactionsTableContainer');
+    const paidTransactionsTableContainer = document.getElementById('paidTransactionsTableContainer');
+    const unpaidTransactionsTableContainer = document.getElementById('unpaidTransactionsTableContainer');
+
+    // Get filter buttons (Anda harus memastikan elemen-elemen ini ada di HTML halaman laporan Anda)
+    const showAllBtn = document.getElementById('showAllTransactions');
+    const showPaidBtn = document.getElementById('showPaidTransactions');
+    const showUnpaidBtn = document.getElementById('showUnpaidTransactions');
+    const downloadAllReportsBtn = document.getElementById('downloadAllReportsBtn');
+
+    // Get other report type filter buttons
+    const showPatientReportBtn = document.getElementById('showPatientReport');
+    const showMedicineReportBtn = document.getElementById('showMedicineReport');
+    const showDoctorScheduleReportBtn = document.getElementById('showDoctorScheduleReport');
+    const showUserAccountReportBtn = document.getElementById('showUserAccountReport');
+
+    // --- Sidebar Toggle Logic ---
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('minimized');
+        if (sidebar.classList.contains('minimized')) {
+            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+            sidebarToggle.querySelector('i').classList.replace('fa-chevron-left', 'fa-chevron-right');
+        } else {
+            mainContent.style.marginLeft = 'var(--sidebar-width)';
+            sidebarToggle.querySelector('i').classList.replace('fa-chevron-right', 'fa-chevron-left');
+        }
+    });
+
+    mobileToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    mainContent.addEventListener('click', (event) => {
+        if (sidebar.classList.contains('active') && !sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
+            sidebar.classList.remove('active');
+        }
+    });
+
+    // --- Report Table Display Logic ---
+    function showTable(tableContainerId) {
+        // Sembunyikan semua kontainer tabel laporan terlebih dahulu
+        const allContainers = document.querySelectorAll('.report-table-container');
+        allContainers.forEach(container => {
+            container.style.display = 'none';
         });
-    </script>
+        // Tampilkan kontainer yang dipilih
+        const selectedContainer = document.getElementById(tableContainerId);
+        if (selectedContainer) {
+            selectedContainer.style.display = 'block';
+        }
+    }
+
+    // --- Data Retrieval and Population Functions ---
+
+    // Fungsi untuk mengambil data dari localStorage
+    function getLocalStorageData(key) {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : [];
+    }
+
+    // Fungsi untuk mengisi tabel pasien
+    function populatePatientTable() {
+        const patients = getLocalStorageData('patients'); // Asumsi 'patients' adalah kunci untuk data pasien
+        const tableBody = document.querySelector('#patientReportTable tbody');
+        if (!tableBody) {
+            console.warn("Tabel pasien tidak ditemukan di HTML (ID: patientReportTable)");
+            return;
+        }
+
+        tableBody.innerHTML = ''; // Hapus baris yang ada
+
+        patients.forEach((patient, index) => {
+            const row = tableBody.insertRow();
+            row.insertCell().textContent = index + 1;
+            row.insertCell().textContent = patient.id || '-';
+            row.insertCell().textContent = patient.nama || '-';
+            row.insertCell().textContent = patient.tanggalLahir || '-';
+            row.insertCell().textContent = patient.jenisKelamin || '-';
+            row.insertCell().textContent = patient.alamat || '-';
+            row.insertCell().textContent = patient.telepon || '-';
+        });
+    }
+
+    // Fungsi untuk mengisi tabel obat
+    function populateMedicineTable() {
+        const obats = getLocalStorageData('obats'); // Asumsi 'obats' adalah kunci untuk data obat
+        const tableBody = document.querySelector('#medicineReportTable tbody');
+        if (!tableBody) {
+            console.warn("Tabel obat tidak ditemukan di HTML (ID: medicineReportTable)");
+            return;
+        }
+
+        tableBody.innerHTML = '';
+
+        obats.forEach((obat, index) => {
+            const row = tableBody.insertRow();
+            row.insertCell().textContent = index + 1;
+            row.insertCell().textContent = obat.kodeObat || '-';
+            row.insertCell().textContent = obat.namaObat || '-';
+            row.insertCell().textContent = obat.jenis || '-';
+            row.insertCell().textContent = obat.stok || '0';
+            row.insertCell().textContent = `Rp ${parseFloat(obat.harga || 0).toLocaleString('id-ID')}`;
+            row.insertCell().textContent = obat.tanggalKadaluarsa || '-';
+        });
+    }
+
+    // Fungsi untuk mengisi tabel jadwal dokter
+    function populateDoctorScheduleTable() {
+        const jadwalDokter = getLocalStorageData('jadwalDokter'); // Asumsi 'jadwalDokter' adalah kunci
+        const tableBody = document.querySelector('#doctorScheduleReportTable tbody');
+        if (!tableBody) {
+            console.warn("Tabel jadwal dokter tidak ditemukan di HTML (ID: doctorScheduleReportTable)");
+            return;
+        }
+
+        tableBody.innerHTML = '';
+
+        jadwalDokter.forEach((jadwal, index) => {
+            const row = tableBody.insertRow();
+            row.insertCell().textContent = index + 1;
+            row.insertCell().textContent = jadwal.namaDokter || '-';
+            row.insertCell().textContent = jadwal.poli || '-';
+            row.insertCell().textContent = jadwal.hari || '-';
+            row.insertCell().textContent = jadwal.jamMulai || '-';
+            row.insertCell().textContent = jadwal.jamSelesai || '-';
+        });
+    }
+
+    // Fungsi untuk mengisi tabel akun pengguna
+    function populateUserAccountTable() {
+        const users = getLocalStorageData('users'); // Asumsi 'users' adalah kunci untuk akun pengguna
+        const tableBody = document.querySelector('#userAccountTable tbody');
+        if (!tableBody) {
+            console.warn("Tabel akun pengguna tidak ditemukan di HTML (ID: userAccountTable)");
+            return;
+        }
+
+        tableBody.innerHTML = '';
+
+        users.forEach((user, index) => {
+            const row = tableBody.insertRow();
+            row.insertCell().textContent = index + 1;
+            row.insertCell().textContent = user.username || '-';
+            row.insertCell().textContent = user.role || '-';
+        });
+    }
+
+    // Fungsi untuk mengisi tabel transaksi (semua, lunas, belum lunas)
+    function populateTransactionTables() {
+        const transactions = getLocalStorageData('transactions'); // Asumsi 'transactions' adalah kunci untuk transaksi
+
+        // Semua Transaksi
+        const allTableBody = document.querySelector('#allTransactionsTable tbody');
+        if (allTableBody) {
+            allTableBody.innerHTML = '';
+            transactions.forEach((transaction, index) => {
+                const row = allTableBody.insertRow();
+                row.insertCell().textContent = index + 1;
+                row.insertCell().textContent = transaction.id || '-';
+                row.insertCell().textContent = transaction.tanggal || '-';
+                row.insertCell().textContent = transaction.namaPasien || '-';
+                row.insertCell().textContent = transaction.jenisLayanan || '-';
+                row.insertCell().textContent = `Rp ${parseFloat(transaction.totalBiaya || 0).toLocaleString('id-ID')}`;
+                row.insertCell().textContent = transaction.statusPembayaran || '-';
+            });
+        } else {
+            console.warn("Tabel semua transaksi tidak ditemukan di HTML (ID: allTransactionsTable)");
+        }
+
+
+        // Transaksi Lunas
+        const paidTableBody = document.querySelector('#paidTransactionsTable tbody');
+        if (paidTableBody) {
+            paidTableBody.innerHTML = '';
+            const paidTransactions = transactions.filter(t => t.statusPembayaran && t.statusPembayaran.toLowerCase() === 'lunas');
+            paidTransactions.forEach((transaction, index) => {
+                const row = paidTableBody.insertRow();
+                row.insertCell().textContent = index + 1;
+                row.insertCell().textContent = transaction.id || '-';
+                row.insertCell().textContent = transaction.tanggal || '-';
+                row.insertCell().textContent = transaction.namaPasien || '-';
+                row.insertCell().textContent = transaction.jenisLayanan || '-';
+                row.insertCell().textContent = `Rp ${parseFloat(transaction.totalBiaya || 0).toLocaleString('id-ID')}`;
+                row.insertCell().textContent = transaction.statusPembayaran || '-';
+            });
+        } else {
+            console.warn("Tabel transaksi lunas tidak ditemukan di HTML (ID: paidTransactionsTable)");
+        }
+
+
+        // Transaksi Belum Lunas
+        const unpaidTableBody = document.querySelector('#unpaidTransactionsTable tbody');
+        if (unpaidTableBody) {
+            unpaidTableBody.innerHTML = '';
+            const unpaidTransactions = transactions.filter(t => t.statusPembayaran && t.statusPembayaran.toLowerCase() === 'belum lunas');
+            unpaidTransactions.forEach((transaction, index) => {
+                const row = unpaidTableBody.insertRow();
+                row.insertCell().textContent = index + 1;
+                row.insertCell().textContent = transaction.id || '-';
+                row.insertCell().textContent = transaction.tanggal || '-';
+                row.insertCell().textContent = transaction.namaPasien || '-';
+                row.insertCell().textContent = transaction.jenisLayanan || '-';
+                row.insertCell().textContent = `Rp ${parseFloat(transaction.totalBiaya || 0).toLocaleString('id-ID')}`;
+                row.insertCell().textContent = transaction.statusPembayaran || '-';
+            });
+        } else {
+            console.warn("Tabel transaksi belum lunas tidak ditemukan di HTML (ID: unpaidTransactionsTable)");
+        }
+    }
+
+    // Fungsi utama untuk mengisi semua tabel laporan
+    function populateAllReportTables() {
+        populatePatientTable();
+        populateMedicineTable();
+        populateDoctorScheduleTable();
+        populateUserAccountTable();
+        populateTransactionTables();
+    }
+
+    // --- Export to Excel Logic ---
+    if (downloadAllReportsBtn) {
+        downloadAllReportsBtn.addEventListener('click', () => {
+            // Pastikan library XLSX sudah dimuat (misalnya dari CDN)
+            if (typeof XLSX === 'undefined') {
+                alert('Library XLSX tidak ditemukan. Pastikan Anda telah menyertakannya di HTML.');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            // Fungsi untuk menambahkan sheet dari tabel HTML
+            const addSheetFromTable = (tableId, sheetName) => {
+                const table = document.getElementById(tableId);
+                if (table) {
+                    // Klon tabel untuk menghapus kolom "Aksi" sebelum ekspor
+                    const tableCloneForExcel = table.cloneNode(true);
+
+                    // Hapus kolom terakhir (asumsi 'Aksi') dari thead dan tbody
+                    tableCloneForExcel.querySelectorAll('thead tr, tbody tr').forEach(row => {
+                        if (row.cells.length > 0) {
+                            // Hapus sel terakhir. Sesuaikan jika kolom 'Aksi' tidak selalu yang terakhir
+                            row.cells[row.cells.length - 1].remove();
+                        }
+                    });
+
+                    const ws = XLSX.utils.table_to_sheet(tableCloneForExcel);
+                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                } else {
+                    console.warn(`Tabel dengan ID '${tableId}' tidak ditemukan untuk diekspor.`);
+                }
+            };
+
+            // Tambahkan sheet untuk setiap laporan
+            addSheetFromTable('patientReportTable', 'Data Pasien');
+            addSheetFromTable('medicineReportTable', 'Data Obat');
+            addSheetFromTable('doctorScheduleReportTable', 'Jadwal Dokter');
+            addSheetFromTable('userAccountTable', 'Pengguna Sistem');
+            addSheetFromTable('allTransactionsTable', 'Semua Transaksi');
+            addSheetFromTable('paidTransactionsTable', 'Transaksi Lunas');
+            addSheetFromTable('unpaidTransactionsTable', 'Transaksi Belum Lunas');
+
+            XLSX.writeFile(wb, "seluruh_laporan_klinik.xlsx");
+        });
+    } else {
+        console.warn("Tombol downloadAllReportsBtn tidak ditemukan.");
+    }
+
+
+    // Event Listeners untuk Filter Laporan Transaksi
+    if (showAllBtn) showAllBtn.addEventListener('click', () => showTable('allTransactionsTableContainer'));
+    else console.warn("Tombol showAllTransactions tidak ditemukan.");
+
+    if (showPaidBtn) showPaidBtn.addEventListener('click', () => showTable('paidTransactionsTableContainer'));
+    else console.warn("Tombol showPaidTransactions tidak ditemukan.");
+
+    if (showUnpaidBtn) showUnpaidBtn.addEventListener('click', () => showTable('unpaidTransactionsTableContainer'));
+    else console.warn("Tombol showUnpaidTransactions tidak ditemukan.");
+
+    // Event Listeners untuk tombol laporan lainnya
+    if (showPatientReportBtn) showPatientReportBtn.addEventListener('click', () => showTable('patientReportTableContainer'));
+    else console.warn("Tombol showPatientReport tidak ditemukan.");
+
+    if (showMedicineReportBtn) showMedicineReportBtn.addEventListener('click', () => showTable('medicineReportTableContainer'));
+    else console.warn("Tombol showMedicineReport tidak ditemukan.");
+
+    if (showDoctorScheduleReportBtn) showDoctorScheduleReportBtn.addEventListener('click', () => showTable('doctorScheduleReportTableContainer'));
+    else console.warn("Tombol showDoctorScheduleReport tidak ditemukan.");
+
+    if (showUserAccountReportBtn) showUserAccountReportBtn.addEventListener('click', () => showTable('userAccountReportTableContainer'));
+    else console.warn("Tombol showUserAccountReport tidak ditemukan.");
+
+
+    // Fungsi inisialisasi
+    function init() {
+        populateAllReportTables(); // Isi semua tabel dengan data
+        showTable('allTransactionsTableContainer'); // Tampilkan 'Semua Transaksi' secara default
+
+        // Periksa lebar layar saat dimuat dan terapkan status sidebar awal
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('minimized'); // Pastikan tidak diminimalkan di seluler
+            sidebar.classList.remove('active'); // Pastikan tersembunyi secara default
+            mainContent.style.marginLeft = '0';
+        } else {
+            sidebar.classList.remove('active'); // Pastikan tidak aktif di desktop
+            mainContent.style.marginLeft = 'var(--sidebar-width)'; // Margin default desktop
+        }
+    }
+
+    // Jalankan inisialisasi
+    init();
+});
+</script>
+    
 </body>
 </html>
