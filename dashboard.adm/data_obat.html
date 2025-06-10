@@ -842,12 +842,12 @@
                         <label for="searchFilter">Cari Obat:</label>
                         <input type="text" id="searchFilter" class="form-control" placeholder="Cari berdasarkan Nama Obat">
                     </div>
-                    <div class="report-buttons-container">
-                        <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i>Unduh PDF</button>
-                        <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i>Unduh Excel</button>
-                        </div>
                 </div>
 
+                <div class="report-buttons-container" style="margin-bottom: 20px;">
+                    <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i>Unduh PDF</button>
+                    <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i>Unduh Excel</button>
+                </div>
                 <div class="table-responsive">
                     <table class="obat-table">
                         <thead>
@@ -1085,11 +1085,24 @@
                 localStorage.setItem('lastObatNumber', lastObatNumber.toString());
             }
 
-            // Generate unique obat ID in OBT-XXX format
+            // Generate unique obat ID in OBT-YYMMDD-XXX format
             function generateObatId() {
-                lastObatNumber++; // Increment the number for the next ID
-                return `OBT-${lastObatNumber.toString().padStart(3, '0')}`; // Format to OBT-001, OBT-002, etc.
+                const date = new Date();
+                const year = date.getFullYear().toString().slice(2); // Get last two digits of the year
+                const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+                const day = date.getDate().toString().padStart(2, '0');
+
+                let counter = 1;
+                let newId;
+                do {
+                    // Combine date and counter
+                    newId = `OBT-${year}${month}${day}-${counter.toString().padStart(3, '0')}`;
+                    counter++;
+                } while (obats.some(obat => obat.id === newId)); // Check if ID already exists
+
+                return newId;
             }
+
 
             // Display obats in the table
             function displayObats(searchTerm = '') {
@@ -1203,7 +1216,7 @@
                 if (obatIdToDelete) {
                     obats = obats.filter(o => o.id !== obatIdToDelete);
                     saveObatsToLocalStorage();
-                    displayObats(searchFilterInput.value);
+                    displayObats(searchFilterInput.value); // Refresh display after delete
                     deleteConfirmationModal.style.display = 'none';
                     toggleBodyOverflow(false);
                     alert('Data obat berhasil dihapus!');
@@ -1277,7 +1290,7 @@
                 }
 
                 saveObatsToLocalStorage();
-                displayObats(searchFilterInput.value);
+                displayObats(searchFilterInput.value); // Refresh display after save
                 hideForm();
             });
 
@@ -1338,21 +1351,22 @@
                 // Hapus kolom "Aksi" sebelum menulis ke Excel
                 const ws = wb.Sheets["Data Obat"];
                 const range = XLSX.utils.decode_range(ws['!ref']);
+                
+                // Adjust the range to exclude the last column ("Aksi")
+                range.e.c--; // Decrement end column index
+
+                const new_ws = {};
                 for (let R = range.s.r; R <= range.e.r; ++R) {
                     for (let C = range.s.c; C <= range.e.c; ++C) {
-                        const cell = ws[XLSX.utils.encode_cell({r: R, c: C})];
-                        if (cell && cell.v === 'Aksi') {
-                            for (let i = C; i < range.e.c; ++i) {
-                                const nextCell = ws[XLSX.utils.encode_cell({r: R, c: i + 1})];
-                                ws[XLSX.utils.encode_cell({r: R, c: i})] = nextCell;
-                            }
-                            delete ws[XLSX.utils.encode_cell({r: R, c: range.e.c})];
+                        const cell_address = XLSX.utils.encode_cell({r: R, c: C});
+                        if (ws[cell_address]) {
+                            new_ws[cell_address] = ws[cell_address];
                         }
                     }
                 }
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c, range.e.r, range.e.c - 1);
+                new_ws['!ref'] = XLSX.utils.encode_range(range);
 
-
+                XLSX.utils.book_append_sheet(wb, new_ws, "Data Obat"); // Re-add with new sheet
                 XLSX.writeFile(wb, 'data_obat.xlsx');
             });
 
