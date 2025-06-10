@@ -437,42 +437,30 @@
             box-shadow: var(--shadow);
         }
 
-        #export-pdf-pasien-btn,
-        #export-pdf-all-transactions-btn,
-        #export-pdf-paid-transactions-btn,
-        #export-pdf-unpaid-transactions-btn,
-        #export-pdf-obat-btn,
-        #export-pdf-pengguna-btn {
+        .report-button.all-download-btn { /* Style for the new single download buttons */
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            justify-content: center;
+        }
+
+        #download-all-pdf-btn {
             background-color: var(--report-pdf-bg);
         }
 
-        #export-pdf-pasien-btn:hover,
-        #export-pdf-all-transactions-btn:hover,
-        #export-pdf-paid-transactions-btn:hover,
-        #export-pdf-unpaid-transactions-btn:hover,
-        #export-pdf-obat-btn:hover,
-        #export-pdf-pengguna-btn:hover {
+        #download-all-pdf-btn:hover {
             background-color: #C0392B;
             transform: translateY(-2px);
         }
 
-        #export-excel-pasien-btn,
-        #export-excel-all-transactions-btn,
-        #export-excel-paid-transactions-btn,
-        #export-excel-unpaid-transactions-btn,
-        #export-excel-obat-btn,
-        #export-excel-pengguna-btn {
+        #download-all-excel-btn {
             background-color: var(--report-excel-bg);
         }
-        #export-excel-pasien-btn:hover,
-        #export-excel-all-transactions-btn:hover,
-        #export-excel-paid-transactions-btn:hover,
-        #export-excel-unpaid-transactions-btn:hover,
-        #export-excel-obat-btn:hover,
-        #export-excel-pengguna-btn:hover {
+        #download-all-excel-btn:hover {
             background-color: #229954;
             transform: translateY(-2px);
         }
+
 
         /* NEW CSS for filter buttons and table display */
         .filter-buttons {
@@ -699,8 +687,17 @@
     </div>
     <div class="main-content" id="main-content">
         <header class="header">
-            <h1>Manajemen Laporan</h1>
+            <h1>Laporan Klinik</h1>
+            <div class="user-info">
+                <span id="welcome-user"></span>
+                </div>
         </header>
+
+        <div class="report-buttons-container" style="justify-content: center; width: 100%; max-width: 1200px; margin-bottom: 30px;">
+            <button class="report-button all-download-btn" id="download-all-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh Seluruh Laporan (PDF)</button>
+            <button class="report-button all-download-btn" id="download-all-excel-btn"><i class="fas fa-file-excel"></i> Unduh Seluruh Laporan (Excel)</button>
+        </div>
+
 
         <main>
             <div id="laporan-pasien" class="content-section">
@@ -714,10 +711,6 @@
                         <span>Pasien Baru Bulan Ini:</span>
                         <span id="pasien-baru-bulan-ini"></span>
                     </div>
-                </div>
-                <div class="report-buttons-container">
-                    <button class="report-button" id="export-pdf-pasien-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button" id="export-excel-pasien-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
                 </div>
                 <div class="report-table-container">
                     <table id="pasienTable" class="report-table">
@@ -749,10 +742,6 @@
                         <span>Dokter Aktif:</span>
                         <span id="dokter-aktif"></span>
                     </div>
-                </div>
-                <div class="report-buttons-container">
-                    <button class="report-button" id="export-pdf-dokter-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button" id="export-excel-dokter-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
                 </div>
                 <div class="report-table-container">
                     <table id="dokterTable" class="report-table">
@@ -799,72 +788,60 @@
 
                 <div id="allTransactionsTableContainer" class="table-container active-table">
                     <h3>Semua Transaksi</h3>
-                    <div class="report-buttons-container">
-                        <button class="report-button" id="export-pdf-all-transactions-btn"><i class="fas fa-file-pdf"></i> Unduh PDF Semua Transaksi</button>
-                        <button class="report-button" id="export-excel-all-transactions-btn"><i class="fas fa-file-excel"></i> Unduh Excel Semua Transaksi</button>
-                    </div>
-                    <table id="transaksiPasienTable" class="report-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>ID Transaksi</th>
-                                <th>Tanggal</th>
-                                <th>Nama Pasien</th>
-                                <th>Jenis Layanan</th>
-                                <th>Total Biaya</th>
-                                <th>Status Pembayaran</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
+                    <div class="report-table-container"> <table id="transaksiPasienTable" class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>ID Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Nama Pasien</th>
+                                    <th>Jenis Layanan</th>
+                                    <th>Total Biaya</th>
+                                    <th>Status Pembayaran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div> </div>
 
                 <div id="paidTransactionsTableContainer" class="table-container" style="display: none;">
                     <h3>Transaksi Lunas</h3>
-                    <div class="report-buttons-container">
-                        <button class="report-button" id="export-pdf-paid-transactions-btn"><i class="fas fa-file-pdf"></i> Unduh PDF Transaksi Lunas</button>
-                        <button class="report-button" id="export-excel-paid-transactions-btn"><i class="fas fa-file-excel"></i> Unduh Excel Transaksi Lunas</button>
-                    </div>
-                    <table id="transaksiLunasTable" class="report-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>ID Transaksi</th>
-                                <th>Tanggal</th>
-                                <th>Nama Pasien</th>
-                                <th>Jenis Layanan</th>
-                                <th>Total Biaya</th>
-                                <th>Status Pembayaran</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
+                    <div class="report-table-container"> <table id="transaksiLunasTable" class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>ID Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Nama Pasien</th>
+                                    <th>Jenis Layanan</th>
+                                    <th>Total Biaya</th>
+                                    <th>Status Pembayaran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div> </div>
 
                 <div id="unpaidTransactionsTableContainer" class="table-container" style="display: none;">
                     <h3>Transaksi Belum Lunas</h3>
-                    <div class="report-buttons-container">
-                        <button class="report-button" id="export-pdf-unpaid-transactions-btn"><i class="fas fa-file-pdf"></i> Unduh PDF Transaksi Belum Lunas</button>
-                        <button class="report-button" id="export-excel-unpaid-transactions-btn"><i class="fas fa-file-excel"></i> Unduh Excel Transaksi Belum Lunas</button>
-                    </div>
-                    <table id="transaksiBelumLunasTable" class="report-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>ID Transaksi</th>
-                                <th>Tanggal</th>
-                                <th>Nama Pasien</th>
-                                <th>Jenis Layanan</th>
-                                <th>Total Biaya</th>
-                                <th>Status Pembayaran</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
+                    <div class="report-table-container"> <table id="transaksiBelumLunasTable" class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>ID Transaksi</th>
+                                    <th>Tanggal</th>
+                                    <th>Nama Pasien</th>
+                                    <th>Jenis Layanan</th>
+                                    <th>Total Biaya</th>
+                                    <th>Status Pembayaran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div> </div>
             </section>
 
             <div id="laporan-obat" class="content-section">
@@ -878,10 +855,6 @@
                         <span>Stok Obat Kritis (&lt; 10 unit):</span>
                         <span id="obat-kritis"></span>
                     </div>
-                </div>
-                <div class="report-buttons-container">
-                    <button class="report-button" id="export-pdf-obat-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button" id="export-excel-obat-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
                 </div>
                 <div class="report-table-container">
                     <table id="obatTable" class="report-table">
@@ -921,10 +894,6 @@
                         <span>Apoteker Terdaftar:</span>
                         <span id="apoteker-count"></span>
                     </div>
-                </div>
-                <div class="report-buttons-container">
-                    <button class="report-button" id="export-pdf-pengguna-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                    <button class="report-button" id="export-excel-pengguna-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
                 </div>
                 <div class="report-table-container">
                     <table id="usersTable" class="report-table">
@@ -988,7 +957,7 @@
                 }
             });
 
-            // --- User Info and Logout ---
+            // --- User Info ---
             const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
             if (loggedInUser) {
                 document.getElementById('welcome-user').textContent = `Selamat datang, ${loggedInUser.username}!`;
@@ -1056,25 +1025,6 @@
                 tableBody.innerHTML = '';
                 let newPatientsThisMonth = 0;
 
-                patients.forEach((patient, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = patient.id;
-                    row.insertCell().textContent = patient.namaLengkap;
-                    row.insertCell().textContent = patient.tanggalLahir;
-                    row.insertCell().textContent = patient.jenisKelamin;
-                    row.insertCell().textContent = patient.alamat;
-                    row.insertCell().textContent = patient.telepon;
-
-                    const registrationDate = new Date(patient.tanggalRegistrasi);
-                    if (registrationDate.getMonth() === currentMonth && registrationDate.getFullYear() === currentYear) {
-                        newPatientsThisMonth++;
-                    }
-                });
-
-                totalPasienSpan.textContent = patients.length;
-                pasienBaruBulanIniSpan.textContent = newPatientsThisMonth;
-
                 if (patients.length === 0) {
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
@@ -1084,7 +1034,26 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                } else {
+                    patients.forEach((patient, index) => {
+                        const row = tableBody.insertRow();
+                        row.insertCell().textContent = index + 1 + ".";
+                        row.insertCell().textContent = patient.id;
+                        row.insertCell().textContent = patient.namaLengkap;
+                        row.insertCell().textContent = patient.tanggalLahir;
+                        row.insertCell().textContent = patient.jenisKelamin;
+                        row.insertCell().textContent = patient.alamat;
+                        row.insertCell().textContent = patient.telepon;
+
+                        const registrationDate = new Date(patient.tanggalRegistrasi);
+                        if (registrationDate.getMonth() === currentMonth && registrationDate.getFullYear() === currentYear) {
+                            newPatientsThisMonth++;
+                        }
+                    });
                 }
+
+                totalPasienSpan.textContent = patients.length;
+                pasienBaruBulanIniSpan.textContent = newPatientsThisMonth;
             }
 
             function populateDoctorReport() {
@@ -1096,25 +1065,6 @@
                 tableBody.innerHTML = '';
                 let activeDoctors = 0;
 
-                doctors.forEach((doctor, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = doctor.id;
-                    row.insertCell().textContent = doctor.nama;
-                    row.insertCell().textContent = doctor.poli;
-                    row.insertCell().textContent = doctor.hariPraktek.join(', ');
-                    row.insertCell().textContent = doctor.jamMulai;
-                    row.insertCell().textContent = doctor.jamSelesai;
-                    row.insertCell().textContent = doctor.status;
-
-                    if (doctor.status === 'Aktif') {
-                        activeDoctors++;
-                    }
-                });
-
-                totalDokterSpan.textContent = doctors.length;
-                dokterAktifSpan.textContent = activeDoctors;
-
                 if (doctors.length === 0) {
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
@@ -1124,7 +1074,26 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                } else {
+                    doctors.forEach((doctor, index) => {
+                        const row = tableBody.insertRow();
+                        row.insertCell().textContent = index + 1 + ".";
+                        row.insertCell().textContent = doctor.id;
+                        row.insertCell().textContent = doctor.nama;
+                        row.insertCell().textContent = doctor.poli;
+                        row.insertCell().textContent = doctor.hariPraktek.join(', ');
+                        row.insertCell().textContent = doctor.jamMulai;
+                        row.insertCell().textContent = doctor.jamSelesai;
+                        row.insertCell().textContent = doctor.status;
+
+                        if (doctor.status === 'Aktif') {
+                            activeDoctors++;
+                        }
+                    });
                 }
+
+                totalDokterSpan.textContent = doctors.length;
+                dokterAktifSpan.textContent = activeDoctors;
             }
 
             function populateTransactionReport() {
@@ -1133,61 +1102,16 @@
 
                 const totalTransaksiSpan = document.getElementById('total-transaksi');
 
+                // Clear previous data
                 tableBodyAll.innerHTML = '';
                 transaksiLunasTableBody.innerHTML = '';
                 transaksiBelumLunasTableBody.innerHTML = '';
 
                 let totalRevenueLunas = 0;
                 let totalRevenueBelumLunas = 0;
+                let indexLunas = 0; // Separate index for 'Lunas' table
+                let indexBelumLunas = 0; // Separate index for 'Belum Lunas' table
 
-                transactions.forEach((transaction, index) => {
-                    // Populate 'Semua Transaksi' table
-                    const rowAll = tableBodyAll.insertRow();
-                    rowAll.insertCell().textContent = index + 1 + ".";
-                    rowAll.insertCell().textContent = transaction.id;
-                    rowAll.insertCell().textContent = transaction.tanggal;
-                    rowAll.insertCell().textContent = transaction.namaPasien;
-                    rowAll.insertCell().textContent = transaction.jenisLayanan;
-                    rowAll.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                    rowAll.insertCell().textContent = transaction.statusPembayaran;
-
-                    // Apply red color for 'Belum Lunas'
-                    if (transaction.statusPembayaran === 'Belum Lunas') {
-                        rowAll.style.color = 'red';
-                        rowAll.style.fontWeight = 'bold';
-                        totalRevenueBelumLunas += transaction.totalBiaya;
-
-                        // Populate 'Belum Lunas' table
-                        const rowUnpaid = transaksiBelumLunasTableBody.insertRow();
-                        rowUnpaid.insertCell().textContent = transaksiBelumLunasTableBody.rows.length + "."; // Re-index for this table
-                        rowUnpaid.insertCell().textContent = transaction.id;
-                        rowUnpaid.insertCell().textContent = transaction.tanggal;
-                        rowUnpaid.insertCell().textContent = transaction.namaPasien;
-                        rowUnpaid.insertCell().textContent = transaction.jenisLayanan;
-                        rowUnpaid.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                        rowUnpaid.insertCell().textContent = transaction.statusPembayaran;
-                        rowUnpaid.style.color = 'red';
-                        rowUnpaid.style.fontWeight = 'bold';
-                    } else if (transaction.statusPembayaran === 'Lunas') {
-                        totalRevenueLunas += transaction.totalBiaya;
-
-                        // Populate 'Lunas' table
-                        const rowPaid = transaksiLunasTableBody.insertRow();
-                        rowPaid.insertCell().textContent = transaksiLunasTableBody.rows.length + "."; // Re-index for this table
-                        rowPaid.insertCell().textContent = transaction.id;
-                        rowPaid.insertCell().textContent = transaction.tanggal;
-                        rowPaid.insertCell().textContent = transaction.namaPasien;
-                        rowPaid.insertCell().textContent = transaction.jenisLayanan;
-                        rowPaid.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                        rowPaid.insertCell().textContent = transaction.statusPembayaran;
-                    }
-                });
-
-                totalTransaksiSpan.textContent = transactions.length;
-                totalPendapatanLunasSpan.textContent = formatRupiah(totalRevenueLunas);
-                totalPendapatanBelumLunasSpan.textContent = formatRupiah(totalRevenueBelumLunas);
-
-                // Handle no data for 'Semua Transaksi'
                 if (transactions.length === 0) {
                     const noDataRowAll = tableBodyAll.insertRow();
                     const noDataCellAll = noDataRowAll.insertCell();
@@ -1197,10 +1121,7 @@
                     noDataCellAll.style.padding = "20px";
                     noDataCellAll.style.fontStyle = "italic";
                     noDataCellAll.style.color = "#555";
-                }
 
-                // Handle no data for 'Lunas'
-                if (transaksiLunasTableBody.rows.length === 0) {
                     const noDataRowPaid = transaksiLunasTableBody.insertRow();
                     const noDataCellPaid = noDataRowPaid.insertCell();
                     noDataCellPaid.colSpan = 7;
@@ -1209,10 +1130,7 @@
                     noDataCellPaid.style.padding = "20px";
                     noDataCellPaid.style.fontStyle = "italic";
                     noDataCellPaid.style.color = "#555";
-                }
 
-                // Handle no data for 'Belum Lunas'
-                if (transaksiBelumLunasTableBody.rows.length === 0) {
                     const noDataRowUnpaid = transaksiBelumLunasTableBody.insertRow();
                     const noDataCellUnpaid = noDataRowUnpaid.insertCell();
                     noDataCellUnpaid.colSpan = 7;
@@ -1221,7 +1139,80 @@
                     noDataCellUnpaid.style.padding = "20px";
                     noDataCellUnpaid.style.fontStyle = "italic";
                     noDataCellUnpaid.style.color = "#555";
+
+                } else {
+                    transactions.forEach((transaction, index) => {
+                        // Populate 'Semua Transaksi' table
+                        const rowAll = tableBodyAll.insertRow();
+                        rowAll.insertCell().textContent = index + 1 + ".";
+                        rowAll.insertCell().textContent = transaction.id;
+                        rowAll.insertCell().textContent = transaction.tanggal;
+                        rowAll.insertCell().textContent = transaction.namaPasien;
+                        rowAll.insertCell().textContent = transaction.jenisLayanan;
+                        rowAll.insertCell().textContent = formatRupiah(transaction.totalBiaya);
+                        rowAll.insertCell().textContent = transaction.statusPembayaran;
+
+                        // Apply red color for 'Belum Lunas'
+                        if (transaction.statusPembayaran === 'Belum Lunas') {
+                            rowAll.style.color = 'red';
+                            rowAll.style.fontWeight = 'bold';
+                            totalRevenueBelumLunas += transaction.totalBiaya;
+
+                            // Populate 'Belum Lunas' table
+                            const rowUnpaid = transaksiBelumLunasTableBody.insertRow();
+                            rowUnpaid.insertCell().textContent = ++indexBelumLunas + "."; // Increment and use for numbering
+                            rowUnpaid.insertCell().textContent = transaction.id;
+                            rowUnpaid.insertCell().textContent = transaction.tanggal;
+                            rowUnpaid.insertCell().textContent = transaction.namaPasien;
+                            rowUnpaid.insertCell().textContent = transaction.jenisLayanan;
+                            rowUnpaid.insertCell().textContent = formatRupiah(transaction.totalBiaya);
+                            rowUnpaid.insertCell().textContent = transaction.statusPembayaran;
+                            rowUnpaid.style.color = 'red';
+                            rowUnpaid.style.fontWeight = 'bold';
+                        } else if (transaction.statusPembayaran === 'Lunas') {
+                            totalRevenueLunas += transaction.totalBiaya;
+
+                            // Populate 'Lunas' table
+                            const rowPaid = transaksiLunasTableBody.insertRow();
+                            rowPaid.insertCell().textContent = ++indexLunas + "."; // Increment and use for numbering
+                            rowPaid.insertCell().textContent = transaction.id;
+                            rowPaid.insertCell().textContent = transaction.tanggal;
+                            rowPaid.insertCell().textContent = transaction.namaPasien;
+                            rowPaid.insertCell().textContent = transaction.jenisLayanan;
+                            rowPaid.insertCell().textContent = formatRupiah(transaction.totalBiaya);
+                            rowPaid.insertCell().textContent = transaction.statusPembayaran;
+                        }
+                    });
+
+                    // Handle no data for 'Lunas' if all transactions are 'Belum Lunas'
+                    if (transaksiLunasTableBody.rows.length === 0) {
+                        const noDataRowPaid = transaksiLunasTableBody.insertRow();
+                        const noDataCellPaid = noDataRowPaid.insertCell();
+                        noDataCellPaid.colSpan = 7;
+                        noDataCellPaid.textContent = "Tidak ada data transaksi lunas untuk ditampilkan.";
+                        noDataCellPaid.style.textAlign = "center";
+                        noDataCellPaid.style.padding = "20px";
+                        noDataCellPaid.style.fontStyle = "italic";
+                        noDataCellPaid.style.color = "#555";
+                    }
+
+                    // Handle no data for 'Belum Lunas' if all transactions are 'Lunas'
+                    if (transaksiBelumLunasTableBody.rows.length === 0) {
+                        const noDataRowUnpaid = transaksiBelumLunasTableBody.insertRow();
+                        const noDataCellUnpaid = noDataRowUnpaid.insertCell();
+                        noDataCellUnpaid.colSpan = 7;
+                        noDataCellUnpaid.textContent = "Tidak ada data transaksi belum lunas untuk ditampilkan.";
+                        noDataCellUnpaid.style.textAlign = "center";
+                        noDataCellUnpaid.style.padding = "20px";
+                        noDataCellUnpaid.style.fontStyle = "italic";
+                        noDataCellUnpaid.style.color = "#555";
+                    }
                 }
+
+
+                totalTransaksiSpan.textContent = transactions.length;
+                totalPendapatanLunasSpan.textContent = formatRupiah(totalRevenueLunas);
+                totalPendapatanBelumLunasSpan.textContent = formatRupiah(totalRevenueBelumLunas);
             }
 
             function populateObatReport() {
@@ -1233,26 +1224,6 @@
                 tableBody.innerHTML = '';
                 let criticalStockCount = 0;
 
-                medicines.forEach((medicine, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = medicine.id;
-                    row.insertCell().textContent = medicine.namaObat;
-                    row.insertCell().textContent = medicine.jenis;
-                    row.insertCell().textContent = medicine.stok;
-                    row.insertCell().textContent = formatRupiah(medicine.hargaSatuan);
-                    row.insertCell().textContent = medicine.deskripsi;
-
-                    if (medicine.stok < 10) {
-                        criticalStockCount++;
-                        row.style.color = 'red'; // Highlight critical stock
-                        row.style.fontWeight = 'bold';
-                    }
-                });
-
-                totalJenisObatSpan.textContent = medicines.length;
-                obatKritisSpan.textContent = criticalStockCount;
-
                 if (medicines.length === 0) {
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
@@ -1262,7 +1233,27 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                } else {
+                    medicines.forEach((medicine, index) => {
+                        const row = tableBody.insertRow();
+                        row.insertCell().textContent = index + 1 + ".";
+                        row.insertCell().textContent = medicine.id;
+                        row.insertCell().textContent = medicine.namaObat;
+                        row.insertCell().textContent = medicine.jenis;
+                        row.insertCell().textContent = medicine.stok;
+                        row.insertCell().textContent = formatRupiah(medicine.hargaSatuan);
+                        row.insertCell().textContent = medicine.deskripsi;
+
+                        if (medicine.stok < 10) {
+                            criticalStockCount++;
+                            row.style.color = 'red'; // Highlight critical stock
+                            row.style.fontWeight = 'bold';
+                        }
+                    });
                 }
+
+                totalJenisObatSpan.textContent = medicines.length;
+                obatKritisSpan.textContent = criticalStockCount;
             }
 
             function populateUsersReport() {
@@ -1278,28 +1269,6 @@
                 let dokterCount = 0;
                 let apotekerCount = 0;
 
-                users.forEach((user, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = user.id;
-                    row.insertCell().textContent = user.username; // Assuming username is the name
-                    row.insertCell().textContent = user.email;
-                    row.insertCell().textContent = user.role;
-
-                    if (user.role === 'admin') {
-                        adminCount++;
-                    } else if (user.role === 'dokter') {
-                        dokterCount++;
-                    } else if (user.role === 'apoteker') {
-                        apotekerCount++;
-                    }
-                });
-
-                totalPenggunaSpan.textContent = users.length;
-                adminCountSpan.textContent = adminCount;
-                dokterCountSpan.textContent = dokterCount;
-                apotekerCountSpan.textContent = apotekerCount;
-
                 if (users.length === 0) {
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
@@ -1309,7 +1278,30 @@
                     noDataCell.style.padding = "20px";
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
+                } else {
+                    users.forEach((user, index) => {
+                        const row = tableBody.insertRow();
+                        row.insertCell().textContent = index + 1 + ".";
+                        row.insertCell().textContent = user.id;
+                        row.insertCell().textContent = user.username; // Assuming username is the name
+                        row.insertCell().textContent = user.email;
+                        row.insertCell().textContent = user.role;
+
+                        if (user.role === 'admin') {
+                            adminCount++;
+                        } else if (user.role === 'dokter') {
+                            dokterCount++;
+                        } else if (user.role === 'apoteker') {
+                            apotekerCount++;
+                        }
+                    });
                 }
+
+
+                totalPenggunaSpan.textContent = users.length;
+                adminCountSpan.textContent = adminCount;
+                dokterCountSpan.textContent = dokterCount;
+                apotekerCountSpan.textContent = apotekerCount;
             }
 
 
@@ -1321,82 +1313,75 @@
                 populateUsersReport(); // Call to populate the new users report
             }
 
-            // --- Export Functions ---
-            // Export Pasien PDF
-            document.getElementById('export-pdf-pasien-btn').addEventListener('click', function () {
+            // --- Global Export Functions ---
+
+            document.getElementById('download-all-pdf-btn').addEventListener('click', function () {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'letter');
-                doc.setFontSize(16);
-                doc.text("Laporan Data Pasien", 40, 60);
+                const margin = 40; // Default margin
+                let yPos = margin;
 
-                const table = document.getElementById('pasienTable');
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const data = [];
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.querySelector('td[colspan="7"]')) { // Skip "No data" row
-                        return;
+                const addHeaderAndFooter = (doc, pageNumber) => {
+                    doc.setFontSize(10);
+                    doc.setTextColor(100);
+                    doc.text("Klinik Sehat Selalu", margin, doc.internal.pageSize.height - 20);
+                    doc.text(`Halaman ${pageNumber}`, doc.internal.pageSize.width - margin - 30, doc.internal.pageSize.height - 20);
+                };
+
+                const addPage = (doc, title) => {
+                    if (yPos > margin) { // Add new page if it's not the very first content
+                        doc.addPage();
                     }
-                    data.push(Array.from(row.querySelectorAll('td')).map(td => td.textContent));
-                });
+                    yPos = margin; // Reset yPos for new page
+                    addHeaderAndFooter(doc, doc.internal.getNumberOfPages());
+                    doc.setFontSize(18);
+                    doc.setTextColor(var_secondary_color || '#333'); // Use secondary color or default
+                    doc.text(title, margin, yPos + 20);
+                    yPos += 50; // Space after title
+                };
 
+                // Helper to get table data
+                const getTableData = (tableId) => {
+                    const table = document.getElementById(tableId);
+                    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+                    const data = [];
+                    table.querySelectorAll('tbody tr').forEach(row => {
+                        if (row.querySelector('td[colspan]')) { // Skip "No data" row
+                            return;
+                        }
+                        const rowData = Array.from(row.querySelectorAll('td')).map(td => td.textContent);
+                        data.push(rowData);
+                    });
+                    return { headers, data };
+                };
+
+                // 1. Laporan Data Pasien
+                addPage(doc, "Laporan Data Pasien");
+                const pasienData = getTableData('pasienTable');
                 doc.autoTable({
-                    startY: 80,
-                    head: [headers],
-                    body: data,
+                    startY: yPos,
+                    head: [pasienData.headers],
+                    body: pasienData.data,
                     styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
                     headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
                     alternateRowStyles: { fillColor: [249, 249, 249] },
                     didParseCell: function (data) {
-                        // Remove the "No." column from PDF if desired
-                        if (data.column.index === 0) {
+                        if (data.column.index === 0) { // Remove 'No.' column from PDF table
                             data.cell.content = '';
                         }
+                    },
+                    didDrawPage: function (data) {
+                        yPos = data.cursor.y + margin; // Update yPos for next content
                     }
                 });
-                doc.save('laporan_data_pasien.pdf');
-            });
 
-            // Export Pasien Excel
-            document.getElementById('export-excel-pasien-btn').addEventListener('click', function () {
-                const table = document.getElementById('pasienTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-
-                // Remove the "No." column before exporting to Excel
-                // Assuming "No." is the first column (index 0)
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let row = range.s.r; row <= range.e.r; row++) {
-                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })]; // Delete the cell at column 0
-                }
-                // Adjust the sheet's range to reflect the removed column
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Pasien");
-                XLSX.writeFile(wb, "laporan_data_pasien.xlsx");
-            });
-
-            // Export Dokter PDF
-            document.getElementById('export-pdf-dokter-btn').addEventListener('click', function () {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'letter');
-                doc.setFontSize(16);
-                doc.text("Laporan Data Dokter", 40, 60);
-
-                const table = document.getElementById('dokterTable');
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const data = [];
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.querySelector('td[colspan="8"]')) { // Skip "No data" row
-                        return;
-                    }
-                    data.push(Array.from(row.querySelectorAll('td')).map(td => td.textContent));
-                });
-
+                // 2. Laporan Data Dokter
+                addPage(doc, "Laporan Data Dokter");
+                const dokterData = getTableData('dokterTable');
                 doc.autoTable({
-                    startY: 80,
-                    head: [headers],
-                    body: data,
+                    startY: yPos,
+                    head: [dokterData.headers],
+                    body: dokterData.data,
                     styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
                     headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
                     alternateRowStyles: { fillColor: [249, 249, 249] },
@@ -1404,48 +1389,19 @@
                         if (data.column.index === 0) {
                             data.cell.content = '';
                         }
+                    },
+                    didDrawPage: function (data) {
+                        yPos = data.cursor.y + margin;
                     }
                 });
-                doc.save('laporan_data_dokter.pdf');
-            });
 
-            // Export Dokter Excel
-            document.getElementById('export-excel-dokter-btn').addEventListener('click', function () {
-                const table = document.getElementById('dokterTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let row = range.s.r; row <= range.e.r; row++) {
-                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })];
-                }
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Dokter");
-                XLSX.writeFile(wb, "laporan_data_dokter.xlsx");
-            });
-
-            // Export All Transactions PDF
-            document.getElementById('export-pdf-all-transactions-btn').addEventListener('click', function () {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'letter');
-                doc.setFontSize(16);
-                doc.text("Laporan Semua Transaksi Pasien", 40, 60);
-
-                const table = document.getElementById('transaksiPasienTable');
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const data = [];
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.querySelector('td[colspan="7"]')) { // Skip "No data" row
-                        return;
-                    }
-                    const rowData = Array.from(row.querySelectorAll('td')).map(td => td.textContent);
-                    data.push(rowData);
-                });
-
+                // 3. Laporan Transaksi Pasien (Semua Transaksi)
+                addPage(doc, "Laporan Transaksi Pasien (Semua)");
+                const transaksiAllData = getTableData('transaksiPasienTable');
                 doc.autoTable({
-                    startY: 80,
-                    head: [headers],
-                    body: data,
+                    startY: yPos,
+                    head: [transaksiAllData.headers],
+                    body: transaksiAllData.data,
                     styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
                     headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
                     alternateRowStyles: { fillColor: [249, 249, 249] },
@@ -1453,204 +1409,94 @@
                         if (data.column.index === 0) {
                             data.cell.content = '';
                         }
-                        // Apply red color to 'Belum Lunas' status in PDF
-                        if (data.column.index === 6 && data.cell.text.includes('Belum Lunas')) { // Assuming Status Pembayaran is the 7th column (index 6)
-                            data.cell.styles.textColor = [255, 0, 0]; // Red color
-                        }
-                    }
-                });
-                doc.save('laporan_semua_transaksi_pasien.pdf');
-            });
-
-            // Export All Transactions Excel
-            document.getElementById('export-excel-all-transactions-btn').addEventListener('click', function () {
-                const table = document.getElementById('transaksiPasienTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let row = range.s.r; row <= range.e.r; row++) {
-                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })];
-                }
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Semua Transaksi");
-                XLSX.writeFile(wb, "laporan_semua_transaksi_pasien.xlsx");
-            });
-
-            // Export Paid Transactions PDF
-            document.getElementById('export-pdf-paid-transactions-btn').addEventListener('click', function () {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'letter');
-                doc.setFontSize(16);
-                doc.text("Laporan Transaksi Pasien Lunas", 40, 60);
-
-                const table = document.getElementById('transaksiLunasTable');
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const data = [];
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.querySelector('td[colspan="7"]')) {
-                        return;
-                    }
-                    data.push(Array.from(row.querySelectorAll('td')).map(td => td.textContent));
-                });
-
-                doc.autoTable({
-                    startY: 80,
-                    head: [headers],
-                    body: data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                    }
-                });
-                doc.save('laporan_transaksi_lunas.pdf');
-            });
-
-            // Export Paid Transactions Excel
-            document.getElementById('export-excel-paid-transactions-btn').addEventListener('click', function () {
-                const table = document.getElementById('transaksiLunasTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let row = range.s.r; row <= range.e.r; row++) {
-                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })];
-                }
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Transaksi Lunas");
-                XLSX.writeFile(wb, "laporan_transaksi_lunas.xlsx");
-            });
-
-            // Export Unpaid Transactions PDF
-            document.getElementById('export-pdf-unpaid-transactions-btn').addEventListener('click', function () {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'letter');
-                doc.setFontSize(16);
-                doc.text("Laporan Transaksi Pasien Belum Lunas", 40, 60);
-
-                const table = document.getElementById('transaksiBelumLunasTable');
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const data = [];
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.querySelector('td[colspan="7"]')) {
-                        return;
-                    }
-                    data.push(Array.from(row.querySelectorAll('td')).map(td => td.textContent));
-                });
-
-                doc.autoTable({
-                    startY: 80,
-                    head: [headers],
-                    body: data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                        // For 'Belum Lunas' table, you can apply red color more easily as all rows are unpaid
-                        if (data.column.index === 6 && data.cell.text.includes('Belum Lunas')) { // Assuming Status Pembayaran is the 7th column (index 6)
-                            data.cell.styles.textColor = [255, 0, 0]; // Red color
-                        }
-                    }
-                });
-                doc.save('laporan_transaksi_belum_lunas.pdf');
-            });
-
-            // Export Unpaid Transactions Excel
-            document.getElementById('export-excel-unpaid-transactions-btn').addEventListener('click', function () {
-                const table = document.getElementById('transaksiBelumLunasTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let row = range.s.r; row <= range.e.r; row++) {
-                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })];
-                }
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Transaksi Belum Lunas");
-                XLSX.writeFile(wb, "laporan_transaksi_belum_lunas.xlsx");
-            });
-
-            // Export Obat PDF
-            document.getElementById('export-pdf-obat-btn').addEventListener('click', function () {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'letter');
-                doc.setFontSize(16);
-                doc.text("Laporan Stok & Penggunaan Obat", 40, 60);
-
-                const table = document.getElementById('obatTable');
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const data = [];
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.querySelector('td[colspan="7"]')) {
-                        return;
-                    }
-                    data.push(Array.from(row.querySelectorAll('td')).map(td => td.textContent));
-                });
-
-                doc.autoTable({
-                    startY: 80,
-                    head: [headers],
-                    body: data,
-                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
-                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
-                    alternateRowStyles: { fillColor: [249, 249, 249] },
-                    didParseCell: function (data) {
-                        if (data.column.index === 0) {
-                            data.cell.content = '';
-                        }
-                        // Apply red color for critical stock in PDF
-                        if (data.column.index === 4 && parseInt(data.cell.text) < 10) { // Assuming Stok is the 5th column (index 4)
-                            data.cell.styles.textColor = [255, 0, 0]; // Red color
+                        // Apply red color to 'Belum Lunas' status
+                        if (data.column.index === 6 && data.cell.text.includes('Belum Lunas')) {
+                            data.cell.styles.textColor = [255, 0, 0];
                             data.cell.styles.fontStyle = 'bold';
                         }
+                    },
+                    didDrawPage: function (data) {
+                        yPos = data.cursor.y + margin;
                     }
                 });
-                doc.save('laporan_stok_obat.pdf');
-            });
 
-            // Export Obat Excel
-            document.getElementById('export-excel-obat-btn').addEventListener('click', function () {
-                const table = document.getElementById('obatTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let row = range.s.r; row <= range.e.r; row++) {
-                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })];
-                }
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Stok Obat");
-                XLSX.writeFile(wb, "laporan_stok_obat.xlsx");
-            });
-
-            // Export Pengguna PDF
-            document.getElementById('export-pdf-pengguna-btn').addEventListener('click', function () {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'pt', 'letter');
-                doc.setFontSize(16);
-                doc.text("Laporan Pengguna Sistem", 40, 60);
-
-                const table = document.getElementById('usersTable');
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
-                const data = [];
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.querySelector('td[colspan="5"]')) {
-                        return;
-                    }
-                    data.push(Array.from(row.querySelectorAll('td')).map(td => td.textContent));
-                });
-
+                // 4. Laporan Transaksi Pasien (Lunas)
+                addPage(doc, "Laporan Transaksi Pasien (Lunas)");
+                const transaksiLunasData = getTableData('transaksiLunasTable');
                 doc.autoTable({
-                    startY: 80,
-                    head: [headers],
-                    body: data,
+                    startY: yPos,
+                    head: [transaksiLunasData.headers],
+                    body: transaksiLunasData.data,
+                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
+                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
+                    alternateRowStyles: { fillColor: [249, 249, 249] },
+                    didParseCell: function (data) {
+                        if (data.column.index === 0) {
+                            data.cell.content = '';
+                        }
+                    },
+                    didDrawPage: function (data) {
+                        yPos = data.cursor.y + margin;
+                    }
+                });
+
+                // 5. Laporan Transaksi Pasien (Belum Lunas)
+                addPage(doc, "Laporan Transaksi Pasien (Belum Lunas)");
+                const transaksiBelumLunasData = getTableData('transaksiBelumLunasTable');
+                doc.autoTable({
+                    startY: yPos,
+                    head: [transaksiBelumLunasData.headers],
+                    body: transaksiBelumLunasData.data,
+                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
+                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
+                    alternateRowStyles: { fillColor: [249, 249, 249] },
+                    didParseCell: function (data) {
+                        if (data.column.index === 0) {
+                            data.cell.content = '';
+                        }
+                        // Apply red color to 'Belum Lunas' status
+                        if (data.column.index === 6 && data.cell.text.includes('Belum Lunas')) {
+                            data.cell.styles.textColor = [255, 0, 0];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    },
+                    didDrawPage: function (data) {
+                        yPos = data.cursor.y + margin;
+                    }
+                });
+
+                // 6. Laporan Stok & Penggunaan Obat
+                addPage(doc, "Laporan Stok & Penggunaan Obat");
+                const obatData = getTableData('obatTable');
+                doc.autoTable({
+                    startY: yPos,
+                    head: [obatData.headers],
+                    body: obatData.data,
+                    styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
+                    headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
+                    alternateRowStyles: { fillColor: [249, 249, 249] },
+                    didParseCell: function (data) {
+                        if (data.column.index === 0) {
+                            data.cell.content = '';
+                        }
+                        // Apply red color for critical stock
+                        if (data.column.index === 4 && parseInt(data.cell.text) < 10) {
+                            data.cell.styles.textColor = [255, 0, 0];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    },
+                    didDrawPage: function (data) {
+                        yPos = data.cursor.y + margin;
+                    }
+                });
+
+                // 7. Laporan Pengguna Sistem
+                addPage(doc, "Laporan Pengguna Sistem");
+                const userData = getTableData('usersTable');
+                doc.autoTable({
+                    startY: yPos,
+                    head: [userData.headers],
+                    body: userData.data,
                     styles: { fontSize: 8, cellPadding: 8, overflow: 'linebreak' },
                     headStyles: { fillColor: [29, 233, 182], textColor: [255, 255, 255] },
                     alternateRowStyles: { fillColor: [249, 249, 249] },
@@ -1660,22 +1506,49 @@
                         }
                     }
                 });
-                doc.save('laporan_pengguna_sistem.pdf');
+
+                doc.save('seluruh_laporan_klinik.pdf');
             });
 
-            // Export Pengguna Excel
-            document.getElementById('export-excel-pengguna-btn').addEventListener('click', function () {
-                const table = document.getElementById('usersTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for (let row = range.s.r; row <= range.e.r; row++) {
-                    delete ws[XLSX.utils.encode_cell({ r: row, c: 0 })];
-                }
-                ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
-
+            document.getElementById('download-all-excel-btn').addEventListener('click', function () {
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Pengguna Sistem");
-                XLSX.writeFile(wb, "laporan_pengguna_sistem.xlsx");
+
+                // Helper to add sheet from table
+                const addSheetFromTable = (tableId, sheetName) => {
+                    const table = document.getElementById(tableId);
+                    if (!table) {
+                        console.warn(`Table with ID ${tableId} not found.`);
+                        return;
+                    }
+                    const ws = XLSX.utils.table_to_sheet(table);
+
+                    // Remove "No." column (index 0) if it exists
+                    if (ws['!ref']) {
+                        const range = XLSX.utils.decode_range(ws['!ref']);
+                        for (let row = range.s.r; row <= range.e.r; row++) {
+                            // Check if cell exists before deleting
+                            const cellAddress = XLSX.utils.encode_cell({ r: row, c: 0 });
+                            if (ws[cellAddress]) {
+                                delete ws[cellAddress];
+                            }
+                        }
+                        // Adjust the sheet's range to reflect the removed column
+                        ws['!ref'] = XLSX.utils.encode_range(range.s.r, range.s.c + 1, range.e.r, range.e.c);
+                    }
+
+
+                    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                };
+
+                addSheetFromTable('pasienTable', 'Data Pasien');
+                addSheetFromTable('dokterTable', 'Data Dokter');
+                addSheetFromTable('transaksiPasienTable', 'Semua Transaksi');
+                addSheetFromTable('transaksiLunasTable', 'Transaksi Lunas');
+                addSheetFromTable('transaksiBelumLunasTable', 'Transaksi Belum Lunas');
+                addSheetFromTable('obatTable', 'Stok Obat');
+                addSheetFromTable('usersTable', 'Pengguna Sistem');
+
+                XLSX.writeFile(wb, "seluruh_laporan_klinik.xlsx");
             });
 
             // Event Listeners for Transaction Report Filters
