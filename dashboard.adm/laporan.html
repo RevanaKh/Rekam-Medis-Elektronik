@@ -788,7 +788,7 @@
                             <th>Jenis</th>
                             <th>Stok</th>
                             <th>Harga Satuan</th>
-                            <th>Deskripsi</th>
+                            <th>Tanggal Kadaluarsa</th> <th>Deskripsi</th>
                         </tr>
                     </thead>
                     <tbody id="obatTableBody">
@@ -1113,7 +1113,7 @@
                     console.log("Tidak ada data obat di localStorage.");
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 7; // Sesuaikan dengan jumlah kolom di tabel obat
+                    noDataCell.colSpan = 8; // Sesuaikan dengan jumlah kolom total setelah penambahan "Tanggal Kadaluarsa"
                     noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
                     noDataCell.style.textAlign = "center";
                     noDataCell.style.padding = "20px";
@@ -1135,7 +1135,8 @@
                     row.insertCell().textContent = drug.namaObat;
                     row.insertCell().textContent = drug.jenis;
                     row.insertCell().textContent = drug.stok;
-                    row.insertCell().textContent = formatRupiah(drug.harga); // Menggunakan drug.harga
+                    row.insertCell().textContent = formatRupiah(drug.harga);
+                    row.insertCell().textContent = drug.tanggalKadaluarsa || '-'; // Display new field, fallback if not set
                     row.insertCell().textContent = drug.deskripsi;
                 });
 
