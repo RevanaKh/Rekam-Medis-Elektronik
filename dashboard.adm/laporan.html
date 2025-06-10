@@ -437,70 +437,22 @@
             box-shadow: var(--shadow);
         }
 
-        .report-button.all-download-btn { /* Style for the new single download buttons */
-            padding: 12px 20px;
-            font-size: 1.1rem;
-            margin: 10px 0;
-            justify-content: center;
-        }
-
-        #download-all-pdf-btn {
+        #export-pdf-btn {
             background-color: var(--report-pdf-bg);
         }
 
-        #download-all-pdf-btn:hover {
+        #export-pdf-btn:hover {
             background-color: #C0392B;
             transform: translateY(-2px);
         }
 
-        #download-all-excel-btn {
+        #export-excel-btn {
             background-color: var(--report-excel-bg);
         }
-        #download-all-excel-btn:hover {
+        #export-excel-btn:hover {
             background-color: #229954;
             transform: translateY(-2px);
         }
-
-
-        /* NEW CSS for filter buttons and table display */
-        .filter-buttons {
-            margin-bottom: 20px;
-            text-align: center;
-            display: flex; /* Use flexbox for horizontal layout */
-            justify-content: center; /* Center the buttons */
-            gap: 10px; /* Space between buttons */
-            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-        }
-        .filter-buttons button {
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-            font-size: 0.95em;
-            white-space: nowrap; /* Prevent text wrapping inside buttons */
-        }
-        .filter-buttons button.active {
-            background-color: var(--primary-color); /* Sesuaikan dengan warna utama Anda */
-            color: white;
-            border-color: var(--primary-dark);
-            font-weight: bold;
-        }
-        .filter-buttons button:hover:not(.active) {
-            background-color: #e0e0e0;
-        }
-        .table-container {
-            margin-top: 20px;
-            /* The display property will be controlled by JavaScript */
-            display: none; /* Hide by default, JS will show the active one */
-        }
-        /* Optional: if you prefer a class for red color, though inline style is used in JS now */
-        /* .report-table tbody tr.unpaid-row {
-            color: red;
-            font-weight: bold;
-        } */
-
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -561,13 +513,6 @@
             }
             .report-item {
                 min-width: unset; /* Remove min-width for full width on mobile */
-            }
-            .filter-buttons {
-                flex-direction: column; /* Stack buttons vertically on mobile */
-                align-items: stretch; /* Make them full width */
-            }
-            .filter-buttons button {
-                width: 100%;
             }
         }
     </style>
@@ -685,639 +630,612 @@
             </a>
         </div>
     </div>
-    <div class="main-content" id="main-content">
-        <header class="header">
-            <h1>Laporan Klinik</h1>
-            <div class="user-info">
-                <span id="welcome-user"></span>
-                </div>
-        </header>
 
-        <div class="report-buttons-container" style="justify-content: center; width: 100%; max-width: 1200px; margin-bottom: 30px;">
-            <button class="report-button all-download-btn" id="download-all-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh Seluruh Laporan (PDF)</button>
-            <button class="report-button all-download-btn" id="download-all-excel-btn"><i class="fas fa-file-excel"></i> Unduh Seluruh Laporan (Excel)</button>
+    <div class="main-content" id="main-content">
+        <div class="header">
+            <h1>Manajemen Laporan</h1>
         </div>
 
-
-        <main>
-            <div id="laporan-pasien" class="content-section">
-                <h3>Laporan Data Pasien</h3>
-                <div class="report-summary">
-                    <div class="report-item">
-                        <span>Total Pasien Terdaftar:</span>
-                        <span id="total-pasien"></span>
-                    </div>
-                    <div class="report-item">
-                        <span>Pasien Baru Bulan Ini:</span>
-                        <span id="pasien-baru-bulan-ini"></span>
-                    </div>
+        <div id="laporan-pasien" class="content-section">
+            <h3>Laporan Data Pasien</h3>
+            <div class="report-summary">
+                <div class="report-item">
+                    <span>Total Pasien Terdaftar:</span>
+                    <span id="total-pasien"></span>
                 </div>
-                <div class="report-table-container">
-                    <table id="pasienTable" class="report-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>ID Pasien</th>
-                                <th>Nama Lengkap</th>
-                                <th>Tanggal Lahir</th>
-                                <th>Jenis Kelamin</th>
-                                <th>Alamat</th>
-                                <th>Telepon</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                <div class="report-item">
+                    <span>Pasien Baru Bulan Ini:</span>
+                    <span id="pasien-baru-bulan-ini"></span>
                 </div>
             </div>
-
-            <div id="laporan-dokter" class="content-section">
-                <h3>Laporan Data Dokter</h3>
-                <div class="report-summary">
-                    <div class="report-item">
-                        <span>Total Dokter Terdaftar:</span>
-                        <span id="total-dokter"></span>
-                    </div>
-                    <div class="report-item">
-                        <span>Dokter Aktif:</span>
-                        <span id="dokter-aktif"></span>
-                    </div>
-                </div>
-                <div class="report-table-container">
-                    <table id="dokterTable" class="report-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>ID Dokter</th>
-                                <th>Nama Dokter</th>
-                                <th>Poli</th>
-                                <th>Hari Praktek</th>
-                                <th>Jam Mulai</th>
-                                <th>Jam Selesai</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="report-buttons-container">
+                <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
+                <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
+            </div>
+            <div class="report-table-container">
+                <table id="pasienTable" class="report-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>ID Pasien</th>
+                            <th>Nama Lengkap</th>
+                            <th>Tanggal Lahir</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Alamat</th>
+                            <th>Telepon</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         </tbody>
-                    </table>
+                </table>
+            </div>
+        </div>
+
+        <div id="laporan-dokter" class="content-section">
+            <h3>Laporan Data Dokter</h3>
+            <div class="report-summary">
+                <div class="report-item">
+                    <span>Total Dokter Terdaftar:</span>
+                    <span id="total-dokter"></span>
+                </div>
+                <div class="report-item">
+                    <span>Dokter Aktif:</span>
+                    <span id="dokter-aktif"></span>
                 </div>
             </div>
-
-            <section id="laporan-transaksi-pasien" class="content-section">
-                <h2>Laporan Transaksi Pasien</h2>
-                <div class="report-summary">
-                    <div class="report-item">
-                        <span>Total Transaksi:</span>
-                        <span id="total-transaksi">0</span>
-                    </div>
-                    <div class="report-item">
-                        <span>Total Pendapatan (Lunas):</span>
-                        <span id="total-pendapatan-lunas">Rp 0</span>
-                    </div>
-                    <div class="report-item">
-                        <span>Pendapatan Belum Lunas:</span>
-                        <span id="total-pendapatan-belum-lunas" style="color: red; font-weight: bold;">Rp 0</span>
-                    </div>
-                </div>
-
-                <div class="filter-buttons">
-                    <button id="show-all-transactions" class="active">Semua Transaksi</button>
-                    <button id="show-paid-transactions">Transaksi Lunas</button>
-                    <button id="show-unpaid-transactions">Transaksi Belum Lunas</button>
-                </div>
-
-                <div id="allTransactionsTableContainer" class="table-container active-table">
-                    <h3>Semua Transaksi</h3>
-                    <div class="report-table-container"> <table id="transaksiPasienTable" class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>ID Transaksi</th>
-                                    <th>Tanggal</th>
-                                    <th>Nama Pasien</th>
-                                    <th>Jenis Layanan</th>
-                                    <th>Total Biaya</th>
-                                    <th>Status Pembayaran</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                </tbody>
-                        </table>
-                    </div> </div>
-
-                <div id="paidTransactionsTableContainer" class="table-container" style="display: none;">
-                    <h3>Transaksi Lunas</h3>
-                    <div class="report-table-container"> <table id="transaksiLunasTable" class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>ID Transaksi</th>
-                                    <th>Tanggal</th>
-                                    <th>Nama Pasien</th>
-                                    <th>Jenis Layanan</th>
-                                    <th>Total Biaya</th>
-                                    <th>Status Pembayaran</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                </tbody>
-                        </table>
-                    </div> </div>
-
-                <div id="unpaidTransactionsTableContainer" class="table-container" style="display: none;">
-                    <h3>Transaksi Belum Lunas</h3>
-                    <div class="report-table-container"> <table id="transaksiBelumLunasTable" class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>ID Transaksi</th>
-                                    <th>Tanggal</th>
-                                    <th>Nama Pasien</th>
-                                    <th>Jenis Layanan</th>
-                                    <th>Total Biaya</th>
-                                    <th>Status Pembayaran</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                </tbody>
-                        </table>
-                    </div> </div>
-            </section>
-
-            <div id="laporan-obat" class="content-section">
-                <h3>Laporan Stok & Penggunaan Obat</h3>
-                <div class="report-summary">
-                    <div class="report-item">
-                        <span>Total Jenis Obat:</span>
-                        <span id="total-jenis-obat"></span>
-                    </div>
-                    <div class="report-item">
-                        <span>Stok Obat Kritis (&lt; 10 unit):</span>
-                        <span id="obat-kritis"></span>
-                    </div>
-                </div>
-                <div class="report-table-container">
-                    <table id="obatTable" class="report-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>ID Obat</th>
-                                <th>Nama Obat</th>
-                                <th>Jenis</th>
-                                <th>Stok</th>
-                                <th>Harga Satuan</th>
-                                <th>Deskripsi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="report-table-container">
+                <table id="dokterTable" class="report-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>ID Dokter</th>
+                            <th>Nama Dokter</th>
+                            <th>Poli</th>
+                            <th>Hari Praktek</th>
+                            <th>Jam Mulai</th>
+                            <th>Jam Selesai</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         </tbody>
-                    </table>
+                </table>
+            </div>
+        </div>
+
+        <div id="laporan-transaksi-pasien" class="content-section">
+            <h3>Laporan Transaksi Pasien</h3>
+            <div class="report-summary">
+                <div class="report-item">
+                    <span>Total Transaksi:</span>
+                    <span id="total-transaksi"></span>
+                </div>
+                <div class="report-item">
+                    <span>Total Pendapatan:</span>
+                    <span id="total-pendapatan"></span>
                 </div>
             </div>
-
-            <div id="laporan-pengguna" class="content-section">
-                <h3>Laporan Pengguna Sistem</h3>
-                <div class="report-summary">
-                    <div class="report-item">
-                        <span>Total Pengguna:</span>
-                        <span id="total-pengguna"></span>
-                    </div>
-                    <div class="report-item">
-                        <span>Admin Terdaftar:</span>
-                        <span id="admin-count"></span>
-                    </div>
-                    <div class="report-item">
-                        <span>Dokter Terdaftar:</span>
-                        <span id="dokter-count"></span>
-                    </div>
-                    <div class="report-item">
-                        <span>Apoteker Terdaftar:</span>
-                        <span id="apoteker-count"></span>
-                    </div>
-                </div>
-                <div class="report-table-container">
-                    <table id="usersTable" class="report-table">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>ID User</th>
-                                <th>Nama</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="report-table-container">
+                <table id="transaksiPasienTable" class="report-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>ID Transaksi</th>
+                            <th>Tanggal</th>
+                            <th>Nama Pasien</th>
+                            <th>Jenis Layanan</th>
+                            <th>Total Biaya</th>
+                            <th>Status Pembayaran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         </tbody>
-                    </table>
+                </table>
+            </div>
+        </div>
+
+        <div id="laporan-pemeriksaan" class="content-section">
+            <h3>Laporan Pemeriksaan Pasien</h3>
+            <div class="report-summary">
+                <div class="report-item">
+                    <span>Total Pemeriksaan:</span>
+                    <span id="total-pemeriksaan"></span>
+                </div>
+                <div class="report-item">
+                    <span>Pemeriksaan Baru Bulan Ini:</span>
+                    <span id="pemeriksaan-baru-bulan-ini"></span>
                 </div>
             </div>
-        </main>
+            <div class="report-table-container">
+                <table id="pemeriksaanTable" class="report-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>ID Pemeriksaan</th>
+                            <th>Tanggal</th>
+                            <th>Nama Pasien</th>
+                            <th>Dokter</th>
+                            <th>Keluhan</th>
+                            <th>Diagnosa</th>
+                            <th>Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="laporan-obat" class="content-section">
+            <h3>Laporan Stok & Penggunaan Obat</h3>
+            <div class="report-summary">
+                <div class="report-item">
+                    <span>Total Jenis Obat:</span>
+                    <span id="total-jenis-obat"></span>
+                </div>
+                <div class="report-item">
+                    <span>Stok Obat Kritis (&lt; 10 unit):</span>
+                    <span id="obat-kritis"></span>
+                </div>
+            </div>
+            <div class="report-table-container">
+                <table id="obatTable" class="report-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>ID Obat</th>
+                            <th>Nama Obat</th>
+                            <th>Jenis</th>
+                            <th>Stok</th>
+                            <th>Harga Satuan</th>
+                            <th>Deskripsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="laporan-pengguna" class="content-section">
+            <h3>Laporan Pengguna Sistem</h3>
+            <div class="report-summary">
+                <div class="report-item">
+                    <span>Total Pengguna:</span>
+                    <span id="total-pengguna"></span>
+                </div>
+                <div class="report-item">
+                    <span>Admin Terdaftar:</span>
+                    <span id="admin-count"></span>
+                </div>
+                <div class="report-item">
+                    <span>Dokter Terdaftar:</span>
+                    <span id="dokter-count"></span>
+                </div>
+                <div class="report-item">
+                    <span>Apoteker Terdaftar:</span>
+                    <span id="apoteker-count"></span>
+                </div>
+            </div>
+            <div class="report-table-container">
+                <table id="usersTable" class="report-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>ID User</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
-            const mainContent = document.getElementById('mainContent');
 
-            // Utility function to format currency
-            function formatRupiah(number) {
-                return new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0, // No decimal places for whole numbers
-                    maximumFractionDigits: 0
-                }).format(number);
-            }
-
-            // Fungsi untuk toggle sidebar
-            function toggleSidebar() {
-                sidebar.classList.toggle('minimized');
-                if (sidebar.classList.contains('minimized')) {
-                    mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
-                } else {
-                    mainContent.style.marginLeft = 'var(--sidebar-width)';
-                }
-            }
-
-            // Event listener untuk tombol toggle sidebar
-            if (toggleSidebarBtn) {
-                toggleSidebarBtn.addEventListener('click', toggleSidebar);
-            }
-
-            // Event listener untuk klik di luar sidebar (mobile)
-            document.addEventListener('click', function(event) {
-                if (window.innerWidth <= 768) {
-                    if (!sidebar.contains(event.target) && !toggleSidebarBtn.contains(event.target) && sidebar.classList.contains('active')) {
-                        sidebar.classList.remove('active');
-                        // mainContent.style.marginLeft = '0'; // If you want main content to take full width
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // User and Access Control
+            function loadUserData() {
+                const user = sessionStorage.getItem('loggedInUser');
+                if (user) {
+                    const loggedInUser = JSON.parse(user);
+                    const welcomeUserElement = document.getElementById('welcome-user');
+                    // welcomeUserElement might not exist on this page, so check before using
+                    if (welcomeUserElement) {
+                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
                     }
+                } else {
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
-            });
+            }
 
-            // Handle sidebar for mobile (if hamburger menu is separate from toggleSidebarBtn)
-            const mobileMenuBtn = document.querySelector('.menu-icon'); // Assuming you have a menu icon for mobile
-            if (mobileMenuBtn) {
-                mobileMenuBtn.addEventListener('click', function() {
+            function checkAccess(allowedRoles) {
+                const user = sessionStorage.getItem('loggedInUser');
+                if (user) {
+                    const loggedInUser = JSON.parse(user);
+                    if (!allowedRoles.includes(loggedInUser.role)) {
+                        alert('Anda tidak memiliki akses ke halaman ini.');
+                        sessionStorage.clear();
+                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                    }
+                } else {
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
+            }
+
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['admin', 'pendaftaran', 'dokter', 'apoteker']); // Admin, Pendaftaran, Dokter, Apoteker bisa akses
+            loadUserData();
+
+            // Sidebar and Mobile Menu Toggle
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+            const mainContent = document.getElementById('main-content');
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                });
+            }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
                     sidebar.classList.toggle('active');
                 });
             }
 
-            // Functions to populate tables
-            function populatePatientTable() {
-                const patients = JSON.parse(localStorage.getItem('patients')) || [];
-                const tableBody = document.getElementById('patientTableBody');
-                tableBody.innerHTML = ''; // Clear existing rows
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    } else {
+                        sidebar.classList.toggle('minimized');
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        } else {
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
+                        }
+                    }
+                });
+            }
 
-                if (patients.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    noDataRow.classList.add('no-data-row');
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 7;
-                    noDataCell.textContent = "Tidak ada data pasien untuk ditampilkan.";
-                    return;
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
                 }
+            });
+
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                    sidebar.classList.remove('active');
+                } else {
+                    mainContent.style.marginLeft = '0';
+                }
+            });
+
+            // --- Laporan Logic ---
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+
+            // Utility function for no data row
+            function addNoDataRow(tableBody, colSpan) {
+                const noDataRow = tableBody.insertRow();
+                const noDataCell = noDataRow.insertCell();
+                noDataCell.colSpan = colSpan;
+                noDataCell.textContent = "Tidak ada data untuk ditampilkan.";
+                noDataCell.style.textAlign = "center";
+                noDataCell.style.padding = "20px";
+                noDataCell.style.fontStyle = "italic";
+                noDataCell.style.color = "#555";
+            }
+
+            // Populate Functions
+            function populatePatientReport() {
+                const patients = JSON.parse(localStorage.getItem('patients')) || [];
+                const tableBody = document.querySelector('#pasienTable tbody');
+                const totalPasienSpan = document.getElementById('total-pasien');
+                const pasienBaruBulanIniSpan = document.getElementById('pasien-baru-bulan-ini');
+
+                tableBody.innerHTML = ''; // Clear existing rows
+                let newPatientsThisMonth = 0;
 
                 patients.forEach((patient, index) => {
+                    // Check if tanggalLahir is a valid date string and in the current month/year
+                    // Assuming tanggalLahir is stored in YYYY-MM-DD format
+                    const patientDOB = new Date(patient.tanggalLahir);
+                    if (!isNaN(patientDOB) && patientDOB.getMonth() === currentMonth && patientDOB.getFullYear() === currentYear) {
+                        newPatientsThisMonth++;
+                    }
+
                     const row = tableBody.insertRow();
-                    row.insertCell(0).textContent = index + 1;
-                    row.insertCell(1).textContent = patient.id;
-                    row.insertCell(2).textContent = patient.nama;
-                    row.insertCell(3).textContent = patient.tanggalLahir;
-                    row.insertCell(4).textContent = patient.jenisKelamin;
-                    row.insertCell(5).textContent = patient.alamat;
-                    row.insertCell(6).textContent = patient.telepon;
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = patient.id;
+                    row.insertCell().textContent = patient.namaLengkap;
+                    row.insertCell().textContent = patient.tanggalLahir;
+                    row.insertCell().textContent = patient.jenisKelamin;
+                    row.insertCell().textContent = patient.alamat;
+                    row.insertCell().textContent = patient.telepon;
                 });
+
+                totalPasienSpan.textContent = patients.length;
+                pasienBaruBulanIniSpan.textContent = newPatientsThisMonth;
+
+                if (patients.length === 0) {
+                    addNoDataRow(tableBody, 7);
+                }
             }
 
-            function populateDoctorScheduleTable() {
-                const jadwalDokter = JSON.parse(localStorage.getItem('jadwalDokter')) || [];
-                const tableBody = document.getElementById('doctorScheduleTableBody');
-                tableBody.innerHTML = '';
+            function populateDoctorReport() {
+                const doctors = JSON.parse(localStorage.getItem('doctors')) || [];
+                const tableBody = document.querySelector('#dokterTable tbody');
+                const totalDokterSpan = document.getElementById('total-dokter');
+                const dokterAktifSpan = document.getElementById('dokter-aktif');
 
-                if (jadwalDokter.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    noDataRow.classList.add('no-data-row');
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 6;
-                    noDataCell.textContent = "Tidak ada data jadwal dokter untuk ditampilkan.";
-                    return;
-                }
+                tableBody.innerHTML = ''; // Clear existing rows
+                let activeDoctors = 0;
 
-                jadwalDokter.forEach((jadwal, index) => {
+                doctors.forEach((doctor, index) => {
+                    if (doctor.status === 'Aktif') { // Assuming 'status' field exists
+                        activeDoctors++;
+                    }
                     const row = tableBody.insertRow();
-                    row.insertCell(0).textContent = index + 1;
-                    row.insertCell(1).textContent = jadwal.namaDokter;
-                    row.insertCell(2).textContent = jadwal.poli;
-                    row.insertCell(3).textContent = jadwal.hari;
-                    row.insertCell(4).textContent = jadwal.jamMulai;
-                    row.insertCell(5).textContent = jadwal.jamSelesai;
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = doctor.id;
+                    row.insertCell().textContent = doctor.namaDokter;
+                    row.insertCell().textContent = doctor.poli;
+                    row.insertCell().textContent = doctor.hari || 'N/A'; // Use 'hari' from jadwal_dokter.html
+                    row.insertCell().textContent = doctor.jamMulai || 'N/A';
+                    row.insertCell().textContent = doctor.jamSelesai || 'N/A';
+                    row.insertCell().textContent = doctor.status || 'N/A';
                 });
-            }
 
-            function populateAccountTable() {
-                const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-                const tableBody = document.getElementById('accountTableBody');
-                tableBody.innerHTML = '';
+                totalDokterSpan.textContent = doctors.length;
+                dokterAktifSpan.textContent = activeDoctors;
 
-                if (accounts.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    noDataRow.classList.add('no-data-row');
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 3;
-                    noDataCell.textContent = "Tidak ada data akun untuk ditampilkan.";
-                    return;
+                if (doctors.length === 0) {
+                    addNoDataRow(tableBody, 8);
                 }
-
-                accounts.forEach((account, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell(0).textContent = index + 1;
-                    row.insertCell(1).textContent = account.username;
-                    row.insertCell(2).textContent = account.role;
-                });
-            }
-
-            function populateObatTable() {
-                const obats = JSON.parse(localStorage.getItem('obats')) || [];
-                const tableBody = document.getElementById('obatTableBody');
-                tableBody.innerHTML = '';
-
-                if (obats.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    noDataRow.classList.add('no-data-row');
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 6;
-                    noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
-                    return;
-                }
-
-                obats.forEach((obat, index) => {
-                    const row = tableBody.insertRow();
-                    row.insertCell(0).textContent = index + 1;
-                    row.insertCell(1).textContent = obat.namaObat;
-                    row.insertCell(2).textContent = obat.jenisObat;
-                    row.insertCell(3).textContent = obat.satuan;
-                    row.insertCell(4).textContent = formatRupiah(obat.harga); // Format harga
-                    row.insertCell(5).textContent = obat.stok;
-                });
             }
 
             function populateTransactionReport() {
                 const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-                const tableBody = document.getElementById('transaksiPasienTableBody');
+                const tableBody = document.querySelector('#transaksiPasienTable tbody');
                 const totalTransaksiSpan = document.getElementById('total-transaksi');
                 const totalPendapatanSpan = document.getElementById('total-pendapatan');
-                const transaksiLunasSpan = document.getElementById('transaksi-lunas'); // Dapatkan elemen span baru
-                const transaksiBelumLunasSpan = document.getElementById('transaksi-belum-lunas'); // Dapatkan elemen span baru
 
-                tableBody.innerHTML = '';
+                tableBody.innerHTML = ''; // Clear existing rows
                 let totalRevenue = 0;
-                let lunasCount = 0; // Inisialisasi counter lunas
-                let belumLunasCount = 0; // Inisialisasi counter belum lunas
-
-                if (transactions.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    noDataRow.classList.add('no-data-row');
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 7;
-                    noDataCell.textContent = "Tidak ada data transaksi untuk ditampilkan.";
-                    totalTransaksiSpan.textContent = "0";
-                    totalPendapatanSpan.textContent = formatRupiah(0);
-                    transaksiLunasSpan.textContent = "0";
-                    transaksiBelumLunasSpan.textContent = "0";
-                    return;
-                }
 
                 transactions.forEach((transaction, index) => {
-                    totalRevenue += parseFloat(transaction.totalBiaya || 0); // Pastikan totalBiaya adalah angka
-                    
-                    // Hitung lunas atau belum lunas
-                    if (transaction.statusPembayaran && transaction.statusPembayaran.toLowerCase() === 'lunas') {
-                        lunasCount++;
-                    } else {
-                        belumLunasCount++;
-                    }
-
+                    totalRevenue += parseFloat(transaction.totalBiaya || 0); // Ensure it's a number
                     const row = tableBody.insertRow();
-                    row.insertCell(0).textContent = index + 1 + ".";
-                    row.insertCell(1).textContent = transaction.id;
-                    row.insertCell(2).textContent = transaction.tanggal;
-                    row.insertCell(3).textContent = transaction.namaPasien;
-                    row.insertCell(4).textContent = transaction.jenisLayanan;
-                    row.insertCell(5).textContent = formatRupiah(transaction.totalBiaya); // Format total biaya
-                    row.insertCell(6).textContent = transaction.statusPembayaran;
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = transaction.id;
+                    row.insertCell().textContent = transaction.tanggal;
+                    row.insertCell().textContent = transaction.namaPasien;
+                    row.insertCell().textContent = transaction.jenisLayanan;
+                    row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
+                    row.insertCell().textContent = transaction.statusPembayaran;
                 });
 
                 totalTransaksiSpan.textContent = transactions.length;
                 totalPendapatanSpan.textContent = formatRupiah(totalRevenue);
-                transaksiLunasSpan.textContent = lunasCount; // Update teks pada span baru
-                transaksiBelumLunasSpan.textContent = belumLunasCount; // Update teks pada span baru
+
+                if (transactions.length === 0) {
+                    addNoDataRow(tableBody, 7);
+                }
             }
 
-            function populateAllReportTables() {
-                populatePatientTable();
-                populateDoctorScheduleTable();
-                populateAccountTable();
-                populateObatTable();
-                populateTransactionReport(); // Pastikan ini terpanggil untuk update card juga
-            }
+            function populateExaminationReport() {
+                // Assuming 'examinations' data is stored in localStorage by a future 'pemeriksaan.html' or similar
+                const examinations = JSON.parse(localStorage.getItem('examinations')) || [];
+                const tableBody = document.querySelector('#pemeriksaanTable tbody');
+                const totalPemeriksaanSpan = document.getElementById('total-pemeriksaan');
+                const pemeriksaanBaruBulanIniSpan = document.getElementById('pemeriksaan-baru-bulan-ini');
 
-            // Export to PDF functions
-            document.getElementById('exportPatientPDF').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.autoTable({
-                    html: '#patientTable',
-                    startY: 20,
-                    columns: [ // Define columns to exclude 'No.'
-                        { header: 'ID Pasien', dataKey: 'ID Pasien' },
-                        { header: 'Nama', dataKey: 'Nama' },
-                        { header: 'Tanggal Lahir', dataKey: 'Tanggal Lahir' },
-                        { header: 'Jenis Kelamin', dataKey: 'Jenis Kelamin' },
-                        { header: 'Alamat', dataKey: 'Alamat' },
-                        { header: 'Telepon', dataKey: 'Telepon' },
-                    ],
-                    headStyles: { fillColor: [29, 233, 182] }, // Match primary-color
-                    theme: 'grid',
-                    didParseCell: function(data) {
-                        // Exclude the 'No.' column from PDF
-                        if (data.column.index === 0) {
-                            data.cell.text = [];
-                        }
-                    },
-                    // You might need to adjust column width here if columns are too wide
-                    columnStyles: {
-                        0: { cellWidth: 10 }, // Hide or make very narrow for 'No.' column
-                        1: { cellWidth: 'auto' },
-                        2: { cellWidth: 'auto' },
-                        3: { cellWidth: 'auto' },
-                        4: { cellWidth: 'auto' },
-                        5: { cellWidth: 'auto' },
-                        6: { cellWidth: 'auto' }
-                    },
-                    margin: { top: 10, left: 10, right: 10, bottom: 10 }
+                tableBody.innerHTML = ''; // Clear existing rows
+                let newExaminationsThisMonth = 0;
+
+                examinations.forEach((exam, index) => {
+                    const examDate = new Date(exam.tanggal); // Assuming 'tanggal' is the date field
+                    if (!isNaN(examDate) && examDate.getMonth() === currentMonth && examDate.getFullYear() === currentYear) {
+                        newExaminationsThisMonth++;
+                    }
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = exam.id || 'N/A';
+                    row.insertCell().textContent = exam.tanggal || 'N/A';
+                    row.insertCell().textContent = exam.namaPasien || 'N/A';
+                    row.insertCell().textContent = exam.dokter || 'N/A';
+                    row.insertCell().textContent = exam.keluhan || 'N/A';
+                    row.insertCell().textContent = exam.diagnosa || 'N/A';
+                    row.insertCell().textContent = exam.tindakan || 'N/A';
                 });
+
+                totalPemeriksaanSpan.textContent = examinations.length;
+                pemeriksaanBaruBulanIniSpan.textContent = newExaminationsThisMonth;
+
+                if (examinations.length === 0) {
+                    addNoDataRow(tableBody, 8);
+                }
+            }
+
+            function populateDrugReport() {
+                // Assuming 'drugs' data is stored in localStorage by a future 'data_obat.html' or similar
+                const drugs = JSON.parse(localStorage.getItem('drugs')) || [];
+                const tableBody = document.querySelector('#obatTable tbody');
+                const totalJenisObatSpan = document.getElementById('total-jenis-obat');
+                const obatKritisSpan = document.getElementById('obat-kritis');
+
+                tableBody.innerHTML = ''; // Clear existing rows
+                let criticalStockCount = 0;
+
+                drugs.forEach((drug, index) => {
+                    if (drug.stok < 10) { // Define critical stock threshold
+                        criticalStockCount++;
+                    }
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = drug.id || 'N/A';
+                    row.insertCell().textContent = drug.namaObat || 'N/A';
+                    row.insertCell().textContent = drug.jenis || 'N/A';
+                    row.insertCell().textContent = drug.stok || 0;
+                    row.insertCell().textContent = formatRupiah(drug.hargaSatuan || 0);
+                    row.insertCell().textContent = drug.deskripsi || 'N/A';
+                });
+
+                totalJenisObatSpan.textContent = drugs.length;
+                obatKritisSpan.textContent = criticalStockCount;
+
+                if (drugs.length === 0) {
+                    addNoDataRow(tableBody, 7);
+                }
+            }
+
+            function populateUserReport() {
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                const tableBody = document.querySelector('#usersTable tbody');
+                const totalPenggunaSpan = document.getElementById('total-pengguna');
+                const adminCountSpan = document.getElementById('admin-count');
+                const dokterCountSpan = document.getElementById('dokter-count');
+                const apotekerCountSpan = document.getElementById('apoteker-count');
+
+                tableBody.innerHTML = ''; // Clear existing rows
+                let adminCount = 0;
+                let dokterCount = 0;
+                let apotekerCount = 0;
+
+                users.forEach((user, index) => {
+                    if (user.role === 'admin') adminCount++;
+                    if (user.role === 'dokter') dokterCount++;
+                    if (user.role === 'apoteker') apotekerCount++;
+
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = index + 1 + ".";
+                    row.insertCell().textContent = user.id || 'N/A';
+                    row.insertCell().textContent = user.nama || 'N/A';
+                    row.insertCell().textContent = user.email || 'N/A';
+                    row.insertCell().textContent = user.role || 'N/A';
+                });
+
+                totalPenggunaSpan.textContent = users.length;
+                adminCountSpan.textContent = adminCount;
+                dokterCountSpan.textContent = dokterCount;
+                apotekerCountSpan.textContent = apotekerCount;
+
+                if (users.length === 0) {
+                    addNoDataRow(tableBody, 5);
+                }
+            }
+
+            // Function to format Rupiah
+            function formatRupiah(amount) {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(amount);
+            }
+
+            // Central function to populate all tables
+            function populateAllReportTables() {
+                populatePatientReport();
+                populateDoctorReport();
+                populateTransactionReport();
+                populateExaminationReport();
+                populateDrugReport();
+                populateUserReport();
+            }
+
+            // PDF Export for Patient Data (specific to pasienTable)
+            document.getElementById('export-pdf-btn').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'letter');
+                const table = document.getElementById('pasienTable'); // Target specific table
+
+                // Clone table to remove "No." column for PDF export if needed
+                // For PDF, autoTable can handle column exclusion easily via columns option.
+                // Or you can create a data array. Let's stick with html:table and map columns.
+                // Ensure the "No." column is not problematic.
+                doc.autoTable({
+                    html: table,
+                    startY: 60,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [29, 233, 182],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 8,
+                        valign: 'middle',
+                        overflow: 'linebreak'
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 30, halign: 'center' }, // No.
+                        1: { cellWidth: 70 }, // ID Pasien
+                        2: { cellWidth: 100 }, // Nama Lengkap
+                        3: { cellWidth: 70 }, // Tanggal Lahir
+                        4: { cellWidth: 60, halign: 'center' }, // Jenis Kelamin
+                        5: { cellWidth: 'auto' }, // Alamat
+                        6: { cellWidth: 70 } // Telepon
+                    },
+                    didDrawPage: function(data) {
+                        doc.text("Laporan Data Pasien", data.settings.marginLeft, 40);
+                    }
+                });
+
                 doc.save('laporan_data_pasien.pdf');
             });
 
-            document.getElementById('exportDoctorPDF').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.autoTable({
-                    html: '#doctorScheduleTable',
-                    startY: 20,
-                    columns: [ // Define columns to exclude 'No.'
-                        { header: 'Nama Dokter', dataKey: 'Nama Dokter' },
-                        { header: 'Poli', dataKey: 'Poli' },
-                        { header: 'Hari', dataKey: 'Hari' },
-                        { header: 'Jam Mulai', dataKey: 'Jam Mulai' },
-                        { header: 'Jam Selesai', dataKey: 'Jam Selesai' },
-                    ],
-                    headStyles: { fillColor: [29, 233, 182] },
-                    theme: 'grid',
-                    didParseCell: function(data) {
-                        if (data.column.index === 0) {
-                            data.cell.text = [];
-                        }
-                    },
-                    margin: { top: 10, left: 10, right: 10, bottom: 10 }
-                });
-                doc.save('laporan_jadwal_dokter.pdf');
-            });
+            // Excel Export for Patient Data (specific to pasienTable)
+            document.getElementById('export-excel-btn').addEventListener('click', function() {
+                const table = document.getElementById('pasienTable'); // Target specific table
 
-            document.getElementById('exportAccountPDF').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.autoTable({
-                    html: '#accountTable',
-                    startY: 20,
-                    columns: [ // Define columns to exclude 'No.'
-                        { header: 'Username', dataKey: 'Username' },
-                        { header: 'Role', dataKey: 'Role' },
-                    ],
-                    headStyles: { fillColor: [29, 233, 182] },
-                    theme: 'grid',
-                    didParseCell: function(data) {
-                        if (data.column.index === 0) {
-                            data.cell.text = [];
-                        }
-                    },
-                    margin: { top: 10, left: 10, right: 10, bottom: 10 }
-                });
-                doc.save('laporan_data_akun.pdf');
-            });
-
-            document.getElementById('exportObatPDF').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.autoTable({
-                    html: '#obatTable',
-                    startY: 20,
-                    columns: [ // Define columns to exclude 'No.'
-                        { header: 'Nama Obat', dataKey: 'Nama Obat' },
-                        { header: 'Jenis Obat', dataKey: 'Jenis Obat' },
-                        { header: 'Satuan', dataKey: 'Satuan' },
-                        { header: 'Harga', dataKey: 'Harga' },
-                        { header: 'Stok', dataKey: 'Stok' },
-                    ],
-                    headStyles: { fillColor: [29, 233, 182] },
-                    theme: 'grid',
-                    didParseCell: function(data) {
-                        if (data.column.index === 0) {
-                            data.cell.text = [];
-                        }
-                    },
-                    margin: { top: 10, left: 10, right: 10, bottom: 10 }
-                });
-                doc.save('laporan_data_obat.pdf');
-            });
-
-            document.getElementById('exportTransactionPDF').addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.autoTable({
-                    html: '#transaksiPasienTable',
-                    startY: 20,
-                    columns: [ // Define columns to exclude 'No.'
-                        { header: 'ID Transaksi', dataKey: 'ID Transaksi' },
-                        { header: 'Tanggal', dataKey: 'Tanggal' },
-                        { header: 'Nama Pasien', dataKey: 'Nama Pasien' },
-                        { header: 'Jenis Layanan', dataKey: 'Jenis Layanan' },
-                        { header: 'Total Biaya', dataKey: 'Total Biaya' },
-                        { header: 'Status Pembayaran', dataKey: 'Status Pembayaran' },
-                    ],
-                    headStyles: { fillColor: [29, 233, 182] },
-                    theme: 'grid',
-                    didParseCell: function(data) {
-                        if (data.column.index === 0) {
-                            data.cell.text = [];
-                        }
-                    },
-                    margin: { top: 10, left: 10, right: 10, bottom: 10 }
-                });
-                doc.save('laporan_data_transaksi.pdf');
-            });
-
-            // Export to Excel functions (Adjusted to correctly remove 'No.' column)
-            // Helper function to clone and prepare table for Excel export (removing 'No.' column)
-            function prepareTableForExcel(tableId) {
-                const table = document.getElementById(tableId);
-                const tableCloneForExcel = table.cloneNode(true); // Clone with true to copy children
-
-                // Remove the 'No.' column header
-                const headerRow = tableCloneForExcel.querySelector('thead tr');
-                if (headerRow && headerRow.cells.length > 0) {
-                    headerRow.cells[0].remove();
+                // Create a clone of the table to manipulate without affecting the displayed one
+                const tableCloneForExcel = table.cloneNode(true);
+                // Remove the "No." column from the cloned table for Excel export
+                // Assuming "No." is the first column (index 0)
+                const headerCells = tableCloneForExcel.querySelector('thead tr').children;
+                if (headerCells.length > 0) {
+                    headerCells[0].remove(); // Remove 'No.' header
                 }
-
-                // Remove the 'No.' column from each body row
-                const bodyRows = tableCloneForExcel.querySelectorAll('tbody tr');
-                bodyRows.forEach(row => {
-                    if (row.cells.length > 0) {
-                        row.cells[0].remove();
+                tableCloneForExcel.querySelectorAll('tbody tr').forEach(row => {
+                    if (row.children.length > 0) {
+                        row.children[0].remove(); // Remove 'No.' data cell
                     }
                 });
-                return tableCloneForExcel;
-            }
 
-            document.getElementById('exportPatientExcel').addEventListener('click', function() {
-                const table = prepareTableForExcel('patientTable');
-                const ws = XLSX.utils.table_to_sheet(table);
+                const ws = XLSX.utils.table_to_sheet(tableCloneForExcel);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Pasien");
                 XLSX.writeFile(wb, "laporan_data_pasien.xlsx");
             });
 
-            document.getElementById('exportDoctorExcel').addEventListener('click', function() {
-                const table = prepareTableForExcel('doctorScheduleTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Jadwal Dokter");
-                XLSX.writeFile(wb, "laporan_jadwal_dokter.xlsx");
-            });
-
-            document.getElementById('exportAccountExcel').addEventListener('click', function() {
-                const table = prepareTableForExcel('accountTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Akun");
-                XLSX.writeFile(wb, "laporan_data_akun.xlsx");
-            });
-
-            document.getElementById('exportObatExcel').addEventListener('click', function() {
-                const table = prepareTableForExcel('obatTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Obat");
-                XLSX.writeFile(wb, "laporan_data_obat.xlsx");
-            });
-
-            document.getElementById('exportTransactionExcel').addEventListener('click', function() {
-                const table = prepareTableForExcel('transaksiPasienTable');
-                const ws = XLSX.utils.table_to_sheet(table);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Transaksi");
-                XLSX.writeFile(wb, "laporan_data_transaksi.xlsx");
-            });
 
             // Initial display and sidebar setup
             function init() {
@@ -1334,19 +1252,9 @@
                 }
             }
 
-            // --- KODE UNTUK UPDATE REAL-TIME DARI LOCALSTORAGE ---
-            window.addEventListener('storage', function(event) {
-                // Event ini akan terpicu jika ada perubahan localStorage di tab/window lain.
-                // Kita akan me-render ulang semua tabel laporan.
-                console.log('Perubahan localStorage terdeteksi, memperbarui laporan:', event.key);
-                populateAllReportTables();
-            });
-            // --- AKHIR KODE UPDATE REAL-TIME ---
-
             // Run initialization
             init();
         });
-</script>
-    
+    </script>
 </body>
 </html>
