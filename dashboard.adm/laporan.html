@@ -791,7 +791,7 @@
                             <th>Deskripsi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="obatTableBody">
                         </tbody>
                 </table>
             </div>
@@ -1011,7 +1011,7 @@
                 dokterAktifSpan.textContent = activeDoctors;
 
                 if (doctors.length === 0) {
-                    const noDataRow = tableBody.insertRow(); /* FIX: Changed from insertCell() to insertRow() */
+                    const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
                     noDataCell.colSpan = 8;
                     noDataCell.textContent = "Tidak ada data dokter untuk ditampilkan.";
@@ -1099,15 +1099,33 @@
             }
 
             function populateDrugReport() {
-                const drugs = JSON.parse(localStorage.getItem('drugs')) || [];
-                const tableBody = document.querySelector('#obatTable tbody');
+                console.log("Memulai populateDrugReport...");
+                const drugs = JSON.parse(localStorage.getItem('obat')) || []; // Menggunakan kunci 'obat'
+                console.log("Data obat yang diambil dari localStorage:", drugs); // Log data yang diambil
+                const tableBody = document.querySelector('#obatTable tbody'); // Menggunakan querySelector
                 const totalJenisObatSpan = document.getElementById('total-jenis-obat');
                 const obatKritisSpan = document.getElementById('obat-kritis');
 
-                tableBody.innerHTML = '';
+                tableBody.innerHTML = ''; // Bersihkan isi tabel sebelum mengisi ulang
                 let criticalStockCount = 0;
 
+                if (drugs.length === 0) {
+                    console.log("Tidak ada data obat di localStorage.");
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 7; // Sesuaikan dengan jumlah kolom di tabel obat
+                    noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
+                    totalJenisObatSpan.textContent = 0;
+                    obatKritisSpan.textContent = 0;
+                    return; // Keluar dari fungsi jika tidak ada data
+                }
+
                 drugs.forEach((drug, index) => {
+                    console.log("Memproses obat:", drug); // Log setiap objek obat
                     if (drug.stok < 10) { // Define critical stock threshold
                         criticalStockCount++;
                     }
@@ -1117,23 +1135,13 @@
                     row.insertCell().textContent = drug.namaObat;
                     row.insertCell().textContent = drug.jenis;
                     row.insertCell().textContent = drug.stok;
-                    row.insertCell().textContent = formatRupiah(drug.harga); // Pastikan ini sesuai dengan nama properti di obat.html (sebelumnya hargaSatuan)
+                    row.insertCell().textContent = formatRupiah(drug.harga); // Menggunakan drug.harga
                     row.insertCell().textContent = drug.deskripsi;
                 });
 
                 totalJenisObatSpan.textContent = drugs.length;
                 obatKritisSpan.textContent = criticalStockCount;
-
-                if (drugs.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 7;
-                    noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
-                    noDataCell.style.textAlign = "center";
-                    noDataCell.style.padding = "20px";
-                    noDataCell.style.fontStyle = "italic";
-                    noDataCell.style.color = "#555";
-                }
+                console.log("populateDrugReport selesai. Total obat:", drugs.length);
             }
 
             function populateUserReport() {
@@ -1194,7 +1202,7 @@
                 populateDoctorReport();
                 populateTransactionReport();
                 populateExaminationReport();
-                populateDrugReport();
+                populateDrugReport(); // Pastikan ini terpanggil
                 populateUserReport();
             }
 
@@ -1244,24 +1252,23 @@
 
                 // Remove the "No." column for Excel export
                 const range = XLSX.utils.decode_range(ws['!ref']);
-                if (range.s.c === 0) { // Only adjust if "No." column is actually the first column
-                    for (let R = range.s.r; R <= range.e.r; ++R) {
-                        for (let C = range.s.c; C <= range.e.c; ++C) {
-                            const cell_address = XLSX.utils.encode_cell({r: R, c: C});
-                            if (ws[cell_address]) {
-                                // Move cells one column to the left
-                                ws[XLSX.utils.encode_cell({r: R, c: C - 1})] = ws[cell_address];
-                                delete ws[cell_address];
-                            }
+                // Create a new sheet without the first column (No.)
+                const new_ws = {};
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    for (let C = range.s.c + 1; C <= range.e.c; ++C) { // Start from column 1
+                        const old_cell_address = XLSX.utils.encode_cell({r: R, c: C});
+                        const new_cell_address = XLSX.utils.encode_cell({r: R, c: C - 1});
+                        if (ws[old_cell_address]) {
+                            new_ws[new_cell_address] = ws[old_cell_address];
                         }
                     }
-                    range.s.c = 0; // Reset start column
-                    range.e.c--; // Decrement end column index
-                    ws['!ref'] = XLSX.utils.encode_range(range);
                 }
+                // Adjust the range for the new sheet
+                new_ws['!ref'] = XLSX.utils.encode_range({s: {r: range.s.r, c: 0}, e: {r: range.e.r, c: range.e.c - 1}});
+
 
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Pasien");
+                XLSX.utils.book_append_sheet(wb, new_ws, "Laporan Data Pasien"); // Use new_ws
                 XLSX.writeFile(wb, "laporan_data_pasien.xlsx");
             });
 
