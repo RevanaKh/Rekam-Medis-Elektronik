@@ -19,7 +19,7 @@
             --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
             --light-color: #f4f4f4; /* Background umum */
             --danger-color: #f44336; /* Warna merah untuk danger */
-            --success-color: #4CAF50;
+            --success-color: #4CAF00;
             --info-color: #17a2b8;
             --warning-color: #ffc107;
             --text-color: #333;
@@ -844,7 +844,6 @@
                 if (user) {
                     const loggedInUser = JSON.parse(user);
                     const welcomeUserElement = document.getElementById('welcome-user');
-                    // welcomeUserElement might not exist on this page, so check before using
                     if (welcomeUserElement) {
                         welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
                     }
@@ -935,22 +934,13 @@
             });
 
             // --- Laporan Logic ---
+
+
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
 
-            // Utility function for no data row
-            function addNoDataRow(tableBody, colSpan) {
-                const noDataRow = tableBody.insertRow();
-                const noDataCell = noDataRow.insertCell();
-                noDataCell.colSpan = colSpan;
-                noDataCell.textContent = "Tidak ada data untuk ditampilkan.";
-                noDataCell.style.textAlign = "center";
-                noDataCell.style.padding = "20px";
-                noDataCell.style.fontStyle = "italic";
-                noDataCell.style.color = "#555";
-            }
-
+         
             // Populate Functions
             function populatePatientReport() {
                 const patients = JSON.parse(localStorage.getItem('patients')) || [];
@@ -958,12 +948,11 @@
                 const totalPasienSpan = document.getElementById('total-pasien');
                 const pasienBaruBulanIniSpan = document.getElementById('pasien-baru-bulan-ini');
 
-                tableBody.innerHTML = ''; // Clear existing rows
+                tableBody.innerHTML = '';
                 let newPatientsThisMonth = 0;
 
                 patients.forEach((patient, index) => {
                     // Check if tanggalLahir is a valid date string and in the current month/year
-                    // Assuming tanggalLahir is stored in YYYY-MM-DD format
                     const patientDOB = new Date(patient.tanggalLahir);
                     if (!isNaN(patientDOB) && patientDOB.getMonth() === currentMonth && patientDOB.getFullYear() === currentYear) {
                         newPatientsThisMonth++;
@@ -983,7 +972,14 @@
                 pasienBaruBulanIniSpan.textContent = newPatientsThisMonth;
 
                 if (patients.length === 0) {
-                    addNoDataRow(tableBody, 7);
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 7;
+                    noDataCell.textContent = "Tidak ada data pasien untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
                 }
             }
 
@@ -993,11 +989,11 @@
                 const totalDokterSpan = document.getElementById('total-dokter');
                 const dokterAktifSpan = document.getElementById('dokter-aktif');
 
-                tableBody.innerHTML = ''; // Clear existing rows
+                tableBody.innerHTML = '';
                 let activeDoctors = 0;
 
                 doctors.forEach((doctor, index) => {
-                    if (doctor.status === 'Aktif') { // Assuming 'status' field exists
+                    if (doctor.status === 'Aktif') {
                         activeDoctors++;
                     }
                     const row = tableBody.insertRow();
@@ -1005,17 +1001,24 @@
                     row.insertCell().textContent = doctor.id;
                     row.insertCell().textContent = doctor.namaDokter;
                     row.insertCell().textContent = doctor.poli;
-                    row.insertCell().textContent = doctor.hari || 'N/A'; // Use 'hari' from jadwal_dokter.html
-                    row.insertCell().textContent = doctor.jamMulai || 'N/A';
-                    row.insertCell().textContent = doctor.jamSelesai || 'N/A';
-                    row.insertCell().textContent = doctor.status || 'N/A';
+                    row.insertCell().textContent = doctor.hari;
+                    row.insertCell().textContent = doctor.jamMulai;
+                    row.insertCell().textContent = doctor.jamSelesai;
+                    row.insertCell().textContent = doctor.status;
                 });
 
                 totalDokterSpan.textContent = doctors.length;
                 dokterAktifSpan.textContent = activeDoctors;
 
                 if (doctors.length === 0) {
-                    addNoDataRow(tableBody, 8);
+                    const noDataRow = tableBody.insertRow(); /* FIX: Changed from insertCell() to insertRow() */
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 8;
+                    noDataCell.textContent = "Tidak ada data dokter untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
                 }
             }
 
@@ -1025,11 +1028,11 @@
                 const totalTransaksiSpan = document.getElementById('total-transaksi');
                 const totalPendapatanSpan = document.getElementById('total-pendapatan');
 
-                tableBody.innerHTML = ''; // Clear existing rows
+                tableBody.innerHTML = '';
                 let totalRevenue = 0;
 
                 transactions.forEach((transaction, index) => {
-                    totalRevenue += parseFloat(transaction.totalBiaya || 0); // Ensure it's a number
+                    totalRevenue += transaction.totalBiaya;
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
                     row.insertCell().textContent = transaction.id;
@@ -1044,52 +1047,64 @@
                 totalPendapatanSpan.textContent = formatRupiah(totalRevenue);
 
                 if (transactions.length === 0) {
-                    addNoDataRow(tableBody, 7);
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 7;
+                    noDataCell.textContent = "Tidak ada data transaksi untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
                 }
             }
 
             function populateExaminationReport() {
-                // Assuming 'examinations' data is stored in localStorage by a future 'pemeriksaan.html' or similar
                 const examinations = JSON.parse(localStorage.getItem('examinations')) || [];
                 const tableBody = document.querySelector('#pemeriksaanTable tbody');
                 const totalPemeriksaanSpan = document.getElementById('total-pemeriksaan');
                 const pemeriksaanBaruBulanIniSpan = document.getElementById('pemeriksaan-baru-bulan-ini');
 
-                tableBody.innerHTML = ''; // Clear existing rows
+                tableBody.innerHTML = '';
                 let newExaminationsThisMonth = 0;
 
                 examinations.forEach((exam, index) => {
-                    const examDate = new Date(exam.tanggal); // Assuming 'tanggal' is the date field
+                    const examDate = new Date(exam.tanggal);
                     if (!isNaN(examDate) && examDate.getMonth() === currentMonth && examDate.getFullYear() === currentYear) {
                         newExaminationsThisMonth++;
                     }
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = exam.id || 'N/A';
-                    row.insertCell().textContent = exam.tanggal || 'N/A';
-                    row.insertCell().textContent = exam.namaPasien || 'N/A';
-                    row.insertCell().textContent = exam.dokter || 'N/A';
-                    row.insertCell().textContent = exam.keluhan || 'N/A';
-                    row.insertCell().textContent = exam.diagnosa || 'N/A';
-                    row.insertCell().textContent = exam.tindakan || 'N/A';
+                    row.insertCell().textContent = exam.id;
+                    row.insertCell().textContent = exam.tanggal;
+                    row.insertCell().textContent = exam.namaPasien;
+                    row.insertCell().textContent = exam.dokter;
+                    row.insertCell().textContent = exam.keluhan;
+                    row.insertCell().textContent = exam.diagnosa;
+                    row.insertCell().textContent = exam.tindakan;
                 });
 
                 totalPemeriksaanSpan.textContent = examinations.length;
                 pemeriksaanBaruBulanIniSpan.textContent = newExaminationsThisMonth;
 
                 if (examinations.length === 0) {
-                    addNoDataRow(tableBody, 8);
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 8;
+                    noDataCell.textContent = "Tidak ada data pemeriksaan untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
                 }
             }
 
             function populateDrugReport() {
-                // Assuming 'drugs' data is stored in localStorage by a future 'data_obat.html' or similar
                 const drugs = JSON.parse(localStorage.getItem('drugs')) || [];
                 const tableBody = document.querySelector('#obatTable tbody');
                 const totalJenisObatSpan = document.getElementById('total-jenis-obat');
                 const obatKritisSpan = document.getElementById('obat-kritis');
 
-                tableBody.innerHTML = ''; // Clear existing rows
+                tableBody.innerHTML = '';
                 let criticalStockCount = 0;
 
                 drugs.forEach((drug, index) => {
@@ -1098,19 +1113,26 @@
                     }
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = drug.id || 'N/A';
-                    row.insertCell().textContent = drug.namaObat || 'N/A';
-                    row.insertCell().textContent = drug.jenis || 'N/A';
-                    row.insertCell().textContent = drug.stok || 0;
-                    row.insertCell().textContent = formatRupiah(drug.hargaSatuan || 0);
-                    row.insertCell().textContent = drug.deskripsi || 'N/A';
+                    row.insertCell().textContent = drug.id;
+                    row.insertCell().textContent = drug.namaObat;
+                    row.insertCell().textContent = drug.jenis;
+                    row.insertCell().textContent = drug.stok;
+                    row.insertCell().textContent = formatRupiah(drug.harga); // Pastikan ini sesuai dengan nama properti di obat.html (sebelumnya hargaSatuan)
+                    row.insertCell().textContent = drug.deskripsi;
                 });
 
                 totalJenisObatSpan.textContent = drugs.length;
                 obatKritisSpan.textContent = criticalStockCount;
 
                 if (drugs.length === 0) {
-                    addNoDataRow(tableBody, 7);
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 7;
+                    noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
                 }
             }
 
@@ -1122,7 +1144,7 @@
                 const dokterCountSpan = document.getElementById('dokter-count');
                 const apotekerCountSpan = document.getElementById('apoteker-count');
 
-                tableBody.innerHTML = ''; // Clear existing rows
+                tableBody.innerHTML = '';
                 let adminCount = 0;
                 let dokterCount = 0;
                 let apotekerCount = 0;
@@ -1134,10 +1156,10 @@
 
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = user.id || 'N/A';
-                    row.insertCell().textContent = user.nama || 'N/A';
-                    row.insertCell().textContent = user.email || 'N/A';
-                    row.insertCell().textContent = user.role || 'N/A';
+                    row.insertCell().textContent = user.id;
+                    row.insertCell().textContent = user.nama;
+                    row.insertCell().textContent = user.email;
+                    row.insertCell().textContent = user.role;
                 });
 
                 totalPenggunaSpan.textContent = users.length;
@@ -1146,7 +1168,14 @@
                 apotekerCountSpan.textContent = apotekerCount;
 
                 if (users.length === 0) {
-                    addNoDataRow(tableBody, 5);
+                    const noDataRow = tableBody.insertRow();
+                    const noDataCell = noDataRow.insertCell();
+                    noDataCell.colSpan = 5;
+                    noDataCell.textContent = "Tidak ada data pengguna untuk ditampilkan.";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataCell.style.fontStyle = "italic";
+                    noDataCell.style.color = "#555";
                 }
             }
 
@@ -1175,10 +1204,6 @@
                 const doc = new jsPDF('p', 'pt', 'letter');
                 const table = document.getElementById('pasienTable'); // Target specific table
 
-                // Clone table to remove "No." column for PDF export if needed
-                // For PDF, autoTable can handle column exclusion easily via columns option.
-                // Or you can create a data array. Let's stick with html:table and map columns.
-                // Ensure the "No." column is not problematic.
                 doc.autoTable({
                     html: table,
                     startY: 60,
@@ -1215,22 +1240,26 @@
             // Excel Export for Patient Data (specific to pasienTable)
             document.getElementById('export-excel-btn').addEventListener('click', function() {
                 const table = document.getElementById('pasienTable'); // Target specific table
+                const ws = XLSX.utils.table_to_sheet(table);
 
-                // Create a clone of the table to manipulate without affecting the displayed one
-                const tableCloneForExcel = table.cloneNode(true);
-                // Remove the "No." column from the cloned table for Excel export
-                // Assuming "No." is the first column (index 0)
-                const headerCells = tableCloneForExcel.querySelector('thead tr').children;
-                if (headerCells.length > 0) {
-                    headerCells[0].remove(); // Remove 'No.' header
-                }
-                tableCloneForExcel.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.children.length > 0) {
-                        row.children[0].remove(); // Remove 'No.' data cell
+                // Remove the "No." column for Excel export
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                if (range.s.c === 0) { // Only adjust if "No." column is actually the first column
+                    for (let R = range.s.r; R <= range.e.r; ++R) {
+                        for (let C = range.s.c; C <= range.e.c; ++C) {
+                            const cell_address = XLSX.utils.encode_cell({r: R, c: C});
+                            if (ws[cell_address]) {
+                                // Move cells one column to the left
+                                ws[XLSX.utils.encode_cell({r: R, c: C - 1})] = ws[cell_address];
+                                delete ws[cell_address];
+                            }
+                        }
                     }
-                });
+                    range.s.c = 0; // Reset start column
+                    range.e.c--; // Decrement end column index
+                    ws['!ref'] = XLSX.utils.encode_range(range);
+                }
 
-                const ws = XLSX.utils.table_to_sheet(tableCloneForExcel);
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Laporan Data Pasien");
                 XLSX.writeFile(wb, "laporan_data_pasien.xlsx");
