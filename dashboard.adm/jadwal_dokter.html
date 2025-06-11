@@ -782,17 +782,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Data jadwal dokter akan dimuat di sini secara dinamis -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
 
                 <div class="pagination">
-                    <!-- Pagination akan dikelola secara dinamis, untuk demo ini hanya placeholder -->
                     <button class="pagination-btn active">1</button>
-                    <!-- <button class="pagination-btn">2</button>
-                    <button class="pagination-btn">3</button> -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -1043,10 +1039,13 @@
             }
 
             let currentJadwalIdToDelete = null;
+            let nextDoctorId = 5; // Mulai dari 5 karena 1-4 sudah ada di dummy data
 
             // Fungsi untuk menghasilkan ID unik
             function generateId() {
-                return 'DTR-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+                const newId = `DTR-${String(nextDoctorId).padStart(3, '0')}`;
+                nextDoctorId++;
+                return newId;
             }
 
             // Fungsi untuk menyimpan data ke localStorage
