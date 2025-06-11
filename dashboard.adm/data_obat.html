@@ -856,7 +856,7 @@
                 <input type="text" id="searchFilterInput" placeholder="Cari obat (nama/jenis/ID)...">
                 <select id="typeFilter">
                     <option value="">Semua Jenis</option>
-                    <option value="Tablet">Tablet</option>
+                    <option value="Tablet">Tablet</m>
                     <option value="Kapsul">Kapsul</option>
                     <option value="Sirup">Sirup</option>
                     <option value="Salep">Salep</option>
@@ -900,7 +900,7 @@
             <form id="obatForm">
                 <div class="form-group">
                     <label for="obatId">ID Obat:</label>
-                    <input type="text" id="obatId" readonly>
+                    <input type="text" id="obatId" value="OBT-" minlength="4" required>
                 </div>
                 <div class="form-group">
                     <label for="namaObat">Nama Obat:</label>
@@ -1100,15 +1100,36 @@
 
             const alertMessage = document.getElementById('alertMessage');
 
-            // Helper to generate UUID-like string for OBT-XXX
+            // --- Perubahan untuk input ID Obat (OBT-) ---
+            const OBT_PREFIX = 'OBT-';
+
+            obatIdInput.addEventListener('input', function() {
+                if (!this.value.startsWith(OBT_PREFIX)) {
+                    // Jika pengguna mencoba menghapus prefix, kembalikan prefix
+                    this.value = OBT_PREFIX;
+                }
+            });
+
+            obatIdInput.addEventListener('keydown', function(e) {
+                // Mencegah penghapusan karakter di dalam prefix
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    // Jika kursor berada di dalam atau sebelum prefix, batalkan aksi
+                    if (this.selectionStart <= OBT_PREFIX.length && this.selectionEnd <= OBT_PREFIX.length) {
+                        e.preventDefault();
+                    }
+                }
+            });
+            // --- Akhir perubahan untuk input ID Obat (OBT-) ---
+
+            // Helper to generate UUID-like string for OBT-XXX (no longer used for new input, but kept for reference if needed)
             function generateShortUUID() {
-                // Generates a short, random string suitable for the XXX part
-                return Math.random().toString(36).substring(2, 8).toUpperCase(); // 6 random alphanumeric characters
+                return Math.random().toString(36).substring(2, 8).toUpperCase();
             }
 
             function generateObatId() {
-                const prefix = "OBT-";
-                return prefix + generateShortUUID();
+                // This function is now effectively unused if we allow manual input after OBT-
+                // It could be used to suggest a full ID if we still wanted auto-generation for new entries.
+                return OBT_PREFIX + generateShortUUID();
             }
 
             function showForm(isEditMode = false, obatData = null) {
@@ -1117,24 +1138,26 @@
                 if (isEditMode && obatData) {
                     formTitle.textContent = 'Edit Data Obat';
                     obatIdInput.value = obatData.id;
+                    obatIdInput.readOnly = true; // ID tidak bisa diubah saat edit
                     namaObatInput.value = obatData.namaObat;
                     jenisObatInput.value = obatData.jenis;
                     stokInput.value = obatData.stok;
                     hargaInput.value = obatData.harga;
-                    tanggalKadaluarsaInput.value = obatData.tanggalKadaluarsa || ''; // Populate new field
+                    tanggalKadaluarsaInput.value = obatData.tanggalKadaluarsa || '';
                     deskripsiInput.value = obatData.deskripsi;
                 } else {
                     formTitle.textContent = 'Tambah Obat Baru';
-                    obatIdInput.value = generateObatId(); // Generate new ID for new entry
-                    obatForm.reset(); // Clear other fields
-                    tanggalKadaluarsaInput.value = ''; // Ensure date field is clear
+                    obatForm.reset(); // Reset form, tapi value OBT- akan tetap karena kita set manual di bawah
+                    obatIdInput.value = OBT_PREFIX; // Mulai dengan OBT-
+                    obatIdInput.readOnly = false; // Bisa diedit saat tambah
+                    tanggalKadaluarsaInput.value = '';
                 }
             }
 
             function hideForm() {
-    obatFormContainer.style.display = 'none'; // Pastikan ini ada dan mengarah ke elemen yang benar
-    toggleBodyOverflow(false); // Opsional, jika Anda memiliki fungsi ini
-}
+                obatFormContainer.style.display = 'none';
+                toggleBodyOverflow(false);
+            }
 
             function toggleBodyOverflow(hide) {
                 document.body.style.overflow = hide ? 'hidden' : '';
@@ -1151,13 +1174,18 @@
             function saveObat(event) {
                 event.preventDefault();
 
-                const id = obatIdInput.value;
-                const namaObat = namaObatInput.value;
+                const id = obatIdInput.value.trim(); // Pastikan tidak ada spasi ekstra
+                const namaObat = namaObatInput.value.trim();
                 const jenis = jenisObatInput.value;
                 const stok = parseInt(stokInput.value);
                 const harga = parseFloat(hargaInput.value);
-                const tanggalKadaluarsa = tanggalKadaluarsaInput.value; // Get new field value
-                const deskripsi = deskripsiInput.value;
+                const tanggalKadaluarsa = tanggalKadaluarsaInput.value;
+                const deskripsi = deskripsiInput.value.trim();
+
+                if (id === OBT_PREFIX || !id.startsWith(OBT_PREFIX)) {
+                    showMessage('ID Obat harus dimulai dengan "OBT-" dan memiliki karakter setelahnya.', 'danger');
+                    return;
+                }
 
                 let obats = JSON.parse(localStorage.getItem('obat')) || [];
 
@@ -1167,7 +1195,7 @@
                     jenis: jenis,
                     stok: stok,
                     harga: harga,
-                    tanggalKadaluarsa: tanggalKadaluarsa, // Save new field
+                    tanggalKadaluarsa: tanggalKadaluarsa,
                     deskripsi: deskripsi
                 };
 
@@ -1176,11 +1204,18 @@
                     obats[existingObatIndex] = newObat; // Update existing
                     showMessage('Data obat berhasil diperbarui!');
                 } else {
+                    // Cek duplikasi ID saat menambahkan baru
+                    if (obats.some(o => o.id === id)) {
+                         showMessage('ID Obat sudah ada. Gunakan ID lain.', 'danger');
+                         return;
+                    }
                     obats.push(newObat); // Add new
                     showMessage('Data obat baru berhasil ditambahkan!');
                 }
 
                 localStorage.setItem('obat', JSON.stringify(obats));
+                // Trigger storage event manually to notify other pages (like Laporan)
+                window.dispatchEvent(new Event('storage')); // Ini penting untuk sinkronisasi
                 hideForm();
                 displayObats(); // Refresh table
             }
@@ -1214,7 +1249,7 @@
                     row.insertCell().textContent = obat.jenis;
                     row.insertCell().textContent = obat.stok;
                     row.insertCell().textContent = formatRupiah(obat.harga);
-                    row.insertCell().textContent = obat.tanggalKadaluarsa; // Display new field
+                    row.insertCell().textContent = obat.tanggalKadaluarsa;
                     row.insertCell().textContent = obat.deskripsi;
 
                     const actionCell = row.insertCell();
@@ -1257,7 +1292,7 @@
                     viewJenisObat.textContent = obat.jenis;
                     viewStok.textContent = obat.stok;
                     viewHarga.textContent = formatRupiah(obat.harga);
-                    viewTanggalKadaluarsa.textContent = obat.tanggalKadaluarsa; // Display new detail
+                    viewTanggalKadaluarsa.textContent = obat.tanggalKadaluarsa;
                     viewDeskripsi.textContent = obat.deskripsi;
                     viewObatModal.style.display = 'flex';
                     toggleBodyOverflow(true);
@@ -1283,6 +1318,8 @@
                 obats = obats.filter(o => o.id !== currentObatIdToDelete);
                 localStorage.setItem('obat', JSON.stringify(obats));
                 showMessage('Data obat berhasil dihapus!', 'danger');
+                // Trigger storage event manually to notify other pages (like Laporan)
+                window.dispatchEvent(new Event('storage')); // Ini penting untuk sinkronisasi
                 deleteConfirmationModal.style.display = 'none';
                 toggleBodyOverflow(false);
                 displayObats(); // Refresh table
