@@ -1030,10 +1030,10 @@
 
             let doctors = JSON.parse(localStorage.getItem('doctors')) || [
                 // Data dummy jika localStorage kosong
-                { id: 'D001', namaDokter: 'Dr. Revana Khoerunnisa', poli: 'umum', hari: 'senin', jamMulai: '09:00', jamSelesai: '12:00', status: 'Aktif' },
-                { id: 'D002', namaDokter: 'Dr. Rifa Nazla Kamillia', poli: 'mata', hari: 'selasa', jamMulai: '10:00', jamSelesai: '13:00', status: 'Aktif' },
-                { id: 'D003', namaDokter: 'Dr. Nailah Tsani Armydiani', poli: 'gigi', hari: 'rabu', jamMulai: '08:00', jamSelesai: '12:00', status: 'Aktif' },
-                { id: 'D004', namaDokter: 'Dr. Salwa Azzahra Nurrohmah', poli: 'THT', hari: 'jumat', jamMulai: '13:00', jamSelesai: '16:00', status: 'Aktif' }
+                { id: 'DTR-001', namaDokter: 'Dr. Revana Khoerunnisa', poli: 'umum', hari: 'senin', jamMulai: '09:00', jamSelesai: '12:00', status: 'Aktif' },
+                { id: 'DTR-002', namaDokter: 'Dr. Rifa Nazla Kamillia', poli: 'mata', hari: 'selasa', jamMulai: '10:00', jamSelesai: '13:00', status: 'Aktif' },
+                { id: 'DTR-003', namaDokter: 'Dr. Nailah Tsani Armydiani', poli: 'gigi', hari: 'rabu', jamMulai: '08:00', jamSelesai: '12:00', status: 'Aktif' },
+                { id: 'DTR-004', namaDokter: 'Dr. Salwa Azzahra Nurrohmah', poli: 'THT', hari: 'jumat', jamMulai: '13:00', jamSelesai: '16:00', status: 'Aktif' }
             ];
 
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
@@ -1046,7 +1046,7 @@
 
             // Fungsi untuk menghasilkan ID unik
             function generateId() {
-                return 'JDL-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
+                return 'DTR-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5).toUpperCase();
             }
 
             // Fungsi untuk menyimpan data ke localStorage
