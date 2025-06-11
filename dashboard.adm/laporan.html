@@ -1289,6 +1289,21 @@
                 }
             }
 
+            // Event listener for localStorage changes
+            window.addEventListener('storage', (event) => {
+                // Check if the changed item is 'users'
+                if (event.key === 'users') {
+                    console.log('localStorage "users" changed, updating user report.');
+                    populateUserReport(); // Only re-populate the user report
+                }
+                // You can add more conditions here if other reports also need real-time updates
+                // For example:
+                // if (event.key === 'patients') {
+                //     populatePatientReport();
+                // }
+            });
+
+
             // Run initialization
             init();
         });
