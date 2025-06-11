@@ -17,16 +17,14 @@
             --light-color: #f4f4f4; /* General background */
             --danger-color: #f44336; /* Red color for danger */
             --success-color: #4CAF50;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
             --text-color: #333;
             --white: #fff;
             --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             --sidebar-width: 250px;
             --sidebar-minimized-width: 60px;
-            --border-color: #ddd; /* Added for table borders consistency */
-
-            /* New colors for report buttons as per image */
-            --report-pdf-bg: #E74C3C; /* Red for PDF */
-            --report-excel-bg: #27AE60; /* Green for Excel */
+            --border-color: #ddd;
         }
 
         * {
@@ -40,7 +38,7 @@
             display: flex;
             min-height: 100vh;
             background-color: var(--light-color);
-            overflow-x: hidden; /* Prevent horizontal scrollbar on the entire body */
+            overflow-x: hidden;
         }
 
         /* Mobile Toggle outside sidebar */
@@ -67,7 +65,7 @@
             pointer-events: none;
         }
 
-        /* Main Sidebar/Navigation */
+        /* Sidebar/Main Navigation */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
@@ -95,6 +93,7 @@
             background-color: var(--primary-dark);
             color: var(--white);
             font-size: 1.5rem;
+            white-space: nowrap;
             overflow: hidden;
             position: relative;
             justify-content: flex-start;
@@ -118,6 +117,20 @@
             font-size: 1.5rem;
         }
 
+        .menu-text {
+            font-size: 1.5rem;
+            opacity: 1;
+            transition: opacity 0.2s ease;
+            color: var(--secondary-color);
+        }
+
+        .sidebar.minimized .menu-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
         .nav-list {
             list-style: none;
             padding: 0;
@@ -136,6 +149,7 @@
             color: var(--secondary-color);
             text-decoration: none;
             transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
             overflow: hidden;
         }
 
@@ -150,13 +164,11 @@
             width: 100%;
             height: 100%;
             stroke: currentColor;
-            fill: none;
         }
 
         .nav-text {
             opacity: 1;
             transition: opacity 0.2s ease;
-            white-space: nowrap;
         }
 
         .sidebar.minimized .nav-text {
@@ -213,7 +225,6 @@
             width: 100%;
             height: 100%;
             stroke: currentColor;
-            fill: none;
         }
 
         .logout-text {
@@ -274,183 +285,303 @@
             padding: 20px;
             transition: margin-left 0.3s ease;
             margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
             overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
             z-index: 1;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Centers content horizontally within main-content */
+            align-items: center;
         }
 
         .sidebar.minimized + .main-content {
             margin-left: var(--sidebar-minimized-width);
+            width: calc(100% - var(--sidebar-minimized-width));
         }
 
-        /* Content Sections */
-        .content-section {
+        /* Global styles for content */
+        .header {
             background-color: var(--white);
-            padding: 30px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Card styles for general content sections */
+        .card {
+            background-color: var(--white);
             border-radius: 8px;
             box-shadow: var(--shadow);
+            padding: 25px;
             margin-bottom: 20px;
-            width: 100%; /* Ensures it fills the width of its parent */
-            max-width: 1200px; /* Optional: Sets a max-width for very wide screens */
-            margin-left: auto; /* Centers the content-section if max-width is applied */
-            margin-right: auto; /* Centers the content-section if max-width is applied */
-            padding-top: 20px; /* Added some top padding to content section */
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .content-section h2 { /* Added for the section header */
-            color: var(--primary-dark);
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
-        }
-
-        .content-section h3 {
-            color: var(--primary-dark);
-            margin-bottom: 20px;
             border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
         }
 
-        /* Styles for tables */
-        .table-responsive { /* Wrapper for scroll */
+        .card-header h2 {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .button-group button {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .button-group button i {
+            font-size: 1.1em;
+        }
+
+        .add-btn {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+        .add-btn:hover {
+            background-color: #008f6b;
+            transform: translateY(-2px);
+        }
+
+        .export-btn {
+            background-color: #3498DB; /* Blue */
+            color: var(--white);
+        }
+        .export-btn:hover {
+            background-color: #217dbb;
+            transform: translateY(-2px);
+        }
+        #export-excel-accounts-btn {
+            background-color: #27AE60; /* Green */
+        }
+        #export-excel-accounts-btn:hover {
+            background-color: #229954;
+            transform: translateY(-2px);
+        }
+        #export-pdf-accounts-btn {
+            background-color: #E74C3C; /* Red */
+        }
+        #export-pdf-accounts-btn:hover {
+            background-color: #C0392B;
+            transform: translateY(-2px);
+        }
+
+
+        .card-body {
+            padding-top: 10px;
+        }
+
+        .form-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            display: none; /* Hidden by default */
+        }
+
+        .form-section h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1 1 calc(50% - 10px);
+            display: flex;
+            flex-direction: column;
+            min-width: 250px;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group select {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: var(--white);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(29, 233, 182, 0.3);
+            outline: none;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
             margin-top: 20px;
-            overflow-x: auto; /* This is crucial for horizontal scrolling */
+            flex-wrap: wrap;
+        }
+
+        .form-actions button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .save-btn {
+            background-color: var(--primary-dark);
+            color: var(--white);
+        }
+        .save-btn:hover {
+            background-color: #008f6b;
+            transform: translateY(-2px);
+        }
+
+        .cancel-btn {
+            background-color: #95a5a6; /* Gray */
+            color: var(--white);
+        }
+        .cancel-btn:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .search-filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-filter-container input[type="text"] {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            min-width: 200px;
+        }
+
+        .account-table-container {
+            overflow-x: auto;
             border-radius: 8px;
             box-shadow: var(--shadow);
             width: 100%;
         }
 
-        table { /* Applying styles directly to the table element within .table-responsive */
-            width: 100%; /* Table will fill 100% of .table-responsive */
+        .account-table {
+            width: 100%;
             border-collapse: collapse;
             margin-bottom: 0;
-            min-width: 650px; /* **Increase this if the table is still getting too narrow** */
-                               /* This ensures the table itself has a minimum width, triggering overflow-x on .table-responsive */
+            min-width: 800px; /* Lebar tabel tetap */
             background-color: var(--white);
         }
 
-        table th, table td {
+        .account-table th, .account-table td {
             border: 1px solid var(--border-color);
             padding: 12px 15px;
             text-align: left;
             font-size: 0.9em;
-            white-space: nowrap; /* Important: prevents text wrap in cells, enabling horizontal scroll */
+            white-space: nowrap;
         }
 
-        table thead th { /* Specific for header */
-            background-color: #f2f2f2;
+        .account-table th {
+            background-color: var(--primary-color);
+            color: var(--white);
             font-weight: bold;
-            color: var(--text-color);
         }
 
-        table tbody tr:nth-child(even) {
+        .account-table tbody tr:nth-child(even) {
             background-color: #f9f9f9;
         }
 
-        table tbody tr:hover {
+        .account-table tbody tr:hover {
             background-color: #f1f1f1;
         }
 
-        /* Styles specific to tambah_akun.html content - keeping form styles */
-        .card {
-            background-color: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            width: 100%; /* Ensures form fills 100% of content-section */
-            max-width: 800px; /* Optional: Limits form width */
-            margin-left: auto; /* Centers form if max-width is applied */
-            margin-right: auto; /* Centers form if max-width is applied */
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-color);
-            font-weight: bold;
-        }
-        input[type="text"], input[type="password"], input[type="email"], select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .button-group {
+        .account-table .actions {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px;
             justify-content: flex-start;
         }
-        .btn { /* General button style */
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            display: flex; /* Make buttons flex for icon + text */
-            align-items: center; /* Center icon and text */
-            gap: 8px; /* Space between icon and text */
-        }
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            color: var(--white);
-        }
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: var(--white);
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-        .action-buttons .btn { /* Specific styles for action buttons in table */
+
+        .account-table .actions button {
             padding: 8px 12px;
-            font-size: 12px;
-            margin-right: 5px;
-        }
-        .action-buttons .btn-edit {
-            background-color: #2196F3;
-            color: #fff;
-        }
-        .action-buttons .btn-edit:hover {
-            background-color: #1976D2;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
 
-        /* Alert styles */
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 1rem;
-            display: none; /* Hidden by default */
-        }
-        .alert-success {
-            background-color: var(--success-color);
+        .edit-btn {
+            background-color: var(--info-color);
             color: var(--white);
         }
-        .alert-danger {
+        .edit-btn:hover {
+            background-color: #117a8b;
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
             background-color: var(--danger-color);
             color: var(--white);
         }
+        .delete-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
 
-        /* Modal Styles */
+        /* Modal for Delete Confirmation */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
+            z-index: 1050;
             left: 0;
             top: 0;
             width: 100%;
@@ -462,146 +593,101 @@
         }
 
         .modal-content {
-            background-color: var(--white);
+            background-color: #fefefe;
             margin: auto;
             padding: 20px;
+            border: 1px solid #888;
             border-radius: 8px;
-            box-shadow: var(--shadow);
-            width: 80%;
-            max-width: 500px;
-            text-align: center;
-            position: relative;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            animation-name: animatetop;
+            animation-duration: 0.4s
         }
 
-        .close-button {
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .modal-header {
+            padding: 10px 16px;
+            background-color: var(--danger-color);
+            color: white;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .close-btn {
             color: #aaa;
             float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            position: absolute;
-            top: 10px;
-            right: 20px;
+            color: white;
         }
 
-        .close-button:hover,
-        .close-button:focus {
-            color: #000;
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #ddd;
             text-decoration: none;
             cursor: pointer;
         }
 
-        .modal-content h3 {
-            margin-bottom: 20px;
-            color: var(--text-color);
-        }
-        .modal-content .button-group {
-            justify-content: center;
+        .modal-body {
+            padding: 20px 16px;
+            text-align: center;
         }
 
-        /* Search and Add Container */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        .modal-footer {
+            padding: 10px 16px;
+            text-align: right;
+            border-top: 1px solid #eee;
+            clear: both;
         }
 
-        .section-header h2 {
-            margin-bottom: 0;
-            margin-right: 20px; /* Space between title and search */
+        .modal-footer button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.9em;
         }
 
-        .search-add-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap; /* Allow wrapping of search and add button */
+        .modal-cancel-btn {
+            background-color: #ccc;
+            color: #333;
+        }
+        .modal-cancel-btn:hover {
+            background-color: #bbb;
         }
 
-        .search-input-container {
-            position: relative;
-            flex-grow: 1; /* Allow search input to grow */
-            min-width: 200px; /* Minimum width for search input */
+        .modal-confirm-btn {
+            background-color: var(--danger-color);
+            color: white;
         }
-
-        .search-input-container input {
-            padding-left: 40px; /* Space for the icon */
+        .modal-confirm-btn:hover {
+            background-color: #c82333;
         }
-
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
-
-        .btn-add {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .btn-add:hover {
-            background-color: var(--primary-dark);
-        }
-
-        /* New styles for export buttons */
-        .btn-export-pdf {
-            background-color: var(--report-pdf-bg); /* Red */
-            color: var(--white);
-        }
-        .btn-export-pdf:hover {
-            background-color: #C0392B;
-        }
-        .btn-export-excel {
-            background-color: var(--report-excel-bg); /* Green */
-            color: var(--white);
-        }
-        .btn-export-excel:hover {
-            background-color: #229954;
-        }
-
-        /* Form container animation */
-        .form-container {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding 0.5s ease-out, margin-bottom 0.5s ease-out;
-            padding: 0 20px; /* Adjust padding when hidden */
-            margin-bottom: 0; /* Remove bottom margin when hidden */
-        }
-
-        .form-container.form-active {
-            max-height: 1000px; /* Sufficiently large to show content */
-            opacity: 1;
-            padding: 20px; /* Restore padding when active */
-            margin-bottom: 20px; /* Restore bottom margin when active */
-        }
-
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .mobile-toggle {
                 display: block;
-                z-index: 10000;
-                top: 10px; /* Adjusted position */
-                left: 10px; /* Adjusted position */
-                font-size: 1.8rem;
-                padding: 8px 12px;
             }
 
             .sidebar {
                 left: -250px;
-                position: fixed;
-                height: 100%;
-                z-index: 2000;
-                background-color: var(--primary-color);
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+                width: var(--sidebar-width);
             }
 
             .sidebar.active {
@@ -611,8 +697,7 @@
             .main-content {
                 margin-left: 0;
                 width: 100%;
-                align-items: flex-start; /* Content starts from left on mobile */
-                padding: 15px; /* Slightly smaller padding on mobile */
+                padding: 15px;
             }
 
             .sidebar.minimized + .main-content {
@@ -627,38 +712,74 @@
                 flex-direction: column;
             }
 
-            .content-section {
-                padding: 15px; /* Smaller padding for content on mobile */
-                margin-top: 60px; /* Push content down to clear fixed mobile toggle */
-            }
-
-            .section-header {
-                flex-direction: column; /* Stack header items vertically */
-                align-items: flex-start; /* Align stacked items to the left */
-                gap: 15px;
-            }
-
-            .section-header h2 {
-                margin-bottom: 0;
-                margin-right: 0;
-            }
-
-            .search-add-container {
-                width: 100%; /* Make search/add container full width */
-                flex-direction: column; /* Stack search and add button */
-                align-items: stretch; /* Stretch items to fill width */
+            .header {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: flex-start;
                 gap: 10px;
             }
 
-            .search-input-container {
-                width: 100%; /* Search input takes full width */
-                min-width: unset; /* Remove min-width constraint */
+            .card {
+                padding: 15px;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .button-group {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .button-group button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-group {
+                flex: 1 1 100%;
+                min-width: unset;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+            .form-actions button {
+                width: 100%;
+            }
+
+            .search-filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-filter-container input {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .account-table th, .account-table td {
+                padding: 8px 10px;
+                font-size: 0.8em;
+            }
+
+            .modal-content {
+                width: 95%;
             }
         }
     </style>
 </head>
 <body>
-    <div class="mobile-toggle" id="mobile-toggle"> ≡ </div>
+    <div class="mobile-toggle" id="mobile-toggle">
+        ≡
+    </div>
+
     <div class="sidebar" id="sidebar">
         <button class="toggle-btn" id="sidebar-toggle">
             <i class="fas fa-chevron-left"></i>
@@ -759,103 +880,134 @@
                 <div class="logout-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="24" height="24">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="17 16 22 11 17 6"></polyline>
-                        <line x1="22" y1="11" x2="10" y2="11"></line>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
                 </div>
-                <div class="nav-text">Logout</div>
+                <div class="logout-text">LOG OUT</div>
             </a>
         </div>
     </div>
-    <div class="main-content">
-        <div class="content-section">
-            <div class="section-header">
-                <h2>Manajemen Akun</h2>
-                <div class="search-add-container">
-                    <div class="search-input-container">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" placeholder="Cari Akun..." id="searchFilterInput">
-                    </div>
-                    <button class="btn btn-add" id="toggleFormBtn">
-                        <i class="fas fa-plus"></i> Tambah Akun Baru
-                    </button>
-                    <button class="btn btn-export-pdf" id="export-pdf-accounts-btn">
-                        <i class="fas fa-file-pdf"></i> Unduh PDF
-                    </button>
-                    <button class="btn btn-export-excel" id="export-excel-accounts-btn">
-                        <i class="fas fa-file-excel"></i> Unduh Excel
-                    </button>
+
+    <div class="main-content" id="main-content">
+        <div class="header">
+            <h1>Manajemen Akun Pengguna</h1>
+            <div class="user-info">
+                <span>Selamat datang, <span id="welcome-user"></span>!</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Daftar Akun</h2>
+                <div class="button-group">
+                    <button class="add-btn" id="add-account-btn"><i class="fas fa-user-plus"></i> Tambah Akun Baru</button>
+                    <button class="export-btn" id="export-pdf-accounts-btn"><i class="fas fa-file-pdf"></i> PDF</button>
+                    <button class="export-btn" id="export-excel-accounts-btn"><i class="fas fa-file-excel"></i> Excel</button>
                 </div>
             </div>
+            <div class="card-body">
+                <div class="form-section" id="account-form-section">
+                    <h3>Tambah/Edit Akun</h3>
+                    <form id="account-form">
+                        <input type="hidden" id="account-id">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nama">Nama:</label>
+                                <input type="text" id="nama" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="email" id="email" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password">
+                                <small>Biarkan kosong jika tidak ingin mengubah password.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="role">Role:</label>
+                                <select id="role" required>
+                                    <option value="">Pilih Role</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="pendaftaran">Pendaftaran</option>
+                                    <option value="dokter">Dokter</option>
+                                    <option value="apoteker">Apoteker</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="save-btn" id="save-account-btn">Simpan Akun</button>
+                            <button type="button" class="cancel-btn" id="cancel-edit-btn">Batal</button>
+                        </div>
+                    </form>
+                </div>
 
-            <div class="card form-container" id="accountFormContainer">
-                <h3><span id="formTitle">Tambah</span> Akun Baru</h3>
-                <div id="successAlert" class="alert alert-success"></div>
-                <div id="errorAlert" class="alert alert-danger"></div>
-                <form id="userForm">
-                    <input type="hidden" id="userId">
-                    <div class="form-group">
-                        <label for="nama">Nama:</label>
-                        <input type="text" id="nama" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Role:</label>
-                        <select id="role" required>
-                            <option value="">Pilih Role</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Dokter">Dokter</option>
-                            <option value="Apoteker">Apoteker</option>
-                            <option value="Pasien">Pasien</option>
-                        </select>
-                    </div>
-                    <div class="button-group">
-                        <button type="submit" class="btn btn-primary" id="saveAccountBtn">Simpan</button>
-                        <button type="button" class="btn btn-danger" id="cancelFormBtn">Batal</button>
-                    </div>
-                </form>
-            </div>
+                <div class="search-filter-container">
+                    <input type="text" id="search-filter-input" placeholder="Cari berdasarkan nama atau email...">
+                </div>
 
-            <div class="table-responsive">
-                <table id="accountTable">
-                    <thead>
-                        <tr>
-                            <th>ID User</th>
-                            <th>Nama</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+                <div class="account-table-container">
+                    <table class="account-table" id="account-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>ID</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="deleteModal" class="modal">
+    <div id="delete-modal" class="modal">
         <div class="modal-content">
-            <span class="close-button" id="closeDeleteModalBtn">&times;</span>
-            <h3>Konfirmasi Hapus</h3>
-            <p>Apakah Anda yakin ingin menghapus akun ini?</p>
-            <div class="button-group">
-                <button class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
-                <button class="btn btn-primary" id="cancelDeleteBtn">Batal</button>
+            <div class="modal-header">
+                <h2>Konfirmasi Hapus</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus akun ini?</p>
+                <p>Ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel-btn" id="cancel-delete-btn">Batal</button>
+                <button class="modal-confirm-btn" id="confirm-delete-btn">Hapus</button>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Function to load user data from sessionStorage and display it
+            const addAccountBtn = document.getElementById('add-account-btn');
+            const accountFormSection = document.getElementById('account-form-section');
+            const accountForm = document.getElementById('account-form');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+            const accountTableBody = document.querySelector('#account-table tbody');
+            const accountIdInput = document.getElementById('account-id');
+            const namaInput = document.getElementById('nama');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const roleSelect = document.getElementById('role');
+            const searchFilterInput = document.getElementById('search-filter-input');
+
+            // Delete Modal Elements
+            const deleteModal = document.getElementById('delete-modal');
+            const closeDeleteBtn = deleteModal.querySelector('.close-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            let accountToDeleteId = null;
+
+            // User and Access Control
             function loadUserData() {
                 const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
@@ -864,289 +1016,260 @@
                     if (welcomeUserElement) {
                         welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
                     }
-                } else {
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                }
-            }
-
-            // Custom message box function
-            function displayMessageBox(message, type) {
-                const messageBox = document.createElement('div');
-                messageBox.classList.add('message-box');
-                messageBox.textContent = message;
-                if (type === 'error') {
-                    messageBox.style.backgroundColor = 'var(--danger-color)';
-                } else if (type === 'success') {
-                    messageBox.style.backgroundColor = 'var(--success-color)';
-                }
-                messageBox.style.color = 'var(--white)';
-                messageBox.style.padding = '15px';
-                messageBox.style.borderRadius = '8px';
-                messageBox.style.position = 'fixed';
-                messageBox.style.top = '20px';
-                messageBox.style.left = '50%';
-                messageBox.style.transform = 'translateX(-50%)';
-                messageBox.style.zIndex = '9999';
-                messageBox.style.opacity = '0';
-                messageBox.style.transition = 'opacity 0.5s ease-in-out';
-                document.body.appendChild(messageBox);
-
-                setTimeout(() => {
-                    messageBox.style.opacity = '1';
-                }, 100);
-
-                setTimeout(() => {
-                    messageBox.style.opacity = '0';
-                    messageBox.addEventListener('transitionend', () => messageBox.remove());
-                }, 3000);
-            }
-
-            // Function to check access based on roles
-            function checkAccess(allowedRoles) {
-                console.log("Checking access...");
-                const user = sessionStorage.getItem('loggedInUser');
-                if (user) {
-                    const loggedInUser = JSON.parse(user);
-                    console.log("Logged-in user data:", loggedInUser);
-                    console.log("User role:", loggedInUser.role);
-                    console.log("Allowed roles (original):", allowedRoles);
-
-                    const userRoleLower = loggedInUser.role ? loggedInUser.role.toLowerCase() : '';
-                    const allowedRolesLower = allowedRoles.map(role => role.toLowerCase());
-
-                    console.log("User role (lowercase):", userRoleLower);
-                    console.log("Allowed roles (lowercase):", allowedRolesLower);
-
-                    if (!allowedRolesLower.includes(userRoleLower)) {
-                        console.log("Access DENIED: User role is NOT included in allowed roles.");
-                        displayMessageBox('Anda tidak memiliki akses ke halaman ini.', 'error');
+                    // Role-based access control for this page
+                    if (loggedInUser.role !== 'admin') {
+                        alert('Anda tidak memiliki akses ke halaman ini.');
                         sessionStorage.clear();
                         window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                    } else {
-                        console.log("Access GRANTED.");
                     }
                 } else {
-                    console.log("No user data in sessionStorage. Redirecting to login page.");
                     window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
             }
 
-
-            // Run access check first
-            checkAccess(['Admin']); // Only 'Admin' role can access this page
-            loadUserData(); // Call after checkAccess
-
+            // Sidebar and Mobile Menu Toggle (from other pages for consistency)
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebar-toggle');
             const mobileToggle = document.getElementById('mobile-toggle');
+            const menuIcon = document.querySelector('.sidebar-header .menu-icon');
+            const mainContent = document.getElementById('main-content');
 
             if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function() {
+                sidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('minimized');
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
                 });
             }
 
             if (mobileToggle) {
-                mobileToggle.addEventListener('click', function() {
+                mobileToggle.addEventListener('click', (event) => {
+                    event.stopPropagation();
                     sidebar.classList.toggle('active');
                 });
             }
 
-            document.addEventListener('click', function(event) {
-                if (window.innerWidth <= 768 && sidebar.classList.contains('active') &&
-                    !sidebar.contains(event.target) && !mobileToggle.contains(event.target)) {
+            if (menuIcon) {
+                menuIcon.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    } else {
+                        sidebar.classList.toggle('minimized');
+                        if (sidebar.classList.contains('minimized')) {
+                            mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                        } else {
+                            mainContent.style.marginLeft = 'var(--sidebar-width)';
+                        }
+                    }
+                });
+            }
+
+            mainContent.addEventListener('click', () => {
+                if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
                     sidebar.classList.remove('active');
                 }
             });
 
-            // Account form and table elements
-            const toggleFormBtn = document.getElementById('toggleFormBtn');
-            const accountFormContainer = document.getElementById('accountFormContainer');
-            const userForm = document.getElementById('userForm');
-            const formTitle = document.getElementById('formTitle');
-            const cancelFormBtn = document.getElementById('cancelFormBtn');
-            const accountTableBody = document.getElementById('accountTable').getElementsByTagName('tbody')[0];
-            const searchFilterInput = document.getElementById('searchFilterInput');
+            sidebar.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
 
-            // Form input fields
-            const userIdInput = document.getElementById('userId');
-            const namaInput = document.getElementById('nama');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            const roleInput = document.getElementById('role');
-
-            // Alerts (now primarily handled by custom message box)
-            const successAlert = document.getElementById('successAlert');
-            const errorAlert = document.getElementById('errorAlert');
-
-            // Delete modal elements
-            const deleteModal = document.getElementById('deleteModal');
-            const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-
-            // Load accounts from localStorage, or initialize with a default admin if empty/no admin found
-            let accounts = JSON.parse(localStorage.getItem('accounts'));
-
-            // If accounts are not in localStorage OR if no Admin user exists,
-            // initialize with a default Admin account for first-time use.
-            if (!accounts || accounts.length === 0 || !accounts.some(acc => acc.role === 'Admin')) {
-                accounts = [
-                    { id: 'ADM-ACC-001', nama: 'Admin', email: 'admin@gmail.com', password: 'admin123', role: 'Admin' }
-                ];
-                localStorage.setItem('accounts', JSON.stringify(accounts));
-                console.log("LocalStorage initialized with default Admin account.");
-            }
-            // Ensure `accounts` is always the latest version after potential initialization
-            accounts = JSON.parse(localStorage.getItem('accounts'));
-
-
-            let currentAccountIdToDelete = null;
-
-            // Function to generate unique ID based on role
-            function generateId(role) {
-                const uniqueNum = Math.floor(100 + Math.random() * 900); // 3 random digits
-                let prefix = '';
-                switch (role) {
-                    case 'Admin':
-                        prefix = 'ADM-ACC-';
-                        break;
-                    case 'Apoteker':
-                        prefix = 'APT-ACC-';
-                        break;
-                    case 'Pasien':
-                        prefix = 'PSN-ACC-';
-                        break;
-                    case 'Dokter':
-                        prefix = 'DKT-ACC-';
-                        break;
-                    default:
-                        prefix = 'USR-ACC-'; // Fallback for unknown roles
-                        break;
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    if (sidebar.classList.contains('minimized')) {
+                        mainContent.style.marginLeft = 'var(--sidebar-minimized-width)';
+                    } else {
+                        mainContent.style.marginLeft = 'var(--sidebar-width)';
+                    }
+                    sidebar.classList.remove('active');
+                } else {
+                    mainContent.style.marginLeft = '0';
                 }
-                return `${prefix}${uniqueNum}`;
+            });
+
+            // Account Management Functions
+            function loadAccounts() {
+                // Ensure 'users' is the correct key
+                const accounts = JSON.parse(localStorage.getItem('users')) || [];
+                return accounts;
             }
 
-            function displayAccounts(filter = '') {
+            function saveAccounts(accounts) {
+                // Ensure 'users' is the correct key
+                localStorage.setItem('users', JSON.stringify(accounts));
+                // Manually trigger storage event to update laporan.html
+                window.dispatchEvent(new Event('storage'));
+            }
+
+            function generateAccountId() {
+                const accounts = loadAccounts();
+                if (accounts.length === 0) {
+                    return 'U001';
+                }
+                const lastId = accounts[accounts.length - 1].id;
+                const num = parseInt(lastId.replace('U', '')) + 1;
+                return 'U' + String(num).padStart(3, '0');
+            }
+
+            function displayAccounts(filterText = '') {
+                const accounts = loadAccounts();
                 accountTableBody.innerHTML = '';
-                // Ensure to reload data from localStorage every time it's displayed
-                accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                let counter = 1;
 
                 const filteredAccounts = accounts.filter(account =>
-                    (account.nama && account.nama.toLowerCase().includes(filter.toLowerCase())) ||
-                    (account.email && account.email.toLowerCase().includes(filter.toLowerCase())) ||
-                    (account.role && account.role.toLowerCase().includes(filter.toLowerCase()))
+                    account.nama.toLowerCase().includes(filterText.toLowerCase()) ||
+                    account.email.toLowerCase().includes(filterText.toLowerCase()) ||
+                    account.role.toLowerCase().includes(filterText.toLowerCase())
                 );
+
+                if (filteredAccounts.length === 0) {
+                    const row = accountTableBody.insertRow();
+                    const cell = row.insertCell();
+                    cell.colSpan = 6;
+                    cell.textContent = "Tidak ada akun ditemukan.";
+                    cell.style.textAlign = "center";
+                    cell.style.padding = "20px";
+                    cell.style.fontStyle = "italic";
+                    cell.style.color = "#555";
+                    return;
+                }
 
                 filteredAccounts.forEach(account => {
                     const row = accountTableBody.insertRow();
-                    row.dataset.id = account.id;
+                    row.insertCell().textContent = counter++;
+                    row.insertCell().textContent = account.id;
+                    row.insertCell().textContent = account.nama;
+                    row.insertCell().textContent = account.email;
+                    row.insertCell().textContent = account.role;
 
-                    row.insertCell(0).textContent = account.id; // Display the generated ID
-                    row.insertCell(1).textContent = account.nama;
-                    row.insertCell(2).textContent = account.email;
-                    row.insertCell(3).textContent = account.role;
+                    const actionsCell = row.insertCell();
+                    actionsCell.classList.add('actions');
 
-                    const actionCell = row.insertCell(4);
-                    actionCell.classList.add('action-buttons');
-                    actionCell.innerHTML = `
-                        <button class="btn btn-edit"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="btn btn-danger delete-btn"><i class="fas fa-trash"></i> Hapus</button>
-                    `;
+                    const editBtn = document.createElement('button');
+                    editBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+                    editBtn.classList.add('edit-btn');
+                    editBtn.addEventListener('click', () => editAccount(account.id));
+                    actionsCell.appendChild(editBtn);
 
-                    actionCell.querySelector('.btn-edit').addEventListener('click', () => editAccount(account.id));
-                    actionCell.querySelector('.delete-btn').addEventListener('click', () => showDeleteModal(account.id));
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Hapus';
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.addEventListener('click', () => confirmDelete(account.id));
+                    actionsCell.appendChild(deleteBtn);
                 });
+            }
+
+            function showForm() {
+                accountFormSection.style.display = 'block';
+                accountFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function hideForm() {
+                accountFormSection.style.display = 'none';
+                accountForm.reset();
+                accountIdInput.value = '';
+                passwordInput.removeAttribute('required'); // Password not required for edit
+                passwordInput.placeholder = 'Biarkan kosong jika tidak ingin mengubah password.';
+            }
+
+            function addAccount() {
+                hideForm(); // Reset form for new entry
+                showForm();
+                passwordInput.setAttribute('required', 'required'); // Password required for new account
+                passwordInput.placeholder = '';
             }
 
             function saveAccount(event) {
                 event.preventDefault();
 
-                const id = userIdInput.value; // Get existing ID if in edit mode
-                const nama = namaInput.value;
-                const email = emailInput.value;
+                const id = accountIdInput.value;
+                const nama = namaInput.value.trim();
+                const email = emailInput.value.trim();
                 const password = passwordInput.value;
-                const role = roleInput.value;
+                const role = roleSelect.value;
 
-                if (!nama || !email || !password || !role) {
-                    displayMessageBox('Harap isi semua field yang diperlukan!', 'error');
+                if (!nama || !email || !role) {
+                    alert('Semua bidang harus diisi.');
                     return;
                 }
 
-                let newAccount = { id, nama, email, password, role };
+                let accounts = loadAccounts();
 
-                const existingIndex = accounts.findIndex(acc => acc.email === email); // Find by email for update/check
-                if (id && existingIndex > -1 && accounts[existingIndex].id === id) { // If editing existing account
-                    // Update existing account
-                    accounts[existingIndex].nama = nama;
-                    accounts[existingIndex].email = email;
-                    accounts[existingIndex].password = password; // Note: In a real app, never pre-fill password for security
-                    accounts[existingIndex].role = role;
-                    displayMessageBox('Akun berhasil diperbarui!', 'success');
-                } else if (!id && existingIndex > -1) { // If adding new account but email exists
-                    displayMessageBox('Email sudah ada. Harap gunakan email lain.', 'error');
-                    return;
-                } else { // Adding a brand new account
-                    // Generate new ID for a new account based on the selected role
-                    newAccount.id = generateId(role);
+                if (id) {
+                    // Edit existing account
+                    const index = accounts.findIndex(acc => acc.id === id);
+                    if (index !== -1) {
+                        accounts[index].nama = nama;
+                        accounts[index].email = email;
+                        if (password) { // Only update password if provided
+                            accounts[index].password = password;
+                        }
+                        accounts[index].role = role;
+                    }
+                } else {
+                    // Add new account
+                    // Check for duplicate email
+                    if (accounts.some(acc => acc.email === email)) {
+                        alert('Email sudah terdaftar. Gunakan email lain.');
+                        return;
+                    }
+                    const newId = generateAccountId();
+                    const newAccount = { id: newId, nama, email, password, role };
                     accounts.push(newAccount);
-                    displayMessageBox('Akun berhasil ditambahkan!', 'success');
                 }
 
-                localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
-                userForm.reset();
+                saveAccounts(accounts);
+                displayAccounts(searchFilterInput.value);
                 hideForm();
-                displayAccounts(); // Refresh table
+                alert('Akun berhasil disimpan!');
             }
 
             function editAccount(id) {
+                const accounts = loadAccounts();
                 const account = accounts.find(acc => acc.id === id);
+
                 if (account) {
-                    showForm(true);
-                    formTitle.textContent = 'Edit';
-                    userIdInput.value = account.id;
+                    accountIdInput.value = account.id;
                     namaInput.value = account.nama;
                     emailInput.value = account.email;
-                    passwordInput.value = account.password; // Note: In a real app, never pre-fill password for security
-                    roleInput.value = account.role;
+                    passwordInput.value = ''; // Clear password field for security
+                    passwordInput.placeholder = 'Biarkan kosong jika tidak ingin mengubah password.';
+                    passwordInput.removeAttribute('required');
+                    roleSelect.value = account.role;
+                    showForm();
                 }
             }
 
-            function showDeleteModal(id) {
-                currentAccountIdToDelete = id;
-                deleteModal.style.display = 'flex'; // Use flex to center the modal
+            function confirmDelete(id) {
+                accountToDeleteId = id;
+                deleteModal.style.display = 'flex'; // Use flex to center
             }
 
             function deleteAccount() {
-                accounts = accounts.filter(acc => acc.id !== currentAccountIdToDelete);
-                localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
-                deleteModal.style.display = 'none';
-                displayMessageBox('Akun berhasil dihapus!', 'success');
-                displayAccounts(); // Refresh table
-            }
-
-            function showForm(isEdit = false) {
-                accountFormContainer.classList.add('form-active');
-                formTitle.textContent = isEdit ? 'Edit' : 'Tambah';
-                if (!isEdit) {
-                    userForm.reset();
-                    userIdInput.value = ''; // Clear ID for new accounts
+                let accounts = loadAccounts();
+                // Prevent deleting the currently logged-in user or the default admin
+                const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+                if (accountToDeleteId === loggedInUser.id || accountToDeleteId === 'U001') { // Assuming U001 is the default admin
+                    alert('Tidak bisa menghapus akun yang sedang login atau akun admin default.');
+                    deleteModal.style.display = 'none';
+                    return;
                 }
-                accountFormContainer.scrollIntoView({ behavior: 'smooth' });
+
+                accounts = accounts.filter(account => account.id !== accountToDeleteId);
+                saveAccounts(accounts);
+                displayAccounts(searchFilterInput.value);
+                deleteModal.style.display = 'none';
+                alert('Akun berhasil dihapus!');
             }
 
-            function hideForm() {
-                accountFormContainer.classList.remove('form-active');
-                userForm.reset();
-                userIdInput.value = '';
-            }
-
-
-            // PDF Export Function for Accounts Table
+            // PDF Export Function
             function exportAccountsToPdf() {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'letter');
-                const table = document.getElementById('accountTable');
+                const table = document.getElementById('account-table');
 
                 doc.autoTable({
                     html: table,
@@ -1161,42 +1284,51 @@
                     styles: {
                         fontSize: 8,
                         cellPadding: 8,
-                        valign: 'middle',
-                        overflow: 'linebreak'
+                        valign: 'middle'
                     },
                     didDrawPage: function(data) {
-                        doc.text("Laporan Akun Pengguna", data.settings.marginLeft, 40);
+                        doc.setFontSize(14);
+                        doc.text("Laporan Akun Pengguna", doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+                        doc.setFontSize(10);
+                        doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.marginLeft, doc.internal.pageSize.height - 20);
                     }
                 });
                 doc.save('laporan_akun_pengguna.pdf');
-                displayMessageBox('Laporan PDF akun berhasil diunduh!', 'success');
             }
 
-            // Excel Export Function for Accounts Table
+            // Excel Export Function
             function exportAccountsToExcel() {
-                const table = document.getElementById('accountTable');
+                const table = document.getElementById('account-table');
                 const ws = XLSX.utils.table_to_sheet(table);
+
+                // Remove the 'A' column (No.) and 'F' column (Aksi) if desired
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                const new_ws = {};
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    for (let C = range.s.c; C <= range.e.c; ++C) {
+                        if (C === 0 || C === 5) continue; // Skip column A (index 0) and F (index 5 for Aksi)
+                        const old_cell_address = XLSX.utils.encode_cell({r: R, c: C});
+                        const new_cell_address = XLSX.utils.encode_cell({r: R, c: (C > 5 ? C - 2 : C - 1)}); // Adjust new column index
+                        if (ws[old_cell_address]) {
+                            new_ws[new_cell_address] = ws[old_cell_address];
+                        }
+                    }
+                }
+                new_ws['!ref'] = XLSX.utils.encode_range({s: {r: range.s.r, c: 0}, e: {r: range.e.r, c: range.e.c - 2}}); // Update new range
+
+
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Akun Pengguna");
+                XLSX.utils.book_append_sheet(wb, new_ws, "Akun Pengguna");
                 XLSX.writeFile(wb, "laporan_akun_pengguna.xlsx");
-                displayMessageBox('Laporan Excel akun berhasil diunduh!', 'success');
             }
+
 
             // Event Listeners
-            toggleFormBtn.addEventListener('click', function() {
-                // Toggle the form visibility using the class
-                accountFormContainer.classList.toggle('form-active');
-                if (accountFormContainer.classList.contains('form-active')) {
-                    formTitle.textContent = 'Tambah'; // Reset title to 'Tambah' for new form
-                    userForm.reset(); // Clear form fields
-                    userIdInput.value = ''; // Ensure no ID is set for new entry
-                    accountFormContainer.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-            cancelFormBtn.addEventListener('click', hideForm);
-            userForm.addEventListener('submit', saveAccount);
+            addAccountBtn.addEventListener('click', addAccount);
+            cancelEditBtn.addEventListener('click', hideForm);
+            accountForm.addEventListener('submit', saveAccount);
 
-            closeDeleteModalBtn.addEventListener('click', () => deleteModal.style.display = 'none');
+            closeDeleteBtn.addEventListener('click', () => deleteModal.style.display = 'none');
             cancelDeleteBtn.addEventListener('click', () => deleteModal.style.display = 'none');
             confirmDeleteBtn.addEventListener('click', deleteAccount);
 
@@ -1217,13 +1349,7 @@
             displayAccounts(); // Load data into table
             hideForm(); // Ensure form is hidden initially
 
-            // Initialize user data if not present (for testing purposes)
-            if (!sessionStorage.getItem('loggedInUser')) {
-                const defaultAdmin = { email: 'admin@gmail.com', password: 'admin123', role: 'Admin', nama: 'Default Admin' };
-                sessionStorage.setItem('loggedInUser', JSON.stringify(defaultAdmin));
-                console.log("Default admin account added to sessionStorage for testing.");
-            }
-            loadUserData(); // Load user data after potential initialization
+            
         });
     </script>
 </body>
