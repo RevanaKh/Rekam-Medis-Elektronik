@@ -375,6 +375,12 @@
             font-weight: bold;
         }
 
+        /* Override for 'Belum Lunas' color */
+        .report-item.unpaid span:last-child {
+            color: var(--danger-color); /* Red color for unpaid */
+        }
+
+
         .report-table-container {
             margin-top: 20px;
             overflow-x: auto;
@@ -714,6 +720,10 @@
                     <span>Total Pendapatan:</span>
                     <span id="total-pendapatan"></span>
                 </div>
+                <div class="report-item unpaid">
+                    <span>Jumlah Belum Lunas:</span>
+                    <span id="total-belum-lunas"></span>
+                </div>
             </div>
             <div class="report-table-container">
                 <table id="transaksiPasienTable" class="report-table">
@@ -733,6 +743,8 @@
                 </table>
             </div>
         </div>
+
+        <!-- Section 'Laporan Pemeriksaan Pasien' Removed -->
 
         <div id="laporan-obat" class="content-section">
             <h3>Laporan Stok & Penggunaan Obat</h3>
@@ -1005,12 +1017,19 @@
                 const tableBody = document.querySelector('#transaksiPasienTable tbody');
                 const totalTransaksiSpan = document.getElementById('total-transaksi');
                 const totalPendapatanSpan = document.getElementById('total-pendapatan');
+                const totalBelumLunasSpan = document.getElementById('total-belum-lunas'); // Elemen baru
 
                 tableBody.innerHTML = '';
                 let totalRevenue = 0;
+                let unpaidRevenue = 0; // Variabel baru untuk belum lunas
 
                 transactions.forEach((transaction, index) => {
                     totalRevenue += transaction.totalBiaya;
+                    // Asumsi 'Lunas' berarti sudah dibayar, lainnya 'Belum Lunas'
+                    if (transaction.statusPembayaran !== 'Lunas') {
+                        unpaidRevenue += transaction.totalBiaya;
+                    }
+
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
                     // Memformat ID transaksi berdasarkan tanggal
@@ -1025,6 +1044,7 @@
 
                 totalTransaksiSpan.textContent = transactions.length;
                 totalPendapatanSpan.textContent = formatRupiah(totalRevenue);
+                totalBelumLunasSpan.textContent = formatRupiah(unpaidRevenue); // Perbarui span 'Belum Lunas'
 
                 if (transactions.length === 0) {
                     const noDataRow = tableBody.insertRow();
@@ -1038,45 +1058,7 @@
                 }
             }
 
-            function populateExaminationReport() {
-                const examinations = JSON.parse(localStorage.getItem('examinations')) || [];
-                const tableBody = document.querySelector('#pemeriksaanTable tbody');
-                const totalPemeriksaanSpan = document.getElementById('total-pemeriksaan');
-                const pemeriksaanBaruBulanIniSpan = document.getElementById('pemeriksaan-baru-bulan-ini');
-
-                tableBody.innerHTML = '';
-                let newExaminationsThisMonth = 0;
-
-                examinations.forEach((exam, index) => {
-                    const examDate = new Date(exam.tanggal);
-                    if (!isNaN(examDate) && examDate.getMonth() === currentMonth && examDate.getFullYear() === currentYear) {
-                        newExaminationsThisMonth++;
-                    }
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = exam.id;
-                    row.insertCell().textContent = exam.tanggal;
-                    row.insertCell().textContent = exam.namaPasien;
-                    row.insertCell().textContent = exam.dokter;
-                    row.insertCell().textContent = exam.keluhan;
-                    row.insertCell().textContent = exam.diagnosa;
-                    row.insertCell().textContent = exam.tindakan;
-                });
-
-                totalPemeriksaanSpan.textContent = examinations.length;
-                pemeriksaanBaruBulanIniSpan.textContent = newExaminationsThisMonth;
-
-                if (examinations.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 8;
-                    noDataCell.textContent = "Tidak ada data pemeriksaan untuk ditampilkan.";
-                    noDataCell.style.textAlign = "center";
-                    noDataCell.style.padding = "20px";
-                    noDataCell.style.fontStyle = "italic";
-                    noDataCell.style.color = "#555";
-                }
-            }
+            // Fungsi populateExaminationReport telah dihapus
 
             function populateDrugReport() {
                 console.log("Memulai populateDrugReport...");
@@ -1182,8 +1164,8 @@
                 populatePatientReport();
                 populateDoctorReport();
                 populateTransactionReport();
-                populateExaminationReport();
-                populateDrugReport(); // Pastikan ini terpanggil
+                // Removed populateExaminationReport()
+                populateDrugReport();
                 populateUserReport();
             }
 
