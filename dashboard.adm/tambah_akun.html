@@ -869,23 +869,6 @@
                 }
             }
 
-            // Fungsi untuk memeriksa akses berdasarkan peran (case-insensitive)
-            function checkAccess(allowedRoles) {
-                const user = sessionStorage.getItem('loggedInUser');
-                if (user) {
-                    const loggedInUser = JSON.parse(user);
-                    // Convert both the stored role and allowed roles to lowercase for comparison
-                    if (!allowedRoles.map(role => role.toLowerCase()).includes(loggedInUser.role.toLowerCase())) {
-                        // Using a custom message box instead of alert()
-                        // alert('Anda tidak memiliki akses ke halaman ini.');
-                        displayMessageBox('Anda tidak memiliki akses ke halaman ini.', 'error');
-                        sessionStorage.clear();
-                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                    }
-                } else {
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
-                }
-            }
 
             // A custom message box function
             function displayMessageBox(message, type) {
@@ -970,13 +953,7 @@
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-            // Load accounts from localStorage, or use dummy data if none exists
-            let accounts = JSON.parse(localStorage.getItem('accounts')) || [
-                { id: 'ADM-ACC-001', nama: 'Admin Utama', email: 'admin@example.com', password: 'adminpassword', role: 'Admin' },
-                { id: 'DKT-ACC-001', nama: 'Dr. Budi Santoso', email: 'budi.santoso@example.com', password: 'dokterpassword', role: 'Dokter' },
-                { id: 'APT-ACC-001', nama: 'Apoteker Siti', email: 'siti.apoteker@example.com', password: 'apotekerpassword', role: 'Apoteker' },
-                { id: 'PSN-ACC-001', nama: 'Pendaftaran Ayu', email: 'ayu.daftar@example.com', password: 'daftarpassword', role: 'Pendaftaran' }
-            ];
+
 
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('accounts') === null || JSON.parse(localStorage.getItem('accounts')).length === 0) {
