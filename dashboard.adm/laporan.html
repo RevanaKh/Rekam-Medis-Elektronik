@@ -910,7 +910,7 @@
             }
 
             // Jalankan pemeriksaan akses terlebih dahulu
-            checkAccess(['admin', 'pendaftaran', 'dokter', 'apoteker']); // Admin, Pendaftaran, Dokter, Apoteker bisa akses
+            checkAccess(['admin', 'pasien', 'dokter', 'apoteker']); // 
             loadUserData();
 
             // Sidebar and Mobile Menu Toggle
@@ -1185,17 +1185,19 @@
                 const adminCountSpan = document.getElementById('admin-count');
                 const dokterCountSpan = document.getElementById('dokter-count');
                 const apotekerCountSpan = document.getElementById('apoteker-count');
-                const apotekerCountSpan = document.getElementById('pasien-count');
+                const pasienCountSpan = document.getElementById('pasien-count');
 
                 tableBody.innerHTML = '';
                 let adminCount = 0;
                 let dokterCount = 0;
                 let apotekerCount = 0;
+                let pasienCount = 0;
 
                 users.forEach((user, index) => {
                     if (user.role === 'admin') adminCount++;
                     if (user.role === 'dokter') dokterCount++;
                     if (user.role === 'apoteker') apotekerCount++;
+                    if (user.role === 'pasien') pasienCount++;
 
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
@@ -1209,7 +1211,7 @@
                 adminCountSpan.textContent = adminCount;
                 dokterCountSpan.textContent = dokterCount;
                 apotekerCountSpan.textContent = apotekerCount;
-
+                pasienCountSpan.textContent = pasienCount;
                 if (users.length === 0) {
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
