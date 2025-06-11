@@ -571,7 +571,7 @@
             max-height: 0;
             opacity: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding 0.5s ease-out, margin-bottom 0.5s ease-out;
             padding: 0 20px; /* Adjust padding when hidden */
             margin-bottom: 0; /* Remove bottom margin when hidden */
         }
@@ -902,8 +902,41 @@
                 }, 3000);
             }
 
+            // Fungsi untuk memeriksa akses berdasarkan peran (case-insensitive)
+            function checkAccess(allowedRoles) {
+                console.log("Memeriksa akses...");
+                const user = sessionStorage.getItem('loggedInUser');
+                if (admin) {
+                    const loggedInUser = JSON.parse(admin);
+                    console.log("Data pengguna yang masuk:", loggedInUser);
+                    console.log("Peran pengguna:", loggedInUser.role);
+                    console.log("Peran yang diizinkan (asli):", allowedRoles);
+
+                    const userRoleLower = loggedInUser.role ? loggedInUser.role.toLowerCase() : '';
+                    const allowedRolesLower = allowedRoles.map(role => role.toLowerCase());
+
+                    console.log("Peran pengguna (huruf kecil):", userRoleLower);
+                    console.log("Peran yang diizinkan (huruf kecil):", allowedRolesLower);
+
+                    if (!allowedRolesLower.includes(userRoleLower)) {
+                        console.log("Akses DITOLAK: Peran pengguna TIDAK termasuk dalam peran yang diizinkan.");
+                        displayMessageBox('Anda tidak memiliki akses ke halaman ini.', 'error');
+                        sessionStorage.clear();
+                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                    } else {
+                        console.log("Akses DIIZINKAN.");
+                    }
+                } else {
+                    console.log("Tidak ada data pengguna di sessionStorage. Mengarahkan ke halaman login.");
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
+                }
+            }
+
+
             // Jalankan pemeriksaan akses terlebih dahulu
             checkAccess(['Admin']); // Hanya 'Admin' role yang bisa mengakses halaman ini
+            loadUserData(); // Panggil setelah checkAccess
+
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebar-toggle');
             const mobileToggle = document.getElementById('mobile-toggle');
@@ -953,12 +986,21 @@
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
+            // Load accounts from localStorage, or initialize with a default admin if empty/no admin found
+            let accounts = JSON.parse(localStorage.getItem('accounts'));
 
-
-            // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
-            if (localStorage.getItem('accounts') === null || JSON.parse(localStorage.getItem('accounts')).length === 0) {
+            // If accounts are not in localStorage OR if no Admin user exists,
+            // initialize with a default Admin account for first-time use.
+            if (!accounts || accounts.length === 0 || !accounts.some(acc => acc.role === 'Admin')) {
+                accounts = [
+                    { id: 'ADM-ACC-001', nama: 'Super Admin', email: 'admin@example.com', password: 'admin123', role: 'Admin' }
+                ];
                 localStorage.setItem('accounts', JSON.stringify(accounts));
+                console.log("Inisialisasi localStorage dengan akun Admin default.");
             }
+            // Ensure `accounts` is always the latest version after potential initialization
+            accounts = JSON.parse(localStorage.getItem('accounts'));
+
 
             let currentAccountIdToDelete = null;
 
@@ -1028,7 +1070,7 @@
                 const role = roleInput.value;
 
                 if (!nama || !email || !password || !role) {
-                    showAlert(errorAlert, 'Harap isi semua field yang diperlukan!');
+                    displayMessageBox('Harap isi semua field yang diperlukan!', 'error'); // Using custom message box
                     return;
                 }
 
@@ -1093,9 +1135,6 @@
                     userForm.reset();
                     userIdInput.value = ''; // Clear ID for new accounts
                 }
-                // successAlert.style.display = 'none'; // Hide alerts when showing form
-                // errorAlert.style.display = 'none';
-                // Scroll to form
                 accountFormContainer.scrollIntoView({ behavior: 'smooth' });
             }
 
@@ -1105,14 +1144,6 @@
                 userIdInput.value = '';
             }
 
-            // This showAlert is retained for direct use if needed for persistent alerts on form
-            function showAlert(alertElement, message) {
-                alertElement.textContent = message;
-                alertElement.style.display = 'block';
-                setTimeout(() => {
-                    alertElement.style.display = 'none';
-                }, 3000); // Hide alert after 3 seconds
-            }
 
             // PDF Export Function for Accounts Table
             function exportAccountsToPdf() {
@@ -1185,9 +1216,19 @@
                 }
             });
 
-            // Initial display: Ensure form is hidden by default using CSS class.
-            // No need to call hideForm() here as CSS handles initial state.
-            displayAccounts();
+            // Initial display and load data
+            displayAccounts(); // Load data into table
+            hideForm(); // Ensure form is hidden initially
+
+            // Inisialisasi data pengguna jika belum ada
+            if (localStorage.getItem('loggedInUser') === null) {
+                // Ini hanya untuk tujuan demonstrasi agar Anda bisa login langsung.
+                // Dalam aplikasi nyata, ini akan diatur oleh halaman login.
+                const defaultAdmin = { email: 'admin@example.com', password: 'admin123', role: 'Admin', nama: 'Default Admin' };
+                sessionStorage.setItem('loggedInUser', JSON.stringify(defaultAdmin));
+                console.log("Akun admin default telah ditambahkan ke sessionStorage untuk pengujian.");
+            }
+            loadUserData(); // Muat data pengguna setelah potensi inisialisasi
         });
     </script>
 </body>
