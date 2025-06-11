@@ -9,13 +9,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Variabel CSS (dari dashboard_adm.html untuk konsistensi) */
+        /* CSS variables (from dashboard_adm.html for consistency) */
         :root {
-            --primary-color: #1de9b6; /* Hijau terang, untuk sidebar, tabel header, dll. */
-            --primary-dark: #00b686; /* Hijau gelap, untuk hover, background tombol utama */
-            --secondary-color: #333; /* Warna hitam untuk logout border/background dan teks */
-            --light-color: #f4f4f4; /* Background umum */
-            --danger-color: #f44336; /* Warna merah untuk danger */
+            --primary-color: #1de9b6; /* Light green, for sidebar, table header, etc. */
+            --primary-dark: #00b686; /* Dark green, for hover, primary button background */
+            --secondary-color: #333; /* Black color for logout border/background and text */
+            --light-color: #f4f4f4; /* General background */
+            --danger-color: #f44336; /* Red color for danger */
             --success-color: #4CAF50;
             --text-color: #333;
             --white: #fff;
@@ -24,9 +24,9 @@
             --sidebar-minimized-width: 60px;
             --border-color: #ddd; /* Added for table borders consistency */
 
-            /* Warna baru untuk tombol laporan sesuai gambar */
-            --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
-            --report-excel-bg: #27AE60; /* Hijau untuk Excel */
+            /* New colors for report buttons as per image */
+            --report-pdf-bg: #E74C3C; /* Red for PDF */
+            --report-excel-bg: #27AE60; /* Green for Excel */
         }
 
         * {
@@ -40,7 +40,7 @@
             display: flex;
             min-height: 100vh;
             background-color: var(--light-color);
-            overflow-x: hidden; /* Mencegah scrollbar horizontal pada body secara keseluruhan */
+            overflow-x: hidden; /* Prevent horizontal scrollbar on the entire body */
         }
 
         /* Mobile Toggle outside sidebar */
@@ -67,7 +67,7 @@
             pointer-events: none;
         }
 
-        /* Sidebar/Navigasi Utama */
+        /* Main Sidebar/Navigation */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
@@ -240,7 +240,7 @@
             margin-right: 0;
         }
 
-        /* Tombol Toggle untuk Desktop */
+        /* Toggle Button for Desktop */
         .toggle-btn {
             position: absolute;
             top: 20px;
@@ -268,7 +268,7 @@
             transform: translateX(-190px) rotate(180deg);
         }
 
-        /* Area Konten Utama */
+        /* Main Content Area */
         .main-content {
             flex-grow: 1;
             padding: 20px;
@@ -869,8 +869,7 @@
                 }
             }
 
-
-            // A custom message box function
+            // Custom message box function
             function displayMessageBox(message, type) {
                 const messageBox = document.createElement('div');
                 messageBox.classList.add('message-box');
@@ -902,40 +901,40 @@
                 }, 3000);
             }
 
-            // Fungsi untuk memeriksa akses berdasarkan peran (case-insensitive)
+            // Function to check access based on roles
             function checkAccess(allowedRoles) {
-                console.log("Memeriksa akses...");
-                const user = sessionStorage.getItem('loggedInUser'); // Menggunakan 'user' dari sessionStorage
+                console.log("Checking access...");
+                const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
                     const loggedInUser = JSON.parse(user);
-                    console.log("Data pengguna yang masuk:", loggedInUser);
-                    console.log("Peran pengguna:", loggedInUser.role);
-                    console.log("Peran yang diizinkan (asli):", allowedRoles);
+                    console.log("Logged-in user data:", loggedInUser);
+                    console.log("User role:", loggedInUser.role);
+                    console.log("Allowed roles (original):", allowedRoles);
 
                     const userRoleLower = loggedInUser.role ? loggedInUser.role.toLowerCase() : '';
                     const allowedRolesLower = allowedRoles.map(role => role.toLowerCase());
 
-                    console.log("Peran pengguna (huruf kecil):", userRoleLower);
-                    console.log("Peran yang diizinkan (huruf kecil):", allowedRolesLower);
+                    console.log("User role (lowercase):", userRoleLower);
+                    console.log("Allowed roles (lowercase):", allowedRolesLower);
 
                     if (!allowedRolesLower.includes(userRoleLower)) {
-                        console.log("Akses DITOLAK: Peran pengguna TIDAK termasuk dalam peran yang diizinkan.");
+                        console.log("Access DENIED: User role is NOT included in allowed roles.");
                         displayMessageBox('Anda tidak memiliki akses ke halaman ini.', 'error');
                         sessionStorage.clear();
                         window.location.href = '/Rekam-Medis-Elektronik/index.html';
                     } else {
-                        console.log("Akses DIIZINKAN.");
+                        console.log("Access GRANTED.");
                     }
                 } else {
-                    console.log("Tidak ada data pengguna di sessionStorage. Mengarahkan ke halaman login.");
+                    console.log("No user data in sessionStorage. Redirecting to login page.");
                     window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
             }
 
 
-            // Jalankan pemeriksaan akses terlebih dahulu
-            checkAccess(['Admin']); // Hanya 'Admin' role yang bisa mengakses halaman ini
-            loadUserData(); // Panggil setelah checkAccess
+            // Run access check first
+            checkAccess(['Admin']); // Only 'Admin' role can access this page
+            loadUserData(); // Call after checkAccess
 
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -976,7 +975,7 @@
             const passwordInput = document.getElementById('password');
             const roleInput = document.getElementById('role');
 
-            // Alerts (now primarily handled by custom message box, but keeping for direct use if needed)
+            // Alerts (now primarily handled by custom message box)
             const successAlert = document.getElementById('successAlert');
             const errorAlert = document.getElementById('errorAlert');
 
@@ -993,10 +992,10 @@
             // initialize with a default Admin account for first-time use.
             if (!accounts || accounts.length === 0 || !accounts.some(acc => acc.role === 'Admin')) {
                 accounts = [
-                    { id: 'ADM-ACC-001', nama: 'Super Admin', email: 'admin@example.com', password: 'admin123', role: 'Admin' }
+                    { id: 'ADM-ACC-001', nama: 'Admin', email: 'admin@gmail.com', password: 'admin123', role: 'Admin' }
                 ];
                 localStorage.setItem('accounts', JSON.stringify(accounts));
-                console.log("Inisialisasi localStorage dengan akun Admin default.");
+                console.log("LocalStorage initialized with default Admin account.");
             }
             // Ensure `accounts` is always the latest version after potential initialization
             accounts = JSON.parse(localStorage.getItem('accounts'));
@@ -1004,9 +1003,9 @@
 
             let currentAccountIdToDelete = null;
 
-            // Fungsi untuk menghasilkan ID unik berdasarkan peran
+            // Function to generate unique ID based on role
             function generateId(role) {
-                const uniqueNum = Math.floor(100 + Math.random() * 900); // Angka 3 digit acak
+                const uniqueNum = Math.floor(100 + Math.random() * 900); // 3 random digits
                 let prefix = '';
                 switch (role) {
                     case 'Admin':
@@ -1030,7 +1029,7 @@
 
             function displayAccounts(filter = '') {
                 accountTableBody.innerHTML = '';
-                // Pastikan untuk memuat ulang data dari localStorage setiap kali menampilkan
+                // Ensure to reload data from localStorage every time it's displayed
                 accounts = JSON.parse(localStorage.getItem('accounts')) || [];
 
                 const filteredAccounts = accounts.filter(account =>
@@ -1070,30 +1069,28 @@
                 const role = roleInput.value;
 
                 if (!nama || !email || !password || !role) {
-                    displayMessageBox('Harap isi semua field yang diperlukan!', 'error'); // Using custom message box
+                    displayMessageBox('Harap isi semua field yang diperlukan!', 'error');
                     return;
                 }
 
                 let newAccount = { id, nama, email, password, role };
 
-                const existingIndex = accounts.findIndex(acc => acc.id === id);
-                if (existingIndex > -1) {
+                const existingIndex = accounts.findIndex(acc => acc.email === email); // Find by email for update/check
+                if (id && existingIndex > -1 && accounts[existingIndex].id === id) { // If editing existing account
                     // Update existing account
                     accounts[existingIndex].nama = nama;
                     accounts[existingIndex].email = email;
                     accounts[existingIndex].password = password; // Note: In a real app, never pre-fill password for security
                     accounts[existingIndex].role = role;
-                    displayMessageBox('Akun berhasil diperbarui!', 'success'); // Using custom message box
-                } else {
-                    // Check if email already exists for new account
-                    if (accounts.some(acc => acc.email === email)) {
-                        displayMessageBox('Email sudah ada. Harap gunakan email lain.', 'error'); // Using custom message box
-                        return;
-                    }
+                    displayMessageBox('Akun berhasil diperbarui!', 'success');
+                } else if (!id && existingIndex > -1) { // If adding new account but email exists
+                    displayMessageBox('Email sudah ada. Harap gunakan email lain.', 'error');
+                    return;
+                } else { // Adding a brand new account
                     // Generate new ID for a new account based on the selected role
                     newAccount.id = generateId(role);
                     accounts.push(newAccount);
-                    displayMessageBox('Akun berhasil ditambahkan!', 'success'); // Using custom message box
+                    displayMessageBox('Akun berhasil ditambahkan!', 'success');
                 }
 
                 localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
@@ -1124,7 +1121,7 @@
                 accounts = accounts.filter(acc => acc.id !== currentAccountIdToDelete);
                 localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
                 deleteModal.style.display = 'none';
-                displayMessageBox('Akun berhasil dihapus!', 'success'); // Using custom message box
+                displayMessageBox('Akun berhasil dihapus!', 'success');
                 displayAccounts(); // Refresh table
             }
 
@@ -1172,7 +1169,7 @@
                     }
                 });
                 doc.save('laporan_akun_pengguna.pdf');
-                displayMessageBox('Laporan PDF akun berhasil diunduh!', 'success'); // Using custom message box
+                displayMessageBox('Laporan PDF akun berhasil diunduh!', 'success');
             }
 
             // Excel Export Function for Accounts Table
@@ -1182,7 +1179,7 @@
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Akun Pengguna");
                 XLSX.writeFile(wb, "laporan_akun_pengguna.xlsx");
-                displayMessageBox('Laporan Excel akun berhasil diunduh!', 'success'); // Using custom message box
+                displayMessageBox('Laporan Excel akun berhasil diunduh!', 'success');
             }
 
             // Event Listeners
@@ -1220,15 +1217,13 @@
             displayAccounts(); // Load data into table
             hideForm(); // Ensure form is hidden initially
 
-            // Inisialisasi data pengguna jika belum ada
-            if (localStorage.getItem('loggedInUser') === null) {
-                // Ini hanya untuk tujuan demonstrasi agar Anda bisa login langsung.
-                // Dalam aplikasi nyata, ini akan diatur oleh halaman login.
+            // Initialize user data if not present (for testing purposes)
+            if (!sessionStorage.getItem('loggedInUser')) {
                 const defaultAdmin = { email: 'admin@gmail.com', password: 'admin123', role: 'Admin', nama: 'Default Admin' };
                 sessionStorage.setItem('loggedInUser', JSON.stringify(defaultAdmin));
-                console.log("Akun admin default telah ditambahkan ke sessionStorage untuk pengujian.");
+                console.log("Default admin account added to sessionStorage for testing.");
             }
-            loadUserData(); // Muat data pengguna setelah potensi inisialisasi
+            loadUserData(); // Load user data after potential initialization
         });
     </script>
 </body>
