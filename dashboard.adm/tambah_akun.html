@@ -566,6 +566,24 @@
             background-color: #229954;
         }
 
+        /* Form container animation */
+        .form-container {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            padding: 0 20px; /* Adjust padding when hidden */
+            margin-bottom: 0; /* Remove bottom margin when hidden */
+        }
+
+        .form-container.form-active {
+            max-height: 1000px; /* Sufficiently large to show content */
+            opacity: 1;
+            padding: 20px; /* Restore padding when active */
+            margin-bottom: 20px; /* Restore bottom margin when active */
+        }
+
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .mobile-toggle {
@@ -795,7 +813,7 @@
                             <option value="Admin">Admin</option>
                             <option value="Dokter">Dokter</option>
                             <option value="Apoteker">Apoteker</option>
-                            <option value="Pendaftaran">Pendaftaran</option> <!-- Changed from Pasien to Pendaftaran as per previous conversation and likely intent -->
+                            <option value="Pendaftaran">Pendaftaran</option>
                         </select>
                     </div>
                     <div class="button-group">
@@ -839,34 +857,66 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Function to load user data from sessionStorage and display it
             function loadUserData() {
-                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
-                    const loggedInUser = JSON.parse(user); // Parse JSON string
-                    // Update welcome message
-                    const welcomeUserElement = document.getElementById('welcome-user'); // Dapatkan elemen span
+                    const loggedInUser = JSON.parse(user);
+                    const welcomeUserElement = document.getElementById('welcome-user');
                     if (welcomeUserElement) {
-                        // Tampilkan nama jika ada, jika tidak, tampilkan email
                         welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
                     }
                 } else {
-                    // Redirect jika tidak ada data user di sessionStorage
                     window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
             }
 
-            // Fungsi untuk memeriksa akses berdasarkan peran
+            // Fungsi untuk memeriksa akses berdasarkan peran (case-insensitive)
             function checkAccess(allowedRoles) {
-                const user = sessionStorage.getItem('loggedInUser'); // Ambil dari sessionStorage
+                const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
-                    const loggedInUser = JSON.parse(user); // Parse JSON string
-                    if (!allowedRoles.includes(loggedInUser.role)) { // Cek role
-                        alert('Anda tidak memiliki akses ke halaman ini.');
-                        sessionStorage.clear(); // Hapus sesi jika tidak punya akses
-                        window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Redirect ke login
+                    const loggedInUser = JSON.parse(user);
+                    // Convert both the stored role and allowed roles to lowercase for comparison
+                    if (!allowedRoles.map(role => role.toLowerCase()).includes(loggedInUser.role.toLowerCase())) {
+                        // Using a custom message box instead of alert()
+                        // alert('Anda tidak memiliki akses ke halaman ini.');
+                        displayMessageBox('Anda tidak memiliki akses ke halaman ini.', 'error');
+                        sessionStorage.clear();
+                        window.location.href = '/Rekam-Medis-Elektronik/index.html';
                     }
                 } else {
-                    window.location.href = '/Rekam-Medis-Elektronik/index.html'; // Belum login
+                    window.location.href = '/Rekam-Medis-Elektronik/index.html';
                 }
+            }
+
+            // A custom message box function
+            function displayMessageBox(message, type) {
+                const messageBox = document.createElement('div');
+                messageBox.classList.add('message-box');
+                messageBox.textContent = message;
+                if (type === 'error') {
+                    messageBox.style.backgroundColor = 'var(--danger-color)';
+                } else if (type === 'success') {
+                    messageBox.style.backgroundColor = 'var(--success-color)';
+                }
+                messageBox.style.color = 'var(--white)';
+                messageBox.style.padding = '15px';
+                messageBox.style.borderRadius = '8px';
+                messageBox.style.position = 'fixed';
+                messageBox.style.top = '20px';
+                messageBox.style.left = '50%';
+                messageBox.style.transform = 'translateX(-50%)';
+                messageBox.style.zIndex = '9999';
+                messageBox.style.opacity = '0';
+                messageBox.style.transition = 'opacity 0.5s ease-in-out';
+                document.body.appendChild(messageBox);
+
+                setTimeout(() => {
+                    messageBox.style.opacity = '1';
+                }, 100);
+
+                setTimeout(() => {
+                    messageBox.style.opacity = '0';
+                    messageBox.addEventListener('transitionend', () => messageBox.remove());
+                }, 3000);
             }
 
             // Jalankan pemeriksaan akses terlebih dahulu
@@ -910,7 +960,7 @@
             const passwordInput = document.getElementById('password');
             const roleInput = document.getElementById('role');
 
-            // Alerts
+            // Alerts (now primarily handled by custom message box, but keeping for direct use if needed)
             const successAlert = document.getElementById('successAlert');
             const errorAlert = document.getElementById('errorAlert');
 
@@ -920,7 +970,14 @@
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-           
+            // Load accounts from localStorage, or use dummy data if none exists
+            let accounts = JSON.parse(localStorage.getItem('accounts')) || [
+                { id: 'ADM-ACC-001', nama: 'Admin Utama', email: 'admin@example.com', password: 'adminpassword', role: 'Admin' },
+                { id: 'DKT-ACC-001', nama: 'Dr. Budi Santoso', email: 'budi.santoso@example.com', password: 'dokterpassword', role: 'Dokter' },
+                { id: 'APT-ACC-001', nama: 'Apoteker Siti', email: 'siti.apoteker@example.com', password: 'apotekerpassword', role: 'Apoteker' },
+                { id: 'PSN-ACC-001', nama: 'Pendaftaran Ayu', email: 'ayu.daftar@example.com', password: 'daftarpassword', role: 'Pendaftaran' }
+            ];
+
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('accounts') === null || JSON.parse(localStorage.getItem('accounts')).length === 0) {
                 localStorage.setItem('accounts', JSON.stringify(accounts));
@@ -1007,17 +1064,17 @@
                     accounts[existingIndex].email = email;
                     accounts[existingIndex].password = password; // Note: In a real app, never pre-fill password for security
                     accounts[existingIndex].role = role;
-                    showAlert(successAlert, 'Akun berhasil diperbarui!');
+                    displayMessageBox('Akun berhasil diperbarui!', 'success'); // Using custom message box
                 } else {
                     // Check if email already exists for new account
                     if (accounts.some(acc => acc.email === email)) {
-                        showAlert(errorAlert, 'Email sudah ada. Harap gunakan email lain.');
+                        displayMessageBox('Email sudah ada. Harap gunakan email lain.', 'error'); // Using custom message box
                         return;
                     }
                     // Generate new ID for a new account based on the selected role
                     newAccount.id = generateId(role);
                     accounts.push(newAccount);
-                    showAlert(successAlert, 'Akun berhasil ditambahkan!');
+                    displayMessageBox('Akun berhasil ditambahkan!', 'success'); // Using custom message box
                 }
 
                 localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
@@ -1048,29 +1105,30 @@
                 accounts = accounts.filter(acc => acc.id !== currentAccountIdToDelete);
                 localStorage.setItem('accounts', JSON.stringify(accounts)); // Save changes to localStorage
                 deleteModal.style.display = 'none';
-                showAlert(successAlert, 'Akun berhasil dihapus!');
+                displayMessageBox('Akun berhasil dihapus!', 'success'); // Using custom message box
                 displayAccounts(); // Refresh table
             }
 
             function showForm(isEdit = false) {
-                accountFormContainer.style.display = 'block';
+                accountFormContainer.classList.add('form-active');
                 formTitle.textContent = isEdit ? 'Edit' : 'Tambah';
                 if (!isEdit) {
                     userForm.reset();
                     userIdInput.value = ''; // Clear ID for new accounts
                 }
-                successAlert.style.display = 'none'; // Hide alerts when showing form
-                errorAlert.style.display = 'none';
+                // successAlert.style.display = 'none'; // Hide alerts when showing form
+                // errorAlert.style.display = 'none';
                 // Scroll to form
                 accountFormContainer.scrollIntoView({ behavior: 'smooth' });
             }
 
             function hideForm() {
-                accountFormContainer.style.display = 'none';
+                accountFormContainer.classList.remove('form-active');
                 userForm.reset();
                 userIdInput.value = '';
             }
 
+            // This showAlert is retained for direct use if needed for persistent alerts on form
             function showAlert(alertElement, message) {
                 alertElement.textContent = message;
                 alertElement.style.display = 'block';
@@ -1106,7 +1164,7 @@
                     }
                 });
                 doc.save('laporan_akun_pengguna.pdf');
-                showAlert(successAlert, 'Laporan PDF akun berhasil diunduh!');
+                displayMessageBox('Laporan PDF akun berhasil diunduh!', 'success'); // Using custom message box
             }
 
             // Excel Export Function for Accounts Table
@@ -1116,15 +1174,18 @@
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "Akun Pengguna");
                 XLSX.writeFile(wb, "laporan_akun_pengguna.xlsx");
-                showAlert(successAlert, 'Laporan Excel akun berhasil diunduh!');
+                displayMessageBox('Laporan Excel akun berhasil diunduh!', 'success'); // Using custom message box
             }
 
             // Event Listeners
             toggleFormBtn.addEventListener('click', function() {
-                if (accountFormContainer.style.display === 'none' || accountFormContainer.style.display === '') {
-                    showForm(false);
-                } else {
-                    hideForm();
+                // Toggle the form visibility using the class
+                accountFormContainer.classList.toggle('form-active');
+                if (accountFormContainer.classList.contains('form-active')) {
+                    formTitle.textContent = 'Tambah'; // Reset title to 'Tambah' for new form
+                    userForm.reset(); // Clear form fields
+                    userIdInput.value = ''; // Ensure no ID is set for new entry
+                    accountFormContainer.scrollIntoView({ behavior: 'smooth' });
                 }
             });
             cancelFormBtn.addEventListener('click', hideForm);
@@ -1147,8 +1208,8 @@
                 }
             });
 
-            // Initial display (hide form by default)
-            hideForm();
+            // Initial display: Ensure form is hidden by default using CSS class.
+            // No need to call hideForm() here as CSS handles initial state.
             displayAccounts();
         });
     </script>
