@@ -7,9 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <!-- Removed html2canvas.min.js as it's not used for autoTable PDF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script> <!-- D3.js for charting -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
     <style>
@@ -466,6 +464,21 @@
         }
 
         /* Updated styles for global buttons */
+        /* Added general .report-button styling for common properties */
+        .report-button {
+            padding: 12px 25px; /* Increased padding */
+            border: none;
+            border-radius: 5px;
+            color: var(--white);
+            font-size: 1em; /* Adjusted font size */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
         #global-export-pdf-btn {
             background-color: var(--report-pdf-bg); /* Red */
         }
@@ -543,7 +556,8 @@
                 padding: 15px;
             }
 
-            .report-buttons-container { /* This applies to consolidated buttons now */
+            .report-buttons-container,
+            .consolidated-buttons { /* Apply to both if you use both or just .consolidated-buttons */
                 flex-direction: column;
                 align-items: stretch;
             }
@@ -702,7 +716,6 @@
                     <span id="pasien-baru-bulan-ini"></span>
                 </div>
             </div>
-            <!-- Removed individual PDF/Excel buttons -->
             <div class="report-table-container">
                 <table id="pasienTable" class="report-table">
                     <thead>
@@ -802,8 +815,6 @@
                 </table>
             </div>
         </div>
-
-        <!-- Section 'Laporan Pemeriksaan Pasien' Removed -->
 
         <div id="laporan-obat" class="content-section">
             <h3>Laporan Stok & Penggunaan Obat</h3>
@@ -910,7 +921,7 @@
             }
 
             // Jalankan pemeriksaan akses terlebih dahulu
-            checkAccess(['admin', 'pasien', 'dokter', 'apoteker']); // 
+            checkAccess(['admin', 'pasien', 'dokter', 'apoteker']); //
             loadUserData();
 
             // Sidebar and Mobile Menu Toggle
@@ -959,10 +970,6 @@
                 }
             });
 
-            sidebar.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 768) {
                     if (sidebar.classList.contains('minimized')) {
@@ -993,7 +1000,7 @@
                 const year = String(date.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
                 return `${day}-${month}-${year}`;
             }
-         
+
             // Populate Functions
             function populatePatientReport() {
                 const patients = JSON.parse(localStorage.getItem('patients')) || [];
@@ -1102,7 +1109,7 @@
                     row.insertCell().textContent = transaction.namaPasien;
                     row.insertCell().textContent = transaction.jenisLayanan;
                     row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                    
+
                     const statusCell = row.insertCell();
                     statusCell.textContent = transaction.statusPembayaran;
                     if (transaction.statusPembayaran === 'Lunas') {
@@ -1333,7 +1340,7 @@
                 console.log("Mulai proses ekspor PDF global...");
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'letter');
-                
+
                 const allTables = document.querySelectorAll('.report-table');
                 let startY = 60; // Initial Y position for the first table
 
@@ -1351,7 +1358,7 @@
                     // Add section title
                     doc.setFontSize(14);
                     doc.text(sectionTitle, doc.internal.pageSize.getWidth() / 2, startY - 20, { align: 'center' });
-                    
+
                     try {
                         await doc.autoTable({
                             html: table,
