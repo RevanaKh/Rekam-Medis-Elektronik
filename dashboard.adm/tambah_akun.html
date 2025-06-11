@@ -892,10 +892,7 @@
     <div class="main-content" id="main-content">
         <div class="header">
             <h1>Manajemen Akun Pengguna</h1>
-            <div class="user-info">
-                <span>Selamat datang, <span id="welcome-user"></span>!</span>
             </div>
-        </div>
 
         <div class="card">
             <div class="card-header">
@@ -932,10 +929,9 @@
                                 <select id="role" required>
                                     <option value="">Pilih Role</option>
                                     <option value="admin">Admin</option>
-                                    <option value="pendaftaran">Pendaftaran</option>
                                     <option value="dokter">Dokter</option>
                                     <option value="apoteker">Apoteker</option>
-                                </select>
+                                    <option value="pasien">Pasien</option> </select>
                             </div>
                         </div>
                         <div class="form-actions">
@@ -1012,10 +1008,11 @@
                 const user = sessionStorage.getItem('loggedInUser');
                 if (user) {
                     const loggedInUser = JSON.parse(user);
-                    const welcomeUserElement = document.getElementById('welcome-user');
-                    if (welcomeUserElement) {
-                        welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
-                    }
+                    // Removed the welcomeUserElement update as per request
+                    // const welcomeUserElement = document.getElementById('welcome-user');
+                    // if (welcomeUserElement) {
+                    //     welcomeUserElement.textContent = loggedInUser.nama || loggedInUser.email;
+                    // }
                     // Role-based access control for this page
                     if (loggedInUser.role !== 'admin') {
                         alert('Anda tidak memiliki akses ke halaman ini.');
@@ -1104,14 +1101,39 @@
                 window.dispatchEvent(new Event('storage'));
             }
 
-            function generateAccountId() {
+            function generateAccountId(role) {
                 const accounts = loadAccounts();
-                if (accounts.length === 0) {
-                    return 'U001';
+                const filteredAccounts = accounts.filter(acc => acc.role === role);
+                let prefix = '';
+                let lastIdNum = 0;
+
+                switch (role) {
+                    case 'admin':
+                        prefix = 'ADM-ACC-';
+                        break;
+                    case 'dokter':
+                        prefix = 'DTR-ACC-';
+                        break;
+                    case 'apoteker':
+                        prefix = 'APT-ACC-';
+                        break;
+                    case 'pasien': // Changed from pendaftaran
+                        prefix = 'PSN-ACC-';
+                        break;
+                    default:
+                        prefix = 'ACC-'; // Fallback
                 }
-                const lastId = accounts[accounts.length - 1].id;
-                const num = parseInt(lastId.replace('U', '')) + 1;
-                return 'U' + String(num).padStart(3, '0');
+
+                if (filteredAccounts.length > 0) {
+                    const lastId = filteredAccounts[filteredAccounts.length - 1].id;
+                    // Extract number from the end of the ID, assuming format like XXX-ACC-001
+                    const match = lastId.match(/\d+$/);
+                    if (match) {
+                        lastIdNum = parseInt(match[0]);
+                    }
+                }
+                const newNum = lastIdNum + 1;
+                return prefix + String(newNum).padStart(3, '0');
             }
 
             function displayAccounts(filterText = '') {
@@ -1216,7 +1238,7 @@
                         alert('Email sudah terdaftar. Gunakan email lain.');
                         return;
                     }
-                    const newId = generateAccountId();
+                    const newId = generateAccountId(role); // Pass role to generate ID
                     const newAccount = { id: newId, nama, email, password, role };
                     accounts.push(newAccount);
                 }
@@ -1252,7 +1274,7 @@
                 let accounts = loadAccounts();
                 // Prevent deleting the currently logged-in user or the default admin
                 const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-                if (accountToDeleteId === loggedInUser.id || accountToDeleteId === 'U001') { // Assuming U001 is the default admin
+                if (accountToDeleteId === loggedInUser.id || accountToDeleteId === 'ADM-ACC-001') { // Assuming ADM-ACC-001 is the default admin
                     alert('Tidak bisa menghapus akun yang sedang login atau akun admin default.');
                     deleteModal.style.display = 'none';
                     return;
@@ -1348,8 +1370,6 @@
             // Initial display and load data
             displayAccounts(); // Load data into table
             hideForm(); // Ensure form is hidden initially
-
-            
         });
     </script>
 </body>
