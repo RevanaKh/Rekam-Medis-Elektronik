@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script> <!-- D3.js for charting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
@@ -380,6 +381,42 @@
             color: var(--danger-color); /* Red color for unpaid */
         }
 
+        /* New styles for chart containers */
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chart-item {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            flex: 1;
+            min-width: 280px; /* Adjust as needed */
+            text-align: center;
+        }
+
+        .chart-item h4 {
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        /* Style for transaction status in tables */
+        .report-table .status-lunas {
+            color: var(--success-color); /* Green for paid */
+            font-weight: bold;
+        }
+        .report-table .status-belum-lunas {
+            color: var(--danger-color); /* Red for unpaid */
+            font-weight: bold;
+        }
+
 
         .report-table-container {
             margin-top: 20px;
@@ -443,7 +480,7 @@
             box-shadow: var(--shadow);
         }
 
-        #export-pdf-btn {
+        #export-pdf-btn { /* This rule is now for global buttons only */
             background-color: var(--report-pdf-bg);
         }
 
@@ -452,13 +489,30 @@
             transform: translateY(-2px);
         }
 
-        #export-excel-btn {
+        #export-excel-btn { /* This rule is now for global buttons only */
             background-color: var(--report-excel-bg);
         }
         #export-excel-btn:hover {
             background-color: #229954;
             transform: translateY(-2px);
         }
+
+        /* Consolidated buttons styling */
+        .consolidated-buttons {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Adjust main content for new button placement */
+        .main-content .header + .consolidated-buttons {
+            margin-top: -10px; /* Pull up a bit if directly after header */
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -504,11 +558,11 @@
                 padding: 15px;
             }
 
-            .report-buttons-container {
+            .report-buttons-container { /* This applies to consolidated buttons now */
                 flex-direction: column;
                 align-items: stretch;
             }
-            .report-button {
+            .report-button { /* This applies to consolidated buttons now */
                 width: 100%;
                 justify-content: center;
             }
@@ -519,6 +573,10 @@
             }
             .report-item {
                 min-width: unset; /* Remove min-width for full width on mobile */
+            }
+            .chart-item {
+                min-width: unset;
+                width: 100%;
             }
         }
     </style>
@@ -642,6 +700,11 @@
             <h1>Manajemen Laporan</h1>
         </div>
 
+        <div class="consolidated-buttons">
+            <button class="report-button" id="global-export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh Semua Laporan PDF</button>
+            <button class="report-button" id="global-export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Semua Laporan Excel</button>
+        </div>
+
         <div id="laporan-pasien" class="content-section">
             <h3>Laporan Data Pasien</h3>
             <div class="report-summary">
@@ -654,10 +717,7 @@
                     <span id="pasien-baru-bulan-ini"></span>
                 </div>
             </div>
-            <div class="report-buttons-container">
-                <button class="report-button" id="export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh PDF</button>
-                <button class="report-button" id="export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Excel</button>
-            </div>
+            <!-- Removed individual PDF/Excel buttons -->
             <div class="report-table-container">
                 <table id="pasienTable" class="report-table">
                     <thead>
@@ -723,6 +783,20 @@
                 <div class="report-item unpaid">
                     <span>Jumlah Belum Lunas:</span>
                     <span id="total-belum-lunas"></span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-item">
+                    <h4>Total Semua Transaksi</h4>
+                    <div id="all-transactions-chart"></div>
+                </div>
+                <div class="chart-item">
+                    <h4>Total Transaksi Lunas</h4>
+                    <div id="paid-transactions-chart"></div>
+                </div>
+                <div class="chart-item">
+                    <h4>Total Transaksi Belum Lunas</h4>
+                    <div id="unpaid-transactions-chart"></div>
                 </div>
             </div>
             <div class="report-table-container">
@@ -1039,7 +1113,14 @@
                     row.insertCell().textContent = transaction.namaPasien;
                     row.insertCell().textContent = transaction.jenisLayanan;
                     row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                    row.insertCell().textContent = transaction.statusPembayaran;
+                    
+                    const statusCell = row.insertCell();
+                    statusCell.textContent = transaction.statusPembayaran;
+                    if (transaction.statusPembayaran === 'Lunas') {
+                        statusCell.classList.add('status-lunas');
+                    } else {
+                        statusCell.classList.add('status-belum-lunas');
+                    }
                 });
 
                 totalTransaksiSpan.textContent = transactions.length;
@@ -1056,6 +1137,7 @@
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
                 }
+                updateTransactionCharts(); // Update charts after populating table
             }
 
             // Fungsi populateExaminationReport telah dihapus
@@ -1159,80 +1241,187 @@
                 }).format(amount);
             }
 
-            // Central function to populate all tables
+            // Function to render a bar chart using D3
+            function renderBarChart(selectorId, data, title, valueKey, labelKey, color) {
+                const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                const width = 300 - margin.left - margin.right; // Smaller width for individual charts
+                const height = 200 - margin.top - margin.bottom;
+
+                d3.select(selectorId).select("svg").remove(); // Clear previous chart
+
+                const svg = d3.select(selectorId).append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleBand()
+                    .range([0, width])
+                    .padding(0.1);
+
+                const y = d3.scaleLinear()
+                    .range([height, 0]);
+
+                x.domain(data.map(d => d[labelKey]));
+                y.domain([0, d3.max(data, d => d[valueKey])]);
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x));
+
+                svg.append("g")
+                    .call(d3.axisLeft(y).ticks(5).tickFormat(d => {
+                        // Format as Rupiah for Y-axis if it's monetary value
+                        return new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        }).format(d);
+                    }));
+
+                svg.selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", d => x(d[labelKey]))
+                    .attr("width", x.bandwidth())
+                    .attr("y", d => y(d[valueKey]))
+                    .attr("height", d => height - y(d[valueKey]))
+                    .attr("fill", color);
+
+                // Add value labels on top of bars
+                svg.selectAll(".text")
+                    .data(data)
+                    .enter().append("text")
+                    .attr("class", "label")
+                    .attr("x", d => x(d[labelKey]) + x.bandwidth() / 2)
+                    .attr("y", d => y(d[valueKey]) - 5) // Slightly above the bar
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "10px")
+                    .style("fill", "#555")
+                    .text(d => formatRupiah(d[valueKey]));
+            }
+
+            // Function to update transaction charts
+            function updateTransactionCharts() {
+                const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+                // Data for "All Transactions" chart (sum of all transaction values)
+                const totalTransactionsValue = transactions.reduce((sum, t) => sum + t.totalBiaya, 0);
+                const allTxData = [{ category: 'Total Transaksi', value: totalTransactionsValue }];
+                renderBarChart('#all-transactions-chart', allTxData, 'Total Semua Transaksi', 'value', 'category', '#1de9b6');
+
+                // Data for "Paid Transactions" chart
+                const paidTransactions = transactions.filter(t => t.statusPembayaran === 'Lunas');
+                const totalPaidValue = paidTransactions.reduce((sum, t) => sum + t.totalBiaya, 0);
+                const paidTxData = [{ category: 'Total Lunas', value: totalPaidValue }];
+                renderBarChart('#paid-transactions-chart', paidTxData, 'Total Transaksi Lunas', 'value', 'category', '#4CAF00');
+
+                // Data for "Unpaid Transactions" chart
+                const unpaidTransactions = transactions.filter(t => t.statusPembayaran !== 'Lunas');
+                const totalUnpaidValue = unpaidTransactions.reduce((sum, t) => sum + t.totalBiaya, 0);
+                const unpaidTxData = [{ category: 'Total Belum Lunas', value: totalUnpaidValue }];
+                renderBarChart('#unpaid-transactions-chart', unpaidTxData, 'Total Transaksi Belum Lunas', 'value', 'category', '#f44336');
+            }
+
+
+            // Central function to populate all tables and charts
             function populateAllReportTables() {
                 populatePatientReport();
                 populateDoctorReport();
                 populateTransactionReport();
-                // Removed populateExaminationReport()
                 populateDrugReport();
                 populateUserReport();
+                // updateTransactionCharts() is called inside populateTransactionReport
             }
 
-            // PDF Export for Patient Data (specific to pasienTable)
-            document.getElementById('export-pdf-btn').addEventListener('click', function() {
+            // Global PDF Export for All Report Tables
+            document.getElementById('global-export-pdf-btn').addEventListener('click', async function() {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'letter');
-                const table = document.getElementById('pasienTable'); // Target specific table
+                
+                const allTables = document.querySelectorAll('.report-table');
+                let startY = 60; // Initial Y position for the first table
 
-                doc.autoTable({
-                    html: table,
-                    startY: 60,
-                    theme: 'grid',
-                    headStyles: {
-                        fillColor: [29, 233, 182],
-                        textColor: [255, 255, 255],
-                        fontStyle: 'bold',
-                        halign: 'center'
-                    },
-                    styles: {
-                        fontSize: 8,
-                        cellPadding: 8,
-                        valign: 'middle',
-                        overflow: 'linebreak'
-                    },
-                    columnStyles: {
-                        0: { cellWidth: 30, halign: 'center' }, // No.
-                        1: { cellWidth: 70 }, // ID Pasien
-                        2: { cellWidth: 100 }, // Nama Lengkap
-                        3: { cellWidth: 70 }, // Tanggal Lahir
-                        4: { cellWidth: 60, halign: 'center' }, // Jenis Kelamin
-                        5: { cellWidth: 'auto' }, // Alamat
-                        6: { cellWidth: 70 } // Telepon
-                    },
-                    didDrawPage: function(data) {
-                        doc.text("Laporan Data Pasien", data.settings.marginLeft, 40);
+                for (let i = 0; i < allTables.length; i++) {
+                    const table = allTables[i];
+                    const sectionTitle = table.closest('.content-section').querySelector('h3').textContent;
+
+                    // Add a new page if it's not the first table
+                    if (i > 0) {
+                        doc.addPage();
+                        startY = 60; // Reset Y position for new page
+                    }
+
+                    // Add section title
+                    doc.setFontSize(14);
+                    doc.text(sectionTitle, doc.internal.pageSize.getWidth() / 2, startY - 20, { align: 'center' });
+                    
+                    await doc.autoTable({
+                        html: table,
+                        startY: startY,
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [29, 233, 182],
+                            textColor: [255, 255, 255],
+                            fontStyle: 'bold',
+                            halign: 'center'
+                        },
+                        styles: {
+                            fontSize: 8,
+                            cellPadding: 8,
+                            valign: 'middle',
+                            overflow: 'linebreak'
+                        },
+                        didDrawPage: function(data) {
+                            // Page number
+                            doc.setFontSize(10);
+                            doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.marginLeft, doc.internal.pageSize.height - 20);
+                        }
+                    });
+
+                    // Update startY for the next table if it's on the same page
+                    // This is less relevant with addPage() for each, but good practice
+                    startY = doc.autoTable.previous.finalY + 20;
+                }
+                doc.save('semua_laporan_data.pdf');
+            });
+
+            // Global Excel Export for All Report Tables
+            document.getElementById('global-export-excel-btn').addEventListener('click', function() {
+                const wb = XLSX.utils.book_new(); // Create new workbook
+                const allTables = document.querySelectorAll('.report-table');
+
+                allTables.forEach(table => {
+                    let sheetName = table.closest('.content-section').querySelector('h3').textContent;
+                    // Sanitize sheet name to be valid for Excel (max 31 chars, no invalid chars)
+                    sheetName = sheetName.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 31).trim();
+                    if (!sheetName) sheetName = "Sheet"; // Fallback if name becomes empty
+
+                    const ws = XLSX.utils.table_to_sheet(table);
+
+                    // If it's the PasienTable, remove the "No." column for Excel export
+                    if (table.id === 'pasienTable') {
+                        const range = XLSX.utils.decode_range(ws['!ref']);
+                        const new_ws = {};
+                        for (let R = range.s.r; R <= range.e.r; ++R) {
+                            for (let C = range.s.c + 1; C <= range.e.c; ++C) { // Start from column 1
+                                const old_cell_address = XLSX.utils.encode_cell({r: R, c: C});
+                                const new_cell_address = XLSX.utils.encode_cell({r: R, c: C - 1});
+                                if (ws[old_cell_address]) {
+                                    new_ws[new_cell_address] = ws[old_cell_address];
+                                }
+                            }
+                        }
+                        new_ws['!ref'] = XLSX.utils.encode_range({s: {r: range.s.r, c: 0}, e: {r: range.e.r, c: range.e.c - 1}});
+                        XLSX.utils.book_append_sheet(wb, new_ws, sheetName);
+                    } else {
+                        XLSX.utils.book_append_sheet(wb, ws, sheetName);
                     }
                 });
 
-                doc.save('laporan_data_pasien.pdf');
-            });
-
-            // Excel Export for Patient Data (specific to pasienTable)
-            document.getElementById('export-excel-btn').addEventListener('click', function() {
-                const table = document.getElementById('pasienTable'); // Target specific table
-                const ws = XLSX.utils.table_to_sheet(table);
-
-                // Remove the "No." column for Excel export
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                // Create a new sheet without the first column (No.)
-                const new_ws = {};
-                for (let R = range.s.r; R <= range.e.r; ++R) {
-                    for (let C = range.s.c + 1; C <= range.e.c; ++C) { // Start from column 1
-                        const old_cell_address = XLSX.utils.encode_cell({r: R, c: C});
-                        const new_cell_address = XLSX.utils.encode_cell({r: R, c: C - 1});
-                        if (ws[old_cell_address]) {
-                            new_ws[new_cell_address] = ws[old_cell_address];
-                        }
-                    }
-                }
-                // Adjust the range for the new sheet
-                new_ws['!ref'] = XLSX.utils.encode_range({s: {r: range.s.r, c: 0}, e: {r: range.e.r, c: range.e.c - 1}});
-
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, new_ws, "Laporan Data Pasien"); // Use new_ws
-                XLSX.writeFile(wb, "laporan_data_pasien.xlsx");
+                XLSX.writeFile(wb, "semua_laporan_data.xlsx");
             });
 
 
@@ -1253,16 +1442,16 @@
 
             // Event listener for localStorage changes
             window.addEventListener('storage', (event) => {
-                // Check if the changed item is 'users'
+                // Check if the changed item is 'users' or 'transactions'
                 if (event.key === 'users') {
                     console.log('localStorage "users" changed, updating user report.');
-                    populateUserReport(); // Only re-populate the user report
+                    populateUserReport();
                 }
-                // You can add more conditions here if other reports also need real-time updates
-                // For example:
-                // if (event.key === 'patients') {
-                //     populatePatientReport();
-                // }
+                if (event.key === 'transactions') {
+                    console.log('localStorage "transactions" changed, updating transaction report and charts.');
+                    populateTransactionReport(); // This also calls updateTransactionCharts()
+                }
+                // Add other keys if other reports also need real-time updates
             });
 
 
