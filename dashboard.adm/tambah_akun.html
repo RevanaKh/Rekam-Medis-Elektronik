@@ -320,7 +320,7 @@
             overflow-x: auto; /* This is crucial for horizontal scrolling */
             border-radius: 8px;
             box-shadow: var(--shadow);
-            width: 100%; /* Ensures it fills the container */
+            width: 100%;
         }
 
         table { /* Applying styles directly to the table element within .table-responsive */
@@ -905,9 +905,9 @@
             // Fungsi untuk memeriksa akses berdasarkan peran (case-insensitive)
             function checkAccess(allowedRoles) {
                 console.log("Memeriksa akses...");
-                const user = sessionStorage.getItem('loggedInUser');
-                if (admin) {
-                    const loggedInUser = JSON.parse(admin);
+                const user = sessionStorage.getItem('loggedInUser'); // Menggunakan 'user' dari sessionStorage
+                if (user) {
+                    const loggedInUser = JSON.parse(user);
                     console.log("Data pengguna yang masuk:", loggedInUser);
                     console.log("Peran pengguna:", loggedInUser.role);
                     console.log("Peran yang diizinkan (asli):", allowedRoles);
@@ -1224,7 +1224,7 @@
             if (localStorage.getItem('loggedInUser') === null) {
                 // Ini hanya untuk tujuan demonstrasi agar Anda bisa login langsung.
                 // Dalam aplikasi nyata, ini akan diatur oleh halaman login.
-                const defaultAdmin = { email: 'admin@example.com', password: 'admin123', role: 'Admin', nama: 'Default Admin' };
+                const defaultAdmin = { email: 'admin@gmail.com', password: 'admin123', role: 'Admin', nama: 'Default Admin' };
                 sessionStorage.setItem('loggedInUser', JSON.stringify(defaultAdmin));
                 console.log("Akun admin default telah ditambahkan ke sessionStorage untuk pengujian.");
             }
