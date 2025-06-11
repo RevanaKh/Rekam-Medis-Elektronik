@@ -7,8 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script> <!-- Added Chart.js -->
+    <!-- Removed html2canvas.min.js as it's not used for autoTable PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script> <!-- D3.js for charting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 
@@ -34,8 +34,6 @@
             --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
             --report-print-bg: #3498DB; /* Biru untuk Cetak */
             --report-excel-bg: #27AE60; /* Hijau untuk Excel */
-            --chart-paid-color: #4CAF50; /* Green for Paid */
-            --chart-unpaid-color: #F44336; /* Red for Unpaid */
         }
 
         * {
@@ -378,6 +376,48 @@
             font-weight: bold;
         }
 
+        /* Override for 'Belum Lunas' color */
+        .report-item.unpaid span:last-child {
+            color: var(--danger-color); /* Red color for unpaid */
+        }
+
+        /* New styles for chart containers */
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chart-item {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            flex: 1;
+            min-width: 280px; /* Adjust as needed */
+            text-align: center;
+        }
+
+        .chart-item h4 {
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        /* Style for transaction status in tables */
+        .report-table .status-lunas {
+            color: var(--success-color); /* Green for paid */
+            font-weight: bold;
+        }
+        .report-table .status-belum-lunas {
+            color: var(--danger-color); /* Red for unpaid */
+            font-weight: bold;
+        }
+
+
         .report-table-container {
             margin-top: 20px;
             overflow-x: auto;
@@ -390,7 +430,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 0;
-            min-width: 800px; /* Fixed table width */
+            min-width: 800px; /* Lebar tabel tetap */
             background-color: var(--white);
         }
 
@@ -417,7 +457,7 @@
         }
 
         /* Report Buttons specific styles */
-        .report-buttons-container {
+        .report-buttons-container { /* This was for individual buttons, now for global buttons */
             margin-bottom: 20px; /* Add margin below buttons */
             display: flex;
             gap: 15px;
@@ -425,48 +465,39 @@
             justify-content: flex-start;
         }
 
-        .report-button {
-            color: var(--white);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            box-shadow: var(--shadow);
+        /* Updated styles for global buttons */
+        #global-export-pdf-btn {
+            background-color: var(--report-pdf-bg); /* Red */
         }
-
-        .report-button.pdf {
-            background-color: var(--report-pdf-bg);
-        }
-
-        .report-button.pdf:hover {
+        #global-export-pdf-btn:hover {
             background-color: #C0392B;
             transform: translateY(-2px);
         }
-
-        .report-button.excel {
-            background-color: var(--report-excel-bg);
+        #global-export-excel-btn {
+            background-color: var(--report-excel-bg); /* Green */
         }
-        .report-button.excel:hover {
+        #global-export-excel-btn:hover {
             background-color: #229954;
             transform: translateY(-2px);
         }
 
-        /* Chart container styling */
-        .chart-container {
+
+        /* Consolidated buttons styling (using .report-buttons-container for layout) */
+        .consolidated-buttons {
             width: 100%;
-            max-width: 400px; /* Adjust as needed */
-            margin: 20px auto;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
+            max-width: 1200px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
+
+        /* Adjust main content for new button placement */
+        .main-content .header + .consolidated-buttons {
+            margin-top: -10px; /* Pull up a bit if directly after header */
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -512,11 +543,11 @@
                 padding: 15px;
             }
 
-            .report-buttons-container {
+            .report-buttons-container { /* This applies to consolidated buttons now */
                 flex-direction: column;
                 align-items: stretch;
             }
-            .report-button {
+            .report-button { /* This applies to consolidated buttons now */
                 width: 100%;
                 justify-content: center;
             }
@@ -527,6 +558,10 @@
             }
             .report-item {
                 min-width: unset; /* Remove min-width for full width on mobile */
+            }
+            .chart-item {
+                min-width: unset;
+                width: 100%;
             }
         }
     </style>
@@ -648,10 +683,11 @@
     <div class="main-content" id="main-content">
         <div class="header">
             <h1>Manajemen Laporan</h1>
-            <div class="report-buttons-container">
-                <button class="report-button pdf" id="export-all-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh Keseluruhan PDF</button>
-                <button class="report-button excel" id="export-all-excel-btn"><i class="fas fa-file-excel"></i> Unduh Keseluruhan Excel</button>
-            </div>
+        </div>
+
+        <div class="consolidated-buttons">
+            <button class="report-button" id="global-export-pdf-btn"><i class="fas fa-file-pdf"></i> Unduh Semua Laporan PDF</button>
+            <button class="report-button" id="global-export-excel-btn"><i class="fas fa-file-excel"></i> Unduh Semua Laporan Excel</button>
         </div>
 
         <div id="laporan-pasien" class="content-section">
@@ -666,7 +702,7 @@
                     <span id="pasien-baru-bulan-ini"></span>
                 </div>
             </div>
-            <!-- Individual download buttons removed as per user request -->
+            <!-- Removed individual PDF/Excel buttons -->
             <div class="report-table-container">
                 <table id="pasienTable" class="report-table">
                     <thead>
@@ -698,7 +734,6 @@
                     <span id="dokter-aktif"></span>
                 </div>
             </div>
-            <!-- Individual download buttons removed as per user request -->
             <div class="report-table-container">
                 <table id="dokterTable" class="report-table">
                     <thead>
@@ -730,12 +765,25 @@
                     <span>Total Pendapatan:</span>
                     <span id="total-pendapatan"></span>
                 </div>
+                <div class="report-item unpaid">
+                    <span>Jumlah Belum Lunas:</span>
+                    <span id="total-belum-lunas"></span>
+                </div>
             </div>
             <div class="chart-container">
-                <h4>Status Pembayaran</h4>
-                <canvas id="transactionChart"></canvas>
+                <div class="chart-item">
+                    <h4>Total Semua Transaksi</h4>
+                    <div id="all-transactions-chart"></div>
+                </div>
+                <div class="chart-item">
+                    <h4>Total Transaksi Lunas</h4>
+                    <div id="paid-transactions-chart"></div>
+                </div>
+                <div class="chart-item">
+                    <h4>Total Transaksi Belum Lunas</h4>
+                    <div id="unpaid-transactions-chart"></div>
+                </div>
             </div>
-            <!-- Individual download buttons removed as per user request -->
             <div class="report-table-container">
                 <table id="transaksiPasienTable" class="report-table">
                     <thead>
@@ -755,38 +803,7 @@
             </div>
         </div>
 
-        <div id="laporan-pemeriksaan" class="content-section">
-            <h3>Laporan Pemeriksaan Pasien</h3>
-            <div class="report-summary">
-                <div class="report-item">
-                    <span>Total Pemeriksaan:</span>
-                    <span id="total-pemeriksaan"></span>
-                </div>
-                <div class="report-item">
-                    <span>Pemeriksaan Baru Bulan Ini:</span>
-                    <span id="pemeriksaan-baru-bulan-ini"></span>
-                </div>
-            </div>
-            <!-- Individual download buttons removed as per user request -->
-            <div class="report-table-container">
-                <table id="pemeriksaanTable" class="report-table">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>ID Pemeriksaan</th>
-                            <th>Tanggal</th>
-                            <th>Nama Pasien</th>
-                            <th>Dokter</th>
-                            <th>Keluhan</th>
-                            <th>Diagnosa</th>
-                            <th>Tindakan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
-        </div>
+        <!-- Section 'Laporan Pemeriksaan Pasien' Removed -->
 
         <div id="laporan-obat" class="content-section">
             <h3>Laporan Stok & Penggunaan Obat</h3>
@@ -800,7 +817,6 @@
                     <span id="obat-kritis"></span>
                 </div>
             </div>
-            <!-- Individual download buttons removed as per user request -->
             <div class="report-table-container">
                 <table id="obatTable" class="report-table">
                     <thead>
@@ -840,7 +856,6 @@
                     <span id="apoteker-count"></span>
                 </div>
             </div>
-            <!-- Individual download buttons removed as per user request -->
             <div class="report-table-container">
                 <table id="usersTable" class="report-table">
                     <thead>
@@ -890,8 +905,8 @@
                 }
             }
 
-            // Run access check first
-            checkAccess(['Admin', 'Pasien', 'Dokter', 'Apoteker']); // Admin, Pasien, Dokter, Apoteker can access
+            // Jalankan pemeriksaan akses terlebih dahulu
+            checkAccess(['admin', 'pendaftaran', 'dokter', 'apoteker']); // Admin, Pendaftaran, Dokter, Apoteker bisa akses
             loadUserData();
 
             // Sidebar and Mobile Menu Toggle
@@ -957,12 +972,24 @@
                 }
             });
 
-            // --- Report Logic ---
+            // --- Laporan Logic ---
+
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
-            let transactionChartInstance = null; // To hold the Chart.js instance
 
+            // Fungsi untuk memformat tanggal ke DD,MM,YY
+            function formatDateToDDMMYY(dateString) {
+                const date = new Date(dateString);
+                if (isNaN(date)) {
+                    return 'Invalid Date'; // Tangani string tanggal yang tidak valid
+                }
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
+                const year = String(date.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
+                return `${day},${month},${year}`;
+            }
+         
             // Populate Functions
             function populatePatientReport() {
                 const patients = JSON.parse(localStorage.getItem('patients')) || [];
@@ -1049,31 +1076,41 @@
                 const tableBody = document.querySelector('#transaksiPasienTable tbody');
                 const totalTransaksiSpan = document.getElementById('total-transaksi');
                 const totalPendapatanSpan = document.getElementById('total-pendapatan');
+                const totalBelumLunasSpan = document.getElementById('total-belum-lunas'); // Elemen baru
 
                 tableBody.innerHTML = '';
                 let totalRevenue = 0;
-                let paidCount = 0;
-                let unpaidCount = 0;
+                let unpaidRevenue = 0; // Variabel baru untuk belum lunas
 
                 transactions.forEach((transaction, index) => {
                     totalRevenue += transaction.totalBiaya;
-                    if (transaction.statusPembayaran === 'Lunas') {
-                        paidCount++;
-                    } else {
-                        unpaidCount++;
+                    // Asumsi 'Lunas' berarti sudah dibayar, lainnya 'Belum Lunas'
+                    if (transaction.statusPembayaran !== 'Lunas') {
+                        unpaidRevenue += transaction.totalBiaya;
                     }
+
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = transaction.id;
+                    // Memformat ID transaksi berdasarkan tanggal
+                    const formattedTxId = `TRX-${formatDateToDDMMYY(transaction.tanggal)}`;
+                    row.insertCell().textContent = formattedTxId; // Menampilkan ID yang baru diformat
                     row.insertCell().textContent = transaction.tanggal;
                     row.insertCell().textContent = transaction.namaPasien;
                     row.insertCell().textContent = transaction.jenisLayanan;
                     row.insertCell().textContent = formatRupiah(transaction.totalBiaya);
-                    row.insertCell().textContent = transaction.statusPembayaran;
+                    
+                    const statusCell = row.insertCell();
+                    statusCell.textContent = transaction.statusPembayaran;
+                    if (transaction.statusPembayaran === 'Lunas') {
+                        statusCell.classList.add('status-lunas');
+                    } else {
+                        statusCell.classList.add('status-belum-lunas');
+                    }
                 });
 
                 totalTransaksiSpan.textContent = transactions.length;
                 totalPendapatanSpan.textContent = formatRupiah(totalRevenue);
+                totalBelumLunasSpan.textContent = formatRupiah(unpaidRevenue); // Perbarui span 'Belum Lunas'
 
                 if (transactions.length === 0) {
                     const noDataRow = tableBody.insertRow();
@@ -1085,107 +1122,27 @@
                     noDataCell.style.fontStyle = "italic";
                     noDataCell.style.color = "#555";
                 }
-                renderTransactionChart(paidCount, unpaidCount); // Render chart after populating table
+                updateTransactionCharts(); // Update charts after populating table
             }
 
-            function renderTransactionChart(paidCount, unpaidCount) {
-                const ctx = document.getElementById('transactionChart').getContext('2d');
-
-                // Destroy existing chart instance if it exists
-                if (transactionChartInstance) {
-                    transactionChartInstance.destroy();
-                }
-
-                transactionChartInstance = new Chart(ctx, {
-                    type: 'doughnut', // Changed to doughnut for a ring chart
-                    data: {
-                        labels: ['Lunas', 'Belum Lunas'],
-                        datasets: [{
-                            data: [paidCount, unpaidCount],
-                            backgroundColor: [
-                                'var(--chart-paid-color)', // Using CSS variable for consistency
-                                'var(--chart-unpaid-color)' // Using CSS variable for consistency
-                            ],
-                            borderColor: [
-                                'var(--white)',
-                                'var(--white)'
-                            ],
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                            },
-                            title: {
-                                display: false, // Title moved to HTML h4 tag
-                                text: 'Status Pembayaran Transaksi'
-                            }
-                        }
-                    }
-                });
-            }
-
-
-            function populateExaminationReport() {
-                const examinations = JSON.parse(localStorage.getItem('examinations')) || [];
-                const tableBody = document.querySelector('#pemeriksaanTable tbody');
-                const totalPemeriksaanSpan = document.getElementById('total-pemeriksaan');
-                const pemeriksaanBaruBulanIniSpan = document.getElementById('pemeriksaan-baru-bulan-ini');
-
-                tableBody.innerHTML = '';
-                let newExaminationsThisMonth = 0;
-
-                examinations.forEach((exam, index) => {
-                    const examDate = new Date(exam.tanggal);
-                    if (!isNaN(examDate) && examDate.getMonth() === currentMonth && examDate.getFullYear() === currentYear) {
-                        newExaminationsThisMonth++;
-                    }
-                    const row = tableBody.insertRow();
-                    row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = exam.id;
-                    row.insertCell().textContent = exam.tanggal;
-                    row.insertCell().textContent = exam.namaPasien;
-                    row.insertCell().textContent = exam.dokter;
-                    row.insertCell().textContent = exam.keluhan;
-                    row.insertCell().textContent = exam.diagnosa;
-                    row.insertCell().textContent = exam.tindakan;
-                });
-
-                totalPemeriksaanSpan.textContent = examinations.length;
-                pemeriksaanBaruBulanIniSpan.textContent = newExaminationsThisMonth;
-
-                if (examinations.length === 0) {
-                    const noDataRow = tableBody.insertRow();
-                    const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 8;
-                    noDataCell.textContent = "Tidak ada data pemeriksaan untuk ditampilkan.";
-                    noDataCell.style.textAlign = "center";
-                    noDataCell.style.padding = "20px";
-                    noDataCell.style.fontStyle = "italic";
-                    noDataCell.style.color = "#555";
-                }
-            }
+            // Fungsi populateExaminationReport telah dihapus
 
             function populateDrugReport() {
-                console.log("Starting populateDrugReport...");
-                const drugs = JSON.parse(localStorage.getItem('obat')) || []; // Use 'obat' key
-                console.log("Drug data retrieved from localStorage:", drugs); // Log retrieved data
-                const tableBody = document.querySelector('#obatTable tbody'); // Use querySelector
+                console.log("Memulai populateDrugReport...");
+                const drugs = JSON.parse(localStorage.getItem('obat')) || []; // Menggunakan kunci 'obat'
+                console.log("Data obat yang diambil dari localStorage:", drugs); // Log data yang diambil
+                const tableBody = document.querySelector('#obatTable tbody'); // Menggunakan querySelector
                 const totalJenisObatSpan = document.getElementById('total-jenis-obat');
                 const obatKritisSpan = document.getElementById('obat-kritis');
 
-                tableBody.innerHTML = ''; // Clear table content before repopulating
+                tableBody.innerHTML = ''; // Bersihkan isi tabel sebelum mengisi ulang
                 let criticalStockCount = 0;
 
                 if (drugs.length === 0) {
-                    console.log("No drug data in localStorage.");
+                    console.log("Tidak ada data obat di localStorage.");
                     const noDataRow = tableBody.insertRow();
                     const noDataCell = noDataRow.insertCell();
-                    noDataCell.colSpan = 8; // Adjust to total column count after adding "Tanggal Kadaluarsa"
+                    noDataCell.colSpan = 8; // Sesuaikan dengan jumlah kolom total setelah penambahan "Tanggal Kadaluarsa"
                     noDataCell.textContent = "Tidak ada data obat untuk ditampilkan.";
                     noDataCell.style.textAlign = "center";
                     noDataCell.style.padding = "20px";
@@ -1193,11 +1150,11 @@
                     noDataCell.style.color = "#555";
                     totalJenisObatSpan.textContent = 0;
                     obatKritisSpan.textContent = 0;
-                    return; // Exit function if no data
+                    return; // Keluar dari fungsi jika tidak ada data
                 }
 
                 drugs.forEach((drug, index) => {
-                    console.log("Processing drug:", drug); // Log each drug object
+                    console.log("Memproses obat:", drug); // Log setiap objek obat
                     if (drug.stok < 10) { // Define critical stock threshold
                         criticalStockCount++;
                     }
@@ -1214,12 +1171,11 @@
 
                 totalJenisObatSpan.textContent = drugs.length;
                 obatKritisSpan.textContent = criticalStockCount;
-                console.log("populateDrugReport finished. Total drugs:", drugs.length);
+                console.log("populateDrugReport selesai. Total obat:", drugs.length);
             }
 
             function populateUserReport() {
-                // IMPORTANT: Fetch from 'accounts' key as used in tambah_akun.html
-                const users = JSON.parse(localStorage.getItem('accounts')) || [];
+                const users = JSON.parse(localStorage.getItem('users')) || [];
                 const tableBody = document.querySelector('#usersTable tbody');
                 const totalPenggunaSpan = document.getElementById('total-pengguna');
                 const adminCountSpan = document.getElementById('admin-count');
@@ -1232,10 +1188,9 @@
                 let apotekerCount = 0;
 
                 users.forEach((user, index) => {
-                    // Use toLowerCase() for robust role checking
-                    if (user.role && user.role.toLowerCase() === 'admin') adminCount++;
-                    if (user.role && user.role.toLowerCase() === 'dokter') dokterCount++;
-                    if (user.role && user.role.toLowerCase() === 'apoteker') apotekerCount++;
+                    if (user.role === 'admin') adminCount++;
+                    if (user.role === 'dokter') dokterCount++;
+                    if (user.role === 'apoteker') apotekerCount++;
 
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
@@ -1271,41 +1226,129 @@
                 }).format(amount);
             }
 
-            // Central function to populate all tables
+            // Function to render a bar chart using D3
+            function renderBarChart(selectorId, data, title, valueKey, labelKey, color) {
+                const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+                const width = 300 - margin.left - margin.right; // Smaller width for individual charts
+                const height = 200 - margin.top - margin.bottom;
+
+                d3.select(selectorId).select("svg").remove(); // Clear previous chart
+
+                const svg = d3.select(selectorId).append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleBand()
+                    .range([0, width])
+                    .padding(0.1);
+
+                const y = d3.scaleLinear()
+                    .range([height, 0]);
+
+                x.domain(data.map(d => d[labelKey]));
+                y.domain([0, d3.max(data, d => d[valueKey])]);
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x));
+
+                svg.append("g")
+                    .call(d3.axisLeft(y).ticks(5).tickFormat(d => {
+                        // Format as Rupiah for Y-axis if it's monetary value
+                        return new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        }).format(d);
+                    }));
+
+                svg.selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", d => x(d[labelKey]))
+                    .attr("width", x.bandwidth())
+                    .attr("y", d => y(d[valueKey]))
+                    .attr("height", d => height - y(d[valueKey]))
+                    .attr("fill", color);
+
+                // Add value labels on top of bars
+                svg.selectAll(".text")
+                    .data(data)
+                    .enter().append("text")
+                    .attr("class", "label")
+                    .attr("x", d => x(d[labelKey]) + x.bandwidth() / 2)
+                    .attr("y", d => y(d[valueKey]) - 5) // Slightly above the bar
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "10px")
+                    .style("fill", "#555")
+                    .text(d => formatRupiah(d[valueKey]));
+            }
+
+            // Function to update transaction charts
+            function updateTransactionCharts() {
+                const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+                // Data for "All Transactions" chart (sum of all transaction values)
+                const totalTransactionsValue = transactions.reduce((sum, t) => sum + t.totalBiaya, 0);
+                const allTxData = [{ category: 'Total Transaksi', value: totalTransactionsValue }];
+                renderBarChart('#all-transactions-chart', allTxData, 'Total Semua Transaksi', 'value', 'category', '#1de9b6');
+
+                // Data for "Paid Transactions" chart
+                const paidTransactions = transactions.filter(t => t.statusPembayaran === 'Lunas');
+                const totalPaidValue = paidTransactions.reduce((sum, t) => sum + t.totalBiaya, 0);
+                const paidTxData = [{ category: 'Total Lunas', value: totalPaidValue }];
+                renderBarChart('#paid-transactions-chart', paidTxData, 'Total Transaksi Lunas', 'value', 'category', '#4CAF00');
+
+                // Data for "Unpaid Transactions" chart
+                const unpaidTransactions = transactions.filter(t => t.statusPembayaran !== 'Lunas');
+                const totalUnpaidValue = unpaidTransactions.reduce((sum, t) => sum + t.totalBiaya, 0);
+                const unpaidTxData = [{ category: 'Total Belum Lunas', value: totalUnpaidValue }];
+                renderBarChart('#unpaid-transactions-chart', unpaidTxData, 'Total Transaksi Belum Lunas', 'value', 'category', '#f44336');
+            }
+
+
+            // Central function to populate all tables and charts
             function populateAllReportTables() {
                 populatePatientReport();
                 populateDoctorReport();
-                populateTransactionReport(); // This will also render the chart
-                populateExaminationReport();
+                populateTransactionReport();
                 populateDrugReport();
                 populateUserReport();
+                // updateTransactionCharts() is called inside populateTransactionReport
             }
 
-            // --- Global PDF Export Function ---
-            document.getElementById('export-all-pdf-btn').addEventListener('click', function() {
+            // Global PDF Export for All Report Tables
+            document.getElementById('global-export-pdf-btn').addEventListener('click', async function() {
+                console.log("Mulai proses ekspor PDF global...");
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'letter');
-                const reports = [
-                    { id: 'pasienTable', title: 'Laporan Data Pasien' },
-                    { id: 'dokterTable', title: 'Laporan Data Dokter' },
-                    { id: 'transaksiPasienTable', title: 'Laporan Transaksi Pasien' },
-                    { id: 'pemeriksaanTable', title: 'Laporan Pemeriksaan Pasien' },
-                    { id: 'obatTable', title: 'Laporan Stok & Penggunaan Obat' },
-                    { id: 'usersTable', title: 'Laporan Pengguna Sistem' }
-                ];
+                
+                const allTables = document.querySelectorAll('.report-table');
+                let startY = 60; // Initial Y position for the first table
 
-                let firstTable = true;
+                for (let i = 0; i < allTables.length; i++) {
+                    const table = allTables[i];
+                    const sectionTitle = table.closest('.content-section').querySelector('h3').textContent;
+                    console.log(`Menggambar tabel: ${sectionTitle}`);
 
-                reports.forEach(report => {
-                    const table = document.getElementById(report.id);
-                    if (table) {
-                        if (!firstTable) {
-                            doc.addPage();
-                        }
-                        doc.text(report.title, 40, 40); // Title for the page
-                        doc.autoTable({
+                    // Add a new page if it's not the first table
+                    if (i > 0) {
+                        doc.addPage();
+                        startY = 60; // Reset Y position for new page
+                    }
+
+                    // Add section title
+                    doc.setFontSize(14);
+                    doc.text(sectionTitle, doc.internal.pageSize.getWidth() / 2, startY - 20, { align: 'center' });
+                    
+                    try {
+                        await doc.autoTable({
                             html: table,
-                            startY: 60,
+                            startY: startY,
                             theme: 'grid',
                             headStyles: {
                                 fillColor: [29, 233, 182],
@@ -1319,56 +1362,44 @@
                                 valign: 'middle',
                                 overflow: 'linebreak'
                             },
-                            // Specific column styles to prevent column 0 (No.) being removed for PDF output
-                            columnStyles: {
-                                0: { cellWidth: 30, halign: 'center' }
-                            },
-                            didParseCell: function(data) {
-                                // This ensures the first column is always kept as 'No.'
-                                if (data.table.id === 'pasienTable' && data.column.index === 0) {
-                                    data.cell.text = (data.row.index + 1) + ".";
-                                }
-                                if (data.table.id === 'dokterTable' && data.column.index === 0) {
-                                    data.cell.text = (data.row.index + 1) + ".";
-                                }
-                                if (data.table.id === 'transaksiPasienTable' && data.column.index === 0) {
-                                    data.cell.text = (data.row.index + 1) + ".";
-                                }
-                                if (data.table.id === 'pemeriksaanTable' && data.column.index === 0) {
-                                    data.cell.text = (data.row.index + 1) + ".";
-                                }
-                                if (data.table.id === 'obatTable' && data.column.index === 0) {
-                                    data.cell.text = (data.row.index + 1) + ".";
-                                }
-                                if (data.table.id === 'usersTable' && data.column.index === 0) {
-                                    data.cell.text = (data.row.index + 1) + ".";
-                                }
+                            didDrawPage: function(data) {
+                                // Page number
+                                doc.setFontSize(10);
+                                doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.marginLeft, doc.internal.pageSize.height - 20);
                             }
                         });
-                        firstTable = false;
+                        console.log(`Tabel ${sectionTitle} berhasil digambar.`);
+                    } catch (error) {
+                        console.error(`Error saat menggambar tabel ${sectionTitle}:`, error);
+                        // Optionally add an error message to the PDF or alert the user
                     }
-                });
-                doc.save('laporan_keseluruhan.pdf');
+
+
+                    // Update startY for the next table if it's on the same page
+                    // This is less relevant with addPage() for each, but good practice
+                    startY = doc.autoTable.previous.finalY + 20;
+                }
+                doc.save('semua_laporan_data.pdf');
+                console.log("Proses ekspor PDF global selesai. File seharusnya sudah diunduh.");
             });
 
-            // --- Global Excel Export Function ---
-            document.getElementById('export-all-excel-btn').addEventListener('click', function() {
-                const wb = XLSX.utils.book_new();
-                const reports = [
-                    { id: 'pasienTable', name: 'Data Pasien' },
-                    { id: 'dokterTable', name: 'Data Dokter' },
-                    { id: 'transaksiPasienTable', name: 'Transaksi Pasien' },
-                    { id: 'pemeriksaanTable', name: 'Data Pemeriksaan' },
-                    { id: 'obatTable', name: 'Stok Obat' },
-                    { id: 'usersTable', name: 'Pengguna Sistem' }
-                ];
+            // Global Excel Export for All Report Tables
+            document.getElementById('global-export-excel-btn').addEventListener('click', function() {
+                console.log("Mulai proses ekspor Excel global...");
+                const wb = XLSX.utils.book_new(); // Create new workbook
+                const allTables = document.querySelectorAll('.report-table');
 
-                reports.forEach(report => {
-                    const table = document.getElementById(report.id);
-                    if (table) {
-                        const ws = XLSX.utils.table_to_sheet(table);
+                allTables.forEach(table => {
+                    let sheetName = table.closest('.content-section').querySelector('h3').textContent;
+                    // Sanitize sheet name to be valid for Excel (max 31 chars, no invalid chars)
+                    sheetName = sheetName.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 31).trim();
+                    if (!sheetName) sheetName = "Sheet"; // Fallback if name becomes empty
+                    console.log(`Menambahkan sheet Excel: ${sheetName}`);
 
-                        // Remove the "No." column (first column, index 0) for Excel export
+                    const ws = XLSX.utils.table_to_sheet(table);
+
+                    // If it's the PasienTable, remove the "No." column for Excel export
+                    if (table.id === 'pasienTable') {
                         const range = XLSX.utils.decode_range(ws['!ref']);
                         const new_ws = {};
                         for (let R = range.s.r; R <= range.e.r; ++R) {
@@ -1380,14 +1411,17 @@
                                 }
                             }
                         }
-                        // Adjust the range for the new sheet
                         new_ws['!ref'] = XLSX.utils.encode_range({s: {r: range.s.r, c: 0}, e: {r: range.e.r, c: range.e.c - 1}});
-
-                        XLSX.utils.book_append_sheet(wb, new_ws, report.name);
+                        XLSX.utils.book_append_sheet(wb, new_ws, sheetName);
+                    } else {
+                        XLSX.utils.book_append_sheet(wb, ws, sheetName);
                     }
                 });
-                XLSX.writeFile(wb, "laporan_keseluruhan.xlsx");
+
+                XLSX.writeFile(wb, "semua_laporan_data.xlsx");
+                console.log("Proses ekspor Excel global selesai. File seharusnya sudah diunduh.");
             });
+
 
             // Initial display and sidebar setup
             function init() {
@@ -1403,6 +1437,21 @@
                     mainContent.style.marginLeft = 'var(--sidebar-width)'; // Default desktop margin
                 }
             }
+
+            // Event listener for localStorage changes
+            window.addEventListener('storage', (event) => {
+                // Check if the changed item is 'users' or 'transactions'
+                if (event.key === 'users') {
+                    console.log('localStorage "users" changed, updating user report.');
+                    populateUserReport();
+                }
+                if (event.key === 'transactions') {
+                    console.log('localStorage "transactions" changed, updating transaction report and charts.');
+                    populateTransactionReport(); // This also calls updateTransactionCharts()
+                }
+                // Add other keys if other reports also need real-time updates
+            });
+
 
             // Run initialization
             init();
