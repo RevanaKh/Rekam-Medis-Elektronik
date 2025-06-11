@@ -935,11 +935,21 @@
 
             // --- Laporan Logic ---
 
-
             const today = new Date();
             const currentMonth = today.getMonth();
             const currentYear = today.getFullYear();
 
+            // Fungsi untuk memformat tanggal ke DD,MM,YY
+            function formatDateToDDMMYY(dateString) {
+                const date = new Date(dateString);
+                if (isNaN(date)) {
+                    return 'Invalid Date'; // Tangani string tanggal yang tidak valid
+                }
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
+                const year = String(date.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
+                return `${day},${month},${year}`;
+            }
          
             // Populate Functions
             function populatePatientReport() {
@@ -1035,7 +1045,9 @@
                     totalRevenue += transaction.totalBiaya;
                     const row = tableBody.insertRow();
                     row.insertCell().textContent = index + 1 + ".";
-                    row.insertCell().textContent = transaction.id;
+                    // Memformat ID transaksi berdasarkan tanggal
+                    const formattedTxId = `TRX-${formatDateToDDMMYY(transaction.tanggal)}`;
+                    row.insertCell().textContent = formattedTxId; // Menampilkan ID yang baru diformat
                     row.insertCell().textContent = transaction.tanggal;
                     row.insertCell().textContent = transaction.namaPasien;
                     row.insertCell().textContent = transaction.jenisLayanan;
