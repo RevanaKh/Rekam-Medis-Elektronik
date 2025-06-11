@@ -855,6 +855,10 @@
                     <span>Apoteker Terdaftar:</span>
                     <span id="apoteker-count"></span>
                 </div>
+                <div class="report-item">
+                    <span>Pasien Terdaftar:</span>
+                    <span id="pasien-count"></span>
+                </div>
             </div>
             <div class="report-table-container">
                 <table id="usersTable" class="report-table">
@@ -1181,6 +1185,7 @@
                 const adminCountSpan = document.getElementById('admin-count');
                 const dokterCountSpan = document.getElementById('dokter-count');
                 const apotekerCountSpan = document.getElementById('apoteker-count');
+                const apotekerCountSpan = document.getElementById('pasien-count');
 
                 tableBody.innerHTML = '';
                 let adminCount = 0;
