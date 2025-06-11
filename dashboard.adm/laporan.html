@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Removed html2canvas.min.js as it's not used for autoTable PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script> <!-- D3.js for charting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -457,7 +457,7 @@
         }
 
         /* Report Buttons specific styles */
-        .report-buttons-container {
+        .report-buttons-container { /* This was for individual buttons, now for global buttons */
             margin-bottom: 20px; /* Add margin below buttons */
             display: flex;
             gap: 15px;
@@ -465,39 +465,24 @@
             justify-content: flex-start;
         }
 
-        .report-button {
-            color: var(--white);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            box-shadow: var(--shadow);
+        /* Updated styles for global buttons */
+        #global-export-pdf-btn {
+            background-color: var(--report-pdf-bg); /* Red */
         }
-
-        #export-pdf-btn { /* This rule is now for global buttons only */
-            background-color: var(--report-pdf-bg);
-        }
-
-        #export-pdf-btn:hover {
+        #global-export-pdf-btn:hover {
             background-color: #C0392B;
             transform: translateY(-2px);
         }
-
-        #export-excel-btn { /* This rule is now for global buttons only */
-            background-color: var(--report-excel-bg);
+        #global-export-excel-btn {
+            background-color: var(--report-excel-bg); /* Green */
         }
-        #export-excel-btn:hover {
+        #global-export-excel-btn:hover {
             background-color: #229954;
             transform: translateY(-2px);
         }
 
-        /* Consolidated buttons styling */
+
+        /* Consolidated buttons styling (using .report-buttons-container for layout) */
         .consolidated-buttons {
             width: 100%;
             max-width: 1200px;
@@ -1002,7 +987,7 @@
                 const day = String(date.getDate()).padStart(2, '0');
                 const month = String(date.getMonth() + 1).padStart(2, '0'); // Bulan dimulai dari 0
                 const year = String(date.getFullYear()).slice(-2); // Ambil dua digit terakhir tahun
-                return `${day}-${month}-${year}`;
+                return `${day},${month},${year}`;
             }
          
             // Populate Functions
@@ -1338,6 +1323,7 @@
 
             // Global PDF Export for All Report Tables
             document.getElementById('global-export-pdf-btn').addEventListener('click', async function() {
+                console.log("Mulai proses ekspor PDF global...");
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'pt', 'letter');
                 
@@ -1347,6 +1333,7 @@
                 for (let i = 0; i < allTables.length; i++) {
                     const table = allTables[i];
                     const sectionTitle = table.closest('.content-section').querySelector('h3').textContent;
+                    console.log(`Menggambar tabel: ${sectionTitle}`);
 
                     // Add a new page if it's not the first table
                     if (i > 0) {
@@ -1358,38 +1345,47 @@
                     doc.setFontSize(14);
                     doc.text(sectionTitle, doc.internal.pageSize.getWidth() / 2, startY - 20, { align: 'center' });
                     
-                    await doc.autoTable({
-                        html: table,
-                        startY: startY,
-                        theme: 'grid',
-                        headStyles: {
-                            fillColor: [29, 233, 182],
-                            textColor: [255, 255, 255],
-                            fontStyle: 'bold',
-                            halign: 'center'
-                        },
-                        styles: {
-                            fontSize: 8,
-                            cellPadding: 8,
-                            valign: 'middle',
-                            overflow: 'linebreak'
-                        },
-                        didDrawPage: function(data) {
-                            // Page number
-                            doc.setFontSize(10);
-                            doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.marginLeft, doc.internal.pageSize.height - 20);
-                        }
-                    });
+                    try {
+                        await doc.autoTable({
+                            html: table,
+                            startY: startY,
+                            theme: 'grid',
+                            headStyles: {
+                                fillColor: [29, 233, 182],
+                                textColor: [255, 255, 255],
+                                fontStyle: 'bold',
+                                halign: 'center'
+                            },
+                            styles: {
+                                fontSize: 8,
+                                cellPadding: 8,
+                                valign: 'middle',
+                                overflow: 'linebreak'
+                            },
+                            didDrawPage: function(data) {
+                                // Page number
+                                doc.setFontSize(10);
+                                doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.marginLeft, doc.internal.pageSize.height - 20);
+                            }
+                        });
+                        console.log(`Tabel ${sectionTitle} berhasil digambar.`);
+                    } catch (error) {
+                        console.error(`Error saat menggambar tabel ${sectionTitle}:`, error);
+                        // Optionally add an error message to the PDF or alert the user
+                    }
+
 
                     // Update startY for the next table if it's on the same page
                     // This is less relevant with addPage() for each, but good practice
                     startY = doc.autoTable.previous.finalY + 20;
                 }
                 doc.save('semua_laporan_data.pdf');
+                console.log("Proses ekspor PDF global selesai. File seharusnya sudah diunduh.");
             });
 
             // Global Excel Export for All Report Tables
             document.getElementById('global-export-excel-btn').addEventListener('click', function() {
+                console.log("Mulai proses ekspor Excel global...");
                 const wb = XLSX.utils.book_new(); // Create new workbook
                 const allTables = document.querySelectorAll('.report-table');
 
@@ -1398,6 +1394,7 @@
                     // Sanitize sheet name to be valid for Excel (max 31 chars, no invalid chars)
                     sheetName = sheetName.replace(/[^a-zA-Z0-9 ]/g, '').substring(0, 31).trim();
                     if (!sheetName) sheetName = "Sheet"; // Fallback if name becomes empty
+                    console.log(`Menambahkan sheet Excel: ${sheetName}`);
 
                     const ws = XLSX.utils.table_to_sheet(table);
 
@@ -1422,6 +1419,7 @@
                 });
 
                 XLSX.writeFile(wb, "semua_laporan_data.xlsx");
+                console.log("Proses ekspor Excel global selesai. File seharusnya sudah diunduh.");
             });
 
 
