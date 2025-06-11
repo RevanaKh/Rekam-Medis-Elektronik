@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Tambah Akun</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Variabel CSS (dari dashboard_adm.html untuk konsistensi) */
@@ -23,7 +26,7 @@
 
             /* Warna baru untuk tombol laporan sesuai gambar */
             --report-pdf-bg: #E74C3C; /* Merah untuk PDF */
-            --report-print-bg: #3498DB; /* Biru untuk Cetak */
+            --report-excel-bg: #27AE60; /* Hijau untuk Excel */
         }
 
         * {
@@ -373,7 +376,7 @@
             color: var(--text-color);
             font-weight: bold;
         }
-        input[type="text"],input[type="nama"], input[type="password"], input[type="email"], select {
+        input[type="text"], input[type="password"], input[type="email"], select {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border-color);
@@ -394,6 +397,9 @@
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s ease;
+            display: flex; /* Make buttons flex for icon + text */
+            align-items: center; /* Center icon and text */
+            gap: 8px; /* Space between icon and text */
         }
         .btn-primary {
             background-color: var(--primary-color);
@@ -542,6 +548,22 @@
 
         .btn-add:hover {
             background-color: var(--primary-dark);
+        }
+
+        /* New styles for export buttons */
+        .btn-export-pdf {
+            background-color: var(--report-pdf-bg); /* Red */
+            color: var(--white);
+        }
+        .btn-export-pdf:hover {
+            background-color: #C0392B;
+        }
+        .btn-export-excel {
+            background-color: var(--report-excel-bg); /* Green */
+            color: var(--white);
+        }
+        .btn-export-excel:hover {
+            background-color: #229954;
         }
 
         /* Responsive adjustments */
@@ -739,6 +761,12 @@
                     <button class="btn btn-add" id="toggleFormBtn">
                         <i class="fas fa-plus"></i> Tambah Akun Baru
                     </button>
+                    <button class="btn btn-export-pdf" id="export-pdf-accounts-btn">
+                        <i class="fas fa-file-pdf"></i> Unduh PDF
+                    </button>
+                    <button class="btn btn-export-excel" id="export-excel-accounts-btn">
+                        <i class="fas fa-file-excel"></i> Unduh Excel
+                    </button>
                 </div>
             </div>
 
@@ -877,7 +905,7 @@
 
             // Form input fields
             const userIdInput = document.getElementById('userId');
-            const namaInput = document.getElementById('nama'); // Corrected variable name
+            const namaInput = document.getElementById('nama');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
             const roleInput = document.getElementById('role');
@@ -892,14 +920,7 @@
             const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
             const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
-            // Load accounts from localStorage, or use dummy data if none exists
-            let accounts = JSON.parse(localStorage.getItem('accounts')) || [
-                { id: 'ADM-ACC-001', nama: 'Admin Utama', email: 'admin@example.com', password: 'adminpassword', role: 'Admin' },
-                { id: 'DKT-ACC-001', nama: 'Dr. Budi Santoso', email: 'budi.santoso@example.com', password: 'dokterpassword', role: 'Dokter' },
-                { id: 'APT-ACC-001', nama: 'Apoteker Siti', email: 'siti.apoteker@example.com', password: 'apotekerpassword', role: 'Apoteker' },
-                { id: 'PSN-ACC-001', nama: 'Pendaftaran Ayu', email: 'ayu.daftar@example.com', password: 'daftarpassword', role: 'Pendaftaran' }
-            ];
-
+           
             // PENTING: Pastikan data awal disimpan ke localStorage jika belum ada
             if (localStorage.getItem('accounts') === null || JSON.parse(localStorage.getItem('accounts')).length === 0) {
                 localStorage.setItem('accounts', JSON.stringify(accounts));
@@ -1058,6 +1079,46 @@
                 }, 3000); // Hide alert after 3 seconds
             }
 
+            // PDF Export Function for Accounts Table
+            function exportAccountsToPdf() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'letter');
+                const table = document.getElementById('accountTable');
+
+                doc.autoTable({
+                    html: table,
+                    startY: 60,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [29, 233, 182],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 8,
+                        valign: 'middle',
+                        overflow: 'linebreak'
+                    },
+                    didDrawPage: function(data) {
+                        doc.text("Laporan Akun Pengguna", data.settings.marginLeft, 40);
+                    }
+                });
+                doc.save('laporan_akun_pengguna.pdf');
+                showAlert(successAlert, 'Laporan PDF akun berhasil diunduh!');
+            }
+
+            // Excel Export Function for Accounts Table
+            function exportAccountsToExcel() {
+                const table = document.getElementById('accountTable');
+                const ws = XLSX.utils.table_to_sheet(table);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Akun Pengguna");
+                XLSX.writeFile(wb, "laporan_akun_pengguna.xlsx");
+                showAlert(successAlert, 'Laporan Excel akun berhasil diunduh!');
+            }
+
             // Event Listeners
             toggleFormBtn.addEventListener('click', function() {
                 if (accountFormContainer.style.display === 'none' || accountFormContainer.style.display === '') {
@@ -1074,6 +1135,10 @@
             confirmDeleteBtn.addEventListener('click', deleteAccount);
 
             searchFilterInput.addEventListener('keyup', () => displayAccounts(searchFilterInput.value));
+
+            // Add event listeners for new export buttons
+            document.getElementById('export-pdf-accounts-btn').addEventListener('click', exportAccountsToPdf);
+            document.getElementById('export-excel-accounts-btn').addEventListener('click', exportAccountsToExcel);
 
             // Close delete modal when clicking outside
             window.addEventListener('click', function(event) {
